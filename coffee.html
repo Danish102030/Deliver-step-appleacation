@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#d97706"/>
+  <title>كوفي وحلويات - خطوة التوصيل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--amber:#d97706;--amber-dark:#b45309;--amber-light:#fef3c7;--amber-soft:#fffbeb;--rose:#be185d;--text:#1f1f1f;--muted:#6b7280;--border:#fde68a;--bg:#fffdf5;--white:#fff;--green:#16a34a}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:90px;direction:rtl}
+    .topbar{background:var(--amber);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(217,119,6,0.3)}
+    .btn-back{background:rgba(255,255,255,0.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+    .topbar-title{font-size:16px;font-weight:700;color:#fff;flex:1}
+    .cart-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;position:relative;flex-shrink:0}
+    .cart-dot{position:absolute;top:-4px;left:-4px;width:16px;height:16px;background:#fff;color:var(--amber);border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .search-wrap{background:var(--amber-dark);padding:0 16px 12px}
+    .search-box{background:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px}
+    .search-box input{border:none;outline:none;font-size:13px;color:var(--text);width:100%;font-family:'Tajawal',sans-serif;background:transparent;direction:rtl}
+    .hero{background:var(--amber);padding:16px}
+    .hero-inner{background:var(--amber-dark);border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
+    .hero-tag{background:rgba(255,255,255,0.2);color:#fef3c7;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-block;margin-bottom:8px}
+    .hero-title{font-size:18px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:5px}
+    .hero-sub{font-size:11px;color:#fef3c7;margin-bottom:12px}
+    .hero-btn{background:#fff;color:var(--amber);border:none;border-radius:9px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif}
+    .hero-visual{width:78px;height:78px;background:rgba(255,255,255,0.12);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0}
+    .filter-row{background:#fff;padding:10px 16px;display:flex;gap:8px;overflow-x:auto;border-bottom:0.5px solid var(--border)}
+    .filter-row::-webkit-scrollbar{display:none}
+    .fpill{background:var(--bg);border:0.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;font-family:'Tajawal',sans-serif}
+    .fpill.act{background:var(--amber);color:#fff;border-color:var(--amber)}
+    .feat-scroll{display:flex;gap:12px;overflow-x:auto;padding:14px 16px;border-bottom:0.5px solid var(--border)}
+    .feat-scroll::-webkit-scrollbar{display:none}
+    .feat-card{flex-shrink:0;width:190px;background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;border:0.5px solid var(--border)}
+    .feat-img{height:95px;position:relative;overflow:hidden}
+    .feat-img img{width:100%;height:100%;object-fit:cover}
+    .feat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.5),transparent)}
+    .feat-badge{position:absolute;top:8px;right:8px;font-size:9px;padding:3px 8px;border-radius:20px;font-weight:700;background:var(--amber);color:#fff}
+    .feat-info{padding:10px}
+    .feat-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px}
+    .feat-meta{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+    .sec-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px}
+    .sec-title{font-size:15px;font-weight:700;color:var(--text)}
+    .sec-sub{font-size:12px;color:var(--muted)}
+    .drinks-scroll{display:flex;gap:10px;overflow-x:auto;padding:0 16px 16px}
+    .drinks-scroll::-webkit-scrollbar{display:none}
+    .drink-card{flex-shrink:0;width:110px;background:#fff;border-radius:14px;overflow:hidden;cursor:pointer;border:0.5px solid var(--border);text-align:center}
+    .drink-img{height:80px;overflow:hidden}
+    .drink-img img{width:100%;height:100%;object-fit:cover}
+    .drink-name{font-size:11px;font-weight:700;padding:6px 6px 4px;color:var(--text)}
+    .drink-price{font-size:12px;font-weight:700;color:var(--amber-dark);padding-bottom:8px}
+    .coffee-list{padding:0 16px;display:flex;flex-direction:column;gap:12px}
+    .coffee-card{background:#fff;border:0.5px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:transform 0.15s}
+    .coffee-card:active{transform:scale(0.98)}
+    .coffee-banner{height:130px;position:relative;overflow:hidden}
+    .coffee-banner img{width:100%;height:100%;object-fit:cover}
+    .coffee-banner-bg{width:100%;height:100%;background:linear-gradient(135deg,#b45309,#d97706);display:flex;align-items:center;justify-content:center;font-size:64px}
+    .coffee-banner-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.6),transparent)}
+    .coffee-logo{position:absolute;bottom:-18px;right:14px;width:44px;height:44px;background:#fff;border-radius:10px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+    .coffee-logo img{width:100%;height:100%;object-fit:cover}
+    .coffee-status{position:absolute;top:10px;left:10px;font-size:9px;padding:3px 8px;border-radius:20px;font-weight:700}
+    .st-open{background:#dcfce7;color:#15803d}
+    .st-closed{background:#fee2e2;color:#dc2626}
+    .coffee-info{padding:26px 14px 14px}
+    .coffee-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+    .coffee-tags{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+    .coffee-star{display:flex;align-items:center;gap:2px;font-size:10px;color:#f59e0b;font-weight:500}
+    .coffee-tag{font-size:10px;color:var(--muted)}
+    .coffee-footer{display:flex;align-items:center;justify-content:space-between}
+    .coffee-time{background:#fffbeb;color:var(--amber);font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;border:0.5px solid var(--amber-light)}
+    .coffee-free{font-size:10px;color:var(--green);font-weight:700}
+    .coffee-min{font-size:10px;color:var(--muted)}
+    .glass-nav-wrap{position:fixed;bottom:0;right:50%;transform:translateX(50%);width:100%;max-width:480px;padding:8px 16px 12px;background:linear-gradient(to top,rgba(255,253,245,1) 60%,rgba(255,253,245,0));pointer-events:none;z-index:200}
+    .glass-nav{background:rgba(255,255,255,0.82);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:0.5px solid rgba(255,255,255,0.95);border-radius:26px;padding:8px 6px;display:grid;grid-template-columns:repeat(4,1fr);box-shadow:0 4px 28px rgba(0,0,0,0.09);pointer-events:all}
+    .gnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 4px;border-radius:20px;position:relative;overflow:hidden}
+    .gnav-icon{font-size:22px;color:var(--muted)}
+    .gnav-icon.act{color:var(--amber)}
+    .gnav-label{font-size:10px;color:var(--muted);font-weight:700}
+    .gnav-label.act{color:var(--amber)}
+    .gnav-dot{width:4px;height:4px;background:var(--amber);border-radius:50%;margin:0 auto;opacity:0}
+    .gnav-dot.act{opacity:1}
+    .skel{background:linear-gradient(90deg,#fef3c7 25%,#fffbeb 50%,#fef3c7 75%);background-size:200% 100%;animation:shim 1.5s infinite;border-radius:14px}
+    @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .empty{text-align:center;padding:3rem;color:var(--muted)}
+    .empty i{font-size:48px;opacity:0.3;display:block;margin-bottom:1rem}
+    .toast{position:fixed;bottom:100px;right:50%;transform:translateX(50%);background:#1f1f1f;color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <button class="btn-back" onclick="window.location.href='/'" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+  <div class="topbar-title">كوفي وحلويات · قبة</div>
+  <div style="position:relative">
+    <button class="cart-btn" onclick="window.location.href='/pages/cart.html'" aria-label="السلة">
+      <i class="ti ti-shopping-cart"></i>
+      <div class="cart-dot" id="cart-count">٠</div>
+    </button>
+  </div>
+</div>
+<div class="search-wrap">
+  <div class="search-box">
+    <i class="ti ti-search" style="font-size:16px;color:var(--amber)" aria-hidden="true"></i>
+    <input type="text" id="search-input" placeholder="ابحث عن كافيه أو حلويات..." oninput="filterShops()"/>
+  </div>
+</div>
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-tag">☕ كوفي وحلويات · قبة</div>
+      <div class="hero-title">أفضل الكافيهات<br>تصلك بسرعة</div>
+      <div class="hero-sub">١٠ كافيهات · ١٥-٣٠ دقيقة توصيل</div>
+      <button class="hero-btn">اطلب الآن</button>
+    </div>
+    <div class="hero-visual"><i class="ti ti-coffee" style="color:#fef3c7;font-size:40px" aria-hidden="true"></i></div>
+  </div>
+</div>
+<div class="filter-row">
+  <div class="fpill act" onclick="setFilter('all',this)">الكل</div>
+  <div class="fpill" onclick="setFilter('coffee',this)">☕ قهوة</div>
+  <div class="fpill" onclick="setFilter('dessert',this)">🍰 حلويات</div>
+  <div class="fpill" onclick="setFilter('juice',this)">🥤 عصائر</div>
+  <div class="fpill" onclick="setFilter('bakery',this)">🥐 مخبوزات</div>
+  <div class="fpill" onclick="setFilter('icecream',this)">🍦 آيس كريم</div>
+</div>
+<div class="feat-scroll" id="featured-scroll"></div>
+<div class="sec-head">
+  <div class="sec-title">مشروبات شعبية</div>
+  <div class="sec-sub" style="color:var(--amber);cursor:pointer">عرض الكل</div>
+</div>
+<div class="drinks-scroll">
+  <div class="drink-card"><div class="drink-img"><img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=200&q=80" alt="كابتشينو" loading="lazy"/></div><div class="drink-name">كابتشينو</div><div class="drink-price">١٨ ريال</div></div>
+  <div class="drink-card"><div class="drink-img"><img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&q=80" alt="آيس لاتيه" loading="lazy"/></div><div class="drink-name">آيس لاتيه</div><div class="drink-price">٢٠ ريال</div></div>
+  <div class="drink-card"><div class="drink-img"><img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=200&q=80" alt="كيك شوكولاتة" loading="lazy"/></div><div class="drink-name">كيك شوكولاتة</div><div class="drink-price">٢٥ ريال</div></div>
+  <div class="drink-card"><div class="drink-img"><img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&q=80" alt="قهوة عربية" loading="lazy"/></div><div class="drink-name">قهوة عربية</div><div class="drink-price">١٢ ريال</div></div>
+  <div class="drink-card"><div class="drink-img"><img src="https://images.unsplash.com/photo-1523677011781-ac91d1ded9b4?w=200&q=80" alt="ليمون" loading="lazy"/></div><div class="drink-name">ليمون</div><div class="drink-price">١٥ ريال</div></div>
+</div>
+<div class="sec-head">
+  <div class="sec-title">الكافيهات والمحلات</div>
+  <div class="sec-sub" id="shop-count">قبة · الرياض</div>
+</div>
+<div class="coffee-list" id="coffee-list">
+  <div class="skel" style="height:200px"></div>
+  <div class="skel" style="height:200px"></div>
+</div>
+<div class="glass-nav-wrap">
+  <nav class="glass-nav">
+    <div class="gnav-item" onclick="window.location.href='/'">
+      <i class="ti ti-home gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">الرئيسية</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item" >
+      <i class="ti ti-tools-kitchen-2 gnav-icon act" aria-hidden="true"></i>
+      <span class="gnav-label act">المطاعم</span>
+      <div class="gnav-dot act"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/pages/supermarket.html'">
+      <i class="ti ti-building-store gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">سوبرماركت</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/pages/account.html'">
+      <i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">حسابي</span>
+      <div class="gnav-dot"></div>
+    </div>
+  </nav>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const COFFEE_CATS=['coffee','dessert','juice','bakery','icecream'];
+const catIcons={coffee:'☕',dessert:'🍰',juice:'🥤',bakery:'🥐',icecream:'🍦'};
+let allShops=[],currentFilter='all',currentSearch='';
+async function loadShops(){
+  try{
+    const{data}=await sb.from('restaurants').select('*').in('category',COFFEE_CATS).eq('is_active',true).order('sort_order');
+    allShops=data||[];
+  }catch(e){allShops=[];}
+  renderFeatured();renderShops();
+}
+function updateCartCount(){
+  const cart=JSON.parse(localStorage.getItem('qibah_cart')||'[]');
+  document.getElementById('cart-count').textContent=cart.reduce((s,i)=>s+i.qty,0)||'٠';
+}
+function renderFeatured(){
+  const list=allShops.filter(s=>s.is_open).slice(0,4);
+  if(!list.length){document.getElementById('featured-scroll').innerHTML='';return;}
+  document.getElementById('featured-scroll').innerHTML=list.map(s=>`
+    <div class="feat-card" onclick="window.location.href='/pages/menu.html?id=${s.id}'">
+      <div class="feat-img">
+        ${s.banner_url?`<img src="${s.banner_url}" alt="${s.name}" loading="lazy"/>`:`<div style="width:100%;height:100%;background:linear-gradient(135deg,#b45309,#d97706);display:flex;align-items:center;justify-content:center;font-size:48px">${catIcons[s.category]||'☕'}</div>`}
+        <div class="feat-overlay"></div>
+        <div class="feat-badge">مميز</div>
+      </div>
+      <div class="feat-info">
+        <div class="feat-name">${s.name}</div>
+        <div class="feat-meta">
+          <span style="color:#f59e0b;font-weight:500;display:flex;align-items:center;gap:2px"><i class="ti ti-star" style="font-size:11px"></i> ${s.rating||'5.0'}</span>
+          <span>· ${s.delivery_time||'20-30'} دقيقة</span>
+          <span style="color:var(--green)">· ${Number(s.delivery_fee)===0?'مجاني':'SAR '+s.delivery_fee}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function setFilter(f,el){currentFilter=f;document.querySelectorAll('.fpill').forEach(p=>p.classList.remove('act'));el.classList.add('act');renderShops();}
+function filterShops(){currentSearch=document.getElementById('search-input').value.toLowerCase();renderShops();}
+function renderShops(){
+  let list=[...allShops];
+  if(currentFilter!=='all')list=list.filter(s=>s.category===currentFilter);
+  if(currentSearch)list=list.filter(s=>s.name.toLowerCase().includes(currentSearch)||(s.name_ar||'').includes(currentSearch));
+  document.getElementById('shop-count').textContent=list.length+' محل · قبة';
+  if(!list.length){document.getElementById('coffee-list').innerHTML='<div class="empty"><i class="ti ti-coffee"></i>لا توجد محلات حالياً</div>';return;}
+  document.getElementById('coffee-list').innerHTML=list.map(s=>`
+    <div class="coffee-card" onclick="window.location.href='/pages/menu.html?id=${s.id}'">
+      <div class="coffee-banner">
+        ${s.banner_url?`<img src="${s.banner_url}" alt="${s.name}" loading="lazy"/>`:`<div class="coffee-banner-bg">${catIcons[s.category]||'☕'}</div>`}
+        <div class="coffee-banner-overlay"></div>
+        <div class="coffee-logo">${s.logo_url?`<img src="${s.logo_url}" alt="${s.name}"/>`:`<span style="font-size:20px">${catIcons[s.category]||'☕'}</span>`}</div>
+        <div class="coffee-status ${s.is_open?'st-open':'st-closed'}">${s.is_open?'● مفتوح':'● مغلق'}</div>
+      </div>
+      <div class="coffee-info">
+        <div class="coffee-name">${s.name} ${s.name_ar?'· '+s.name_ar:''}</div>
+        <div class="coffee-tags">
+          <span class="coffee-star"><i class="ti ti-star" style="font-size:11px"></i> ${s.rating||'5.0'}</span>
+          <span class="coffee-tag">· ${catIcons[s.category]||''} ${s.category}</span>
+        </div>
+        <div class="coffee-footer">
+          <div class="coffee-time"><i class="ti ti-clock" style="font-size:11px"></i>${s.is_open?(s.delivery_time||'20-30')+' دقيقة':'مغلق الآن'}</div>
+          <div style="text-align:right">
+            <div class="${Number(s.delivery_fee)===0?'coffee-free':''}" style="${Number(s.delivery_fee)>0?'font-size:10px;color:var(--amber);font-weight:700':''}">
+              ${Number(s.delivery_fee)===0?'توصيل مجاني':'SAR '+s.delivery_fee}
+            </div>
+            <div class="coffee-min">حد أدنى SAR ${s.min_order||20}</div>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+window.addEventListener('load',()=>{updateCartCount();loadShops();});
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+  <meta name="theme-color" content="#16a34a"/>
+  <title>تم تأكيد الطلب - خطوة التوصيل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <style>
+    :root{--rose:#be185d;--green:#16a34a;--text:#1f1f1f;--muted:#6b7280;--border:#e5e7eb;--bg:#f9fafb}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;direction:rtl;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+    .circle{width:90px;height:90px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:pop .4s ease}
+    @keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+    .title{font-size:22px;font-weight:700;color:var(--green);text-align:center;margin-bottom:8px}
+    .sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:6px}
+    .order-num{font-size:18px;font-weight:700;color:var(--text);text-align:center;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 24px;margin:16px auto;display:inline-block}
+    .wa-section{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;width:100%;margin-top:16px;text-align:center}
+    .wa-title{font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text)}
+    .wa-btn{width:100%;background:#25d366;color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;transition:background .2s}
+    .wa-btn:active{background:#128c7e}
+    .wa-btn-vendor{background:#075e54}
+    .wa-btn-vendor:active{background:#054c44}
+    .wa-sent{background:#f0fdf4;color:#15803d;border:none;border-radius:12px;padding:14px;font-size:13px;font-family:'Tajawal',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;width:100%}
+    .track-btn{width:100%;background:var(--rose);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
+    .home-btn{width:100%;background:#fff;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+    .notice{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px;font-size:12px;color:#92400e;text-align:right;margin-top:12px;line-height:1.8;width:100%}
+  </style>
+</head>
+<body>
+  <div class="circle"><i class="ti ti-check" style="font-size:44px;color:var(--green)"></i></div>
+  <div class="title">تم تأكيد طلبك! 🎉</div>
+  <div class="sub">شكراً لك! طلبك قيد التنفيذ الآن</div>
+  <div class="order-num" id="order-num">DS-XXXX</div>
+
+  <div class="wa-section">
+    <div class="wa-title">📲 إرسال تفاصيل الطلب</div>
+    <div id="wa-buttons"></div>
+  </div>
+
+  <div class="notice">
+    <i class="ti ti-clock" style="font-size:14px;vertical-align:-2px;margin-left:4px"></i>
+    <strong>وقت التوصيل المتوقع: ٢٠-٤٠ دقيقة</strong><br/>
+    سيتواصل معك السائق قريباً على رقم هاتفك
+  </div>
+
+  <button class="track-btn" onclick="window.location.href='/pages/order-tracking.html'">
+    <i class="ti ti-map-pin" style="font-size:18px"></i>
+    تتبع طلبي
+  </button>
+  <button class="home-btn" onclick="window.location.href='/'">
+    <i class="ti ti-home" style="font-size:16px"></i>
+    العودة للرئيسية
+  </button>
+
+<script>
+window.addEventListener('load', () => {
+  const orderNum    = localStorage.getItem('qibah_last_order_num') || 'DS-XXXX';
+  const ownerWa     = localStorage.getItem('qibah_owner_wa_msg');
+  const vendorWa    = localStorage.getItem('qibah_vendor_wa_msg');
+  const vendorName  = localStorage.getItem('qibah_vendor_name') || 'خطوة التوصيل';
+  const isSupermarket = localStorage.getItem('qibah_is_supermarket') === 'yes';
+
+  // Fix old QIB- order numbers to DS-
+  const displayNum = orderNum.replace('QIB-', 'DS-');
+  document.getElementById('order-num').textContent = '#' + displayNum;
+
+  const btns = document.getElementById('wa-buttons');
+  let html = '';
+
+  if(isSupermarket){
+    // Supermarket → ONE button to owner only
+    html +=
+      `<div style="font-size:12px;color:var(--muted);margin-bottom:10px;text-align:center">
+        اضغط لإرسال طلب السوبرماركت
+      </div>
+      <button class="wa-btn" onclick="sendWA('vendor')">
+        <i class="ti ti-brand-whatsapp" style="font-size:20px"></i>
+        أرسل الطلب لـ خطوة التوصيل 🛒
+      </button>`;
+  } else {
+    // Restaurant → TWO buttons
+    html +=
+      `<div style="font-size:12px;color:var(--muted);margin-bottom:10px;text-align:center">
+        اضغط على الزرين بالترتيب لإرسال الطلب
+      </div>`;
+    if(ownerWa){
+      html +=
+        `<button class="wa-btn" onclick="sendWA('owner')">
+          <i class="ti ti-brand-whatsapp" style="font-size:20px"></i>
+          ١. أرسل لـ خطوة التوصيل
+        </button>`;
+    }
+    if(vendorWa){
+      html +=
+        `<button class="wa-btn wa-btn-vendor" onclick="sendWA('vendor')">
+          <i class="ti ti-brand-whatsapp" style="font-size:20px"></i>
+          ٢. أرسل لـ ${vendorName}
+        </button>`;
+    }
+  }
+
+  btns.innerHTML = html;
+});
+
+function sendWA(type){
+  const key = type === 'owner' ? 'qibah_owner_wa_msg' : 'qibah_vendor_wa_msg';
+  const url  = localStorage.getItem(key);
+  if(!url) return;
+
+  window.open(url, '_blank');
+
+  // Replace button with success message
+  const btn = event.currentTarget;
+  btn.outerHTML =
+    `<div class="wa-sent">
+      <i class="ti ti-check-circle" style="font-size:18px"></i>
+      ✅ تم الإرسال بنجاح
+    </div>`;
+
+  localStorage.removeItem(key);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#be185d"/>
+  <title>القائمة - خطوة التوصيل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f1f1f;--muted:#6b7280;--border:#f0e4e9;--bg:#f9f9f9;--white:#fff;--green:#16a34a;--amber:#d97706}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:100px;direction:rtl}
+    .rest-header{position:relative;height:200px}
+    .rest-header img{width:100%;height:100%;object-fit:cover}
+    .header-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.75),rgba(0,0,0,0.1))}
+    .header-btns{position:absolute;top:12px;right:12px;left:12px;display:flex;justify-content:space-between}
+    .hbtn{background:rgba(255,255,255,0.2);border:none;color:#fff;width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;backdrop-filter:blur(10px)}
+    .cart-badge-wrap{position:relative}
+    .hcart-dot{position:absolute;top:-4px;left:-4px;width:16px;height:16px;background:var(--rose);border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#fff}
+    .header-info{position:absolute;bottom:0;left:0;right:0;padding:16px;display:flex;align-items:flex-end;gap:12px}
+    .rest-logo{width:54px;height:54px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid #fff;flex-shrink:0;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.2)}
+    .rest-logo img{width:100%;height:100%;object-fit:cover}
+    .rest-header-title{color:#fff;font-size:17px;font-weight:700;margin-bottom:2px}
+    .rest-header-sub{font-size:11px;color:rgba(255,255,255,0.8)}
+    .info-strip{background:#fff;padding:10px 16px;display:flex;align-items:center;gap:16px;border-bottom:0.5px solid var(--border);overflow-x:auto}
+    .info-strip::-webkit-scrollbar{display:none}
+    .info-item{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);flex-shrink:0}
+    .info-item i{font-size:14px;color:var(--rose)}
+    .info-val{font-weight:700;color:var(--text)}
+    .cat-tabs{background:#fff;border-bottom:0.5px solid var(--border);display:flex;overflow-x:auto;position:sticky;top:0;z-index:10}
+    .cat-tabs::-webkit-scrollbar{display:none}
+    .cat-tab{padding:10px 16px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;flex-shrink:0;transition:all 0.2s;font-family:'Tajawal',sans-serif}
+    .cat-tab.act{color:var(--rose);border-bottom-color:var(--rose)}
+    .menu-section{padding:14px 16px 4px}
+    .menu-sec-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .menu-sec-title::after{content:'';flex:1;height:1px;background:var(--border);margin-right:8px}
+    .menu-item{background:#fff;border:0.5px solid var(--border);border-radius:14px;padding:12px;display:flex;gap:12px;margin-bottom:10px;cursor:pointer;transition:border-color 0.2s}
+    .menu-item:active{border-color:var(--rose)}
+    .menu-item-img{width:84px;height:84px;border-radius:10px;object-fit:cover;flex-shrink:0}
+    .menu-item-img-fallback{width:84px;height:84px;border-radius:10px;background:var(--rose-soft);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0}
+    .menu-item-info{flex:1;display:flex;flex-direction:column;justify-content:space-between}
+    .item-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+    .item-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px}
+    .item-footer{display:flex;align-items:center;justify-content:space-between}
+    .item-price{font-size:15px;font-weight:700;color:var(--rose-dark)}
+    .add-btn{width:30px;height:30px;background:var(--rose);color:#fff;border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+    .add-btn:active{background:var(--rose-dark)}
+    .qty-ctrl{display:flex;align-items:center;gap:6px}
+    .qty-btn{width:28px;height:28px;border-radius:7px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+    .qty-m{background:var(--rose-light);color:var(--rose)}
+    .qty-p{background:var(--rose);color:#fff}
+    .qty-n{font-size:13px;font-weight:700;min-width:20px;text-align:center}
+    .out-stock-badge{background:#fee2e2;color:#dc2626;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700}
+    .cart-bar{position:fixed;bottom:16px;right:50%;transform:translateX(50%);width:calc(100% - 32px);max-width:448px;background:var(--rose);border-radius:16px;padding:14px 16px;display:none;align-items:center;justify-content:space-between;cursor:pointer;box-shadow:0 8px 24px rgba(190,24,93,0.4);z-index:100}
+    .cart-bar.show{display:flex}
+    .cart-count-pill{background:rgba(255,255,255,0.25);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px}
+    .cart-bar-text{font-size:14px;font-weight:700;color:#fff}
+    .cart-bar-total{font-size:15px;font-weight:700;color:#fff}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+    .modal-overlay.show{display:flex}
+    .modal{background:#fff;border-radius:24px 24px 0 0;padding:1.5rem;width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
+    .modal-title{font-size:16px;font-weight:700;margin-bottom:6px}
+    .modal-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+    .modal-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border)}
+    .modal-item:last-of-type{border-bottom:none}
+    .modal-total{display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding:12px 0 0;border-top:1px solid var(--border);margin-top:8px}
+    .modal-total .v{color:var(--rose-dark)}
+    .btn-checkout{width:100%;background:var(--rose);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-cancel{width:100%;background:var(--bg);border:0.5px solid var(--border);border-radius:12px;padding:12px;font-size:13px;cursor:pointer;margin-top:8px;font-family:'Tajawal',sans-serif;font-weight:700}
+    .header-bg{width:100%;height:100%;background:linear-gradient(135deg,#9d174d,#be185d);display:flex;align-items:center;justify-content:center;font-size:64px}
+    .toast{position:fixed;bottom:100px;right:50%;transform:translateX(50%);background:#1f1f1f;color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+<div class="rest-header" id="rest-header">
+  <div class="header-bg" id="header-bg">🍽️</div>
+  <img id="rest-banner-img" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>
+  <div class="header-overlay"></div>
+  <div class="header-btns">
+    <button class="hbtn" onclick="history.back()" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+    <div class="cart-badge-wrap">
+      <button class="hbtn" onclick="openCartModal()" aria-label="السلة"><i class="ti ti-shopping-cart"></i></button>
+      <div class="hcart-dot" id="header-cart-count">٠</div>
+    </div>
+  </div>
+  <div class="header-info">
+    <div class="rest-logo" id="rest-logo-el"><span id="rest-logo-icon">🍽️</span></div>
+    <div>
+      <div class="rest-header-title" id="rest-name-el">جاري التحميل...</div>
+      <div class="rest-header-sub" id="rest-sub-el">قبة · الرياض</div>
+    </div>
+  </div>
+</div>
+<div class="info-strip">
+  <div class="info-item"><i class="ti ti-star" style="color:#f59e0b" aria-hidden="true"></i><span class="info-val" id="info-rating">5.0</span></div>
+  <div class="info-item"><i class="ti ti-clock" aria-hidden="true"></i><span class="info-val" id="info-time">20-35 دقيقة</span></div>
+  <div class="info-item"><i class="ti ti-truck" aria-hidden="true"></i><span class="info-val" id="info-delivery" style="color:var(--green)">توصيل مجاني</span></div>
+  <div class="info-item"><i class="ti ti-circle-check" style="color:var(--green)" aria-hidden="true"></i><span class="info-val" id="info-status" style="color:var(--green)">مفتوح</span></div>
+</div>
+<div class="cat-tabs" id="cat-tabs"></div>
+<div id="menu-content"></div>
+<div class="cart-bar" id="cart-bar" onclick="openCartModal()">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="cart-count-pill" id="cart-count-pill">٠ منتج</div>
+    <div class="cart-bar-text">عرض السلة</div>
+  </div>
+  <div class="cart-bar-total" id="cart-bar-total">٠ ريال</div>
+</div>
+<div class="modal-overlay" id="cart-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-rest-name">طلبك</div>
+    <div class="modal-sub">مراجعة الطلب قبل الإتمام</div>
+    <div id="modal-items"></div>
+    <div class="modal-total"><span>الإجمالي</span><span class="v" id="modal-total">٠ ريال</span></div>
+    <button class="btn-checkout" onclick="proceedToCheckout()">
+      <i class="ti ti-shopping-cart-check" style="font-size:18px" aria-hidden="true"></i>
+      إتمام الطلب
+    </button>
+    <button class="btn-cancel" onclick="closeCartModal()">متابعة التسوق</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const catIcons={broasted:'🍗',coffee:'☕',pizza:'🍕',burger:'🍔',shawarma:'🥙',saudi:'🍚',dessert:'🍰',juice:'🥤'};
+let currentRestaurant=null,menuItems=[],cart={};
+const OWNER_WA='966503098962';
+
+window.addEventListener('load',async()=>{
+  const params=new URLSearchParams(window.location.search);
+  const id=params.get('id');
+  if(!id){window.location.href='/pages/restaurants.html';return;}
+  try{
+    const{data:rest}=await sb.from('restaurants').select('*').eq('id',id).single();
+    if(!rest){window.location.href='/pages/restaurants.html';return;}
+    currentRestaurant=rest;
+    const{data:items}=await sb.from('menu_items').select('*').eq('restaurant_id',id).eq('is_active',true).order('sort_order');
+    menuItems=items||[];
+    loadRestaurant();
+  }catch(e){window.location.href='/pages/restaurants.html';}
+});
+
+function loadRestaurant(){
+  const r=currentRestaurant;
+  if(r.banner_url){
+    document.getElementById('rest-banner-img').src=r.banner_url;
+    document.getElementById('rest-banner-img').style.display='block';
+    document.getElementById('header-bg').style.display='none';
+  } else {
+    document.getElementById('header-bg').textContent=catIcons[r.category]||'🍽️';
+  }
+  document.getElementById('rest-name-el').textContent=r.name;
+  document.getElementById('rest-sub-el').textContent=(r.name_ar||'')+' · قبة';
+  document.getElementById('info-rating').textContent=r.rating||'5.0';
+  document.getElementById('info-time').textContent=(r.delivery_time||'20-35')+' دقيقة';
+  document.getElementById('info-delivery').textContent=Number(r.delivery_fee)===0?'توصيل مجاني':'SAR '+r.delivery_fee;
+  document.getElementById('info-status').textContent=r.is_open?'مفتوح':'مغلق';
+  if(r.logo_url){
+    const logoEl=document.getElementById('rest-logo-el');
+    logoEl.innerHTML=`<img src="${r.logo_url}" alt="${r.name}" style="width:100%;height:100%;object-fit:cover"/>`;
+  } else {
+    document.getElementById('rest-logo-icon').textContent=catIcons[r.category]||'🍽️';
+  }
+  document.title=r.name+' - قبة';
+  const categories=[...new Set(menuItems.map(i=>i.category))];
+  document.getElementById('cat-tabs').innerHTML=categories.map((c,i)=>`<div class="cat-tab ${i===0?'act':''}" onclick="setCategory('${c}',this)">${c}</div>`).join('');
+  renderMenu();
+}
+
+function setCategory(cat,el){
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('act'));
+  el.classList.add('act');
+  const sec=document.getElementById('sec-'+cat.replace(/\s/g,'-'));
+  if(sec)sec.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderMenu(){
+  if(!menuItems.length){
+    document.getElementById('menu-content').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)"><i class="ti ti-tools-kitchen-2" style="font-size:48px;opacity:0.3;display:block;margin-bottom:1rem"></i>القائمة قريباً!</div>';
+    return;
+  }
+  const groups={};
+  menuItems.forEach(item=>{if(!groups[item.category])groups[item.category]=[];groups[item.category].push(item);});
+  document.getElementById('menu-content').innerHTML=Object.entries(groups).map(([cat,items])=>`
+    <div class="menu-section" id="sec-${cat.replace(/\s/g,'-')}">
+      <div class="menu-sec-title">${cat}</div>
+      ${items.map(item=>{
+        const qty=cart[item.id]?.qty||0;
+        const price=item.discount_price||item.price;
+        return `
+        <div class="menu-item" id="item-${item.id}">
+          ${item.image_url?`<img class="menu-item-img" src="${item.image_url}" alt="${item.name}" loading="lazy"/>`:`<div class="menu-item-img-fallback">🍽️</div>`}
+          <div class="menu-item-info">
+            <div>
+              <div class="item-name">${item.name}</div>
+              ${item.description?`<div class="item-desc">${item.description}</div>`:''}
+            </div>
+            <div class="item-footer">
+              <div class="item-price">
+                ${item.discount_price?`<span style="text-decoration:line-through;color:var(--muted);font-size:12px;margin-left:4px">SAR ${item.price}</span>SAR ${item.discount_price}`:`SAR ${item.price}`}
+              </div>
+              ${item.in_stock===false
+                ?`<span class="out-stock-badge">نفذت الكمية</span>`
+                :`<div id="ctrl-${item.id}">${qty>0?`<div class="qty-ctrl"><button class="qty-btn qty-m" onclick="changeQty('${item.id}',-1)"><i class="ti ti-minus" style="font-size:11px"></i></button><span class="qty-n">${qty}</span><button class="qty-btn qty-p" onclick="changeQty('${item.id}',1)"><i class="ti ti-plus" style="font-size:11px"></i></button></div>`:`<button class="add-btn" onclick="changeQty('${item.id}',1)"><i class="ti ti-plus" style="font-size:14px"></i></button>`}</div>`
+              }
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+
+function changeQty(itemId,delta){
+  const foundItem=menuItems.find(i=>i.id===itemId);
+  if(!foundItem)return;
+  const price=foundItem.discount_price||foundItem.price;
+  if(!cart[itemId])cart[itemId]={item:{...foundItem,price},qty:0};
+  cart[itemId].qty=Math.max(0,cart[itemId].qty+delta);
+  if(cart[itemId].qty===0)delete cart[itemId];
+  updateCartBar();
+  const ctrl=document.getElementById('ctrl-'+itemId);
+  if(!ctrl)return;
+  const qty=cart[itemId]?.qty||0;
+  if(qty>0){
+    ctrl.innerHTML=`<div class="qty-ctrl"><button class="qty-btn qty-m" onclick="changeQty('${itemId}',-1)"><i class="ti ti-minus" style="font-size:11px"></i></button><span class="qty-n">${qty}</span><button class="qty-btn qty-p" onclick="changeQty('${itemId}',1)"><i class="ti ti-plus" style="font-size:11px"></i></button></div>`;
+  } else {
+    ctrl.innerHTML=`<button class="add-btn" onclick="changeQty('${itemId}',1)"><i class="ti ti-plus" style="font-size:14px"></i></button>`;
+  }
+  if(delta>0)showToast('تمت الإضافة! ✓');
+}
+
+function updateCartBar(){
+  const items=Object.values(cart);
+  const count=items.reduce((s,i)=>s+i.qty,0);
+  const total=items.reduce((s,i)=>s+(i.item.price*i.qty),0);
+  const bar=document.getElementById('cart-bar');
+  document.getElementById('header-cart-count').textContent=count||'٠';
+  if(count>0){
+    bar.classList.add('show');
+    document.getElementById('cart-count-pill').textContent=count+' منتج';
+    document.getElementById('cart-bar-total').textContent='SAR '+total.toFixed(0);
+  } else {
+    bar.classList.remove('show');
+  }
+}
+
+function openCartModal(){
+  const items=Object.values(cart);
+  if(!items.length){showToast('أضف منتجات أولاً!');return;}
+  const total=items.reduce((s,i)=>s+(i.item.price*i.qty),0);
+  const r=currentRestaurant;
+  document.getElementById('modal-rest-name').textContent=r.name;
+  document.getElementById('modal-items').innerHTML=items.map(i=>`
+    <div class="modal-item">
+      <div><div style="font-size:13px;font-weight:700">${i.item.name}</div><div style="font-size:10px;color:var(--muted)">× ${i.qty}</div></div>
+      <div style="font-size:13px;font-weight:700;color:var(--rose-dark)">SAR ${(i.item.price*i.qty).toFixed(0)}</div>
+    </div>`).join('');
+  document.getElementById('modal-total').textContent='SAR '+total.toFixed(2);
+  document.getElementById('cart-modal').classList.add('show');
+}
+
+function closeCartModal(){document.getElementById('cart-modal').classList.remove('show');}
+
+function proceedToCheckout(){
+  const items=Object.values(cart);
+  if(!items.length)return;
+  const r=currentRestaurant;
+  const cartData=items.map(i=>({id:i.item.id,name:i.item.name,price:i.item.price,qty:i.qty,restaurant:r.name,restaurant_wa:r.whatsapp}));
+  localStorage.setItem('qibah_cart',JSON.stringify(cartData));
+  localStorage.setItem('qibah_restaurant',JSON.stringify({id:r.id,name:r.name,name_ar:r.name_ar||'',whatsapp:r.whatsapp,delivery_fee:Number(r.delivery_fee)||0}));
+  localStorage.setItem('qibah_delivery_fee',String(Number(r.delivery_fee)||0));
+  closeCartModal();
+  window.location.href='/pages/checkout.html';
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+</script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#be185d"/>
+  <title>المطاعم - خطوة التوصيل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f1f1f;--muted:#6b7280;--border:#f0e4e9;--bg:#f9f9f9;--white:#fff;--green:#16a34a;--amber:#d97706}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:90px;direction:rtl}
+    .topbar{background:var(--rose);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+    .btn-back{background:rgba(255,255,255,0.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+    .topbar-title{font-size:16px;font-weight:700;color:#fff;flex:1}
+    .cart-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;position:relative;flex-shrink:0}
+    .cart-dot{position:absolute;top:-4px;left:-4px;width:16px;height:16px;background:#fff;color:var(--rose);border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .search-wrap{background:var(--rose-dark);padding:0 16px 12px}
+    .search-box{background:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px}
+    .search-box input{border:none;outline:none;font-size:13px;color:var(--text);width:100%;font-family:'Tajawal',sans-serif;background:transparent;direction:rtl}
+    .filter-row{background:#fff;padding:10px 16px;display:flex;gap:8px;overflow-x:auto;border-bottom:0.5px solid var(--border)}
+    .filter-row::-webkit-scrollbar{display:none}
+    .fpill{background:var(--bg);border:0.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;font-family:'Tajawal',sans-serif}
+    .fpill.act{background:var(--rose);color:#fff;border-color:var(--rose)}
+    .feat-scroll{display:flex;gap:12px;overflow-x:auto;padding:14px 16px;border-bottom:0.5px solid var(--border)}
+    .feat-scroll::-webkit-scrollbar{display:none}
+    .feat-card{flex-shrink:0;width:200px;background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;border:0.5px solid var(--border)}
+    .feat-img{height:100px;position:relative;overflow:hidden}
+    .feat-img img{width:100%;height:100%;object-fit:cover}
+    .feat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.5),transparent)}
+    .feat-badge{position:absolute;top:8px;right:8px;font-size:9px;padding:3px 8px;border-radius:20px;font-weight:700;background:var(--rose);color:#fff}
+    .feat-info{padding:10px}
+    .feat-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px}
+    .feat-meta{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+    .sec-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px}
+    .sec-title{font-size:15px;font-weight:700;color:var(--text)}
+    .sec-sub{font-size:12px;color:var(--muted)}
+    .rest-list{padding:0 16px;display:flex;flex-direction:column;gap:12px}
+    .rest-card{background:#fff;border:0.5px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:transform 0.15s;position:relative}
+    .rest-card:active{transform:scale(0.98)}
+    .rest-banner{height:130px;position:relative;overflow:hidden}
+    .rest-banner img{width:100%;height:100%;object-fit:cover}
+    .rest-banner-bg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;background:linear-gradient(135deg,#9d174d,#be185d)}
+    .rest-banner-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.6),transparent)}
+    .rest-logo{position:absolute;bottom:-18px;right:14px;width:44px;height:44px;background:#fff;border-radius:10px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,0.15);overflow:hidden}
+    .rest-logo img{width:100%;height:100%;object-fit:cover}
+    .rest-status{position:absolute;top:10px;left:10px;font-size:9px;padding:3px 8px;border-radius:20px;font-weight:700}
+    .st-open{background:#dcfce7;color:#15803d}
+    .st-closed{background:#fee2e2;color:#dc2626}
+    .rest-info{padding:26px 14px 14px}
+    .rest-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+    .rest-tags{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+    .rest-star{display:flex;align-items:center;gap:2px;font-size:10px;color:#f59e0b;font-weight:500}
+    .rest-tag{font-size:10px;color:var(--muted)}
+    .rest-footer{display:flex;align-items:center;justify-content:space-between}
+    .rest-time-badge{background:#f0fdf4;color:#15803d;font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;display:flex;align-items:center;gap:3px}
+    .rest-free{font-size:10px;color:var(--green);font-weight:700}
+    .rest-min{font-size:10px;color:var(--muted)}
+    .glass-nav-wrap{position:fixed;bottom:0;right:50%;transform:translateX(50%);width:100%;max-width:480px;padding:8px 16px 12px;background:linear-gradient(to top,rgba(249,249,249,1) 60%,rgba(249,249,249,0));pointer-events:none;z-index:200}
+    .glass-nav{background:rgba(255,255,255,0.82);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:0.5px solid rgba(255,255,255,0.95);border-radius:26px;padding:8px 6px;display:grid;grid-template-columns:repeat(4,1fr);box-shadow:0 4px 28px rgba(0,0,0,0.09);pointer-events:all}
+    .gnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 4px;border-radius:20px;position:relative;overflow:hidden}
+    .gnav-icon{font-size:22px;color:var(--muted)}
+    .gnav-icon.act{color:var(--rose)}
+    .gnav-label{font-size:10px;color:var(--muted);font-weight:700}
+    .gnav-label.act{color:var(--rose)}
+    .gnav-dot{width:4px;height:4px;background:var(--rose);border-radius:50%;margin:0 auto;opacity:0}
+    .gnav-dot.act{opacity:1}
+    .skel{background:linear-gradient(90deg,#f0e4e9 25%,#fce7f3 50%,#f0e4e9 75%);background-size:200% 100%;animation:shim 1.5s infinite;border-radius:14px}
+    @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .toast{position:fixed;bottom:100px;right:50%;transform:translateX(50%);background:#1f1f1f;color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999;font-family:'Tajawal',sans-serif}
+    .toast.show{opacity:1}
+    .empty{text-align:center;padding:3rem;color:var(--muted)}
+    .empty i{font-size:48px;opacity:0.3;display:block;margin-bottom:1rem}
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="btn-back" onclick="window.location.href='/'" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+  <div class="topbar-title">المطاعم · قبة</div>
+  <div style="position:relative">
+    <button class="cart-btn" onclick="window.location.href='/pages/cart.html'" aria-label="السلة">
+      <i class="ti ti-shopping-cart"></i>
+      <div class="cart-dot" id="cart-count">٠</div>
+    </button>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <i class="ti ti-search" style="font-size:16px;color:var(--rose)" aria-hidden="true"></i>
+    <input type="text" id="search-input" placeholder="ابحث عن مطعم..." oninput="filterRestaurants()"/>
+  </div>
+</div>
+
+<div class="filter-row">
+  <div class="fpill act" onclick="setFilter('all',this)">الكل</div>
+  <div class="fpill" onclick="setFilter('broasted',this)">🍗 بروستد</div>
+  <div class="fpill" onclick="setFilter('coffee',this)">☕ قهوة</div>
+  <div class="fpill" onclick="setFilter('pizza',this)">🍕 بيتزا</div>
+  <div class="fpill" onclick="setFilter('shawarma',this)">🥙 شاورما</div>
+  <div class="fpill" onclick="setFilter('burger',this)">🍔 برجر</div>
+  <div class="fpill" onclick="setFilter('saudi',this)">🍚 سعودي</div>
+</div>
+
+<div class="feat-scroll" id="featured-scroll"></div>
+
+<div class="sec-head">
+  <div class="sec-title">جميع المطاعم</div>
+  <div class="sec-sub" id="rest-count">قبة · الرياض</div>
+</div>
+
+<div class="rest-list" id="rest-list">
+  <div class="skel" style="height:200px"></div>
+  <div class="skel" style="height:200px"></div>
+  <div class="skel" style="height:200px"></div>
+</div>
+
+<div class="glass-nav-wrap">
+  <nav class="glass-nav">
+    <div class="gnav-item" onclick="window.location.href='/'">
+      <i class="ti ti-home gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">الرئيسية</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item" >
+      <i class="ti ti-tools-kitchen-2 gnav-icon act" aria-hidden="true"></i>
+      <span class="gnav-label act">المطاعم</span>
+      <div class="gnav-dot act"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/pages/supermarket.html'">
+      <i class="ti ti-building-store gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">سوبرماركت</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/pages/account.html'">
+      <i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">حسابي</span>
+      <div class="gnav-dot"></div>
+    </div>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL = 'https://vjuhxpttssmyomqqomdx.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+const catIcons = {broasted:'🍗',coffee:'☕',pizza:'🍕',burger:'🍔',shawarma:'🥙',saudi:'🍚',dessert:'🍰',juice:'🥤'};
+let allRestaurants = [], currentFilter = 'all', currentSearch = '';
+
+async function loadRestaurants() {
+  try {
+    const {data} = await sb.from('restaurants').select('*').eq('is_active',true).order('sort_order');
+    allRestaurants = data || [];
+  } catch(e) { allRestaurants = []; }
+  renderFeatured();
+  renderRestaurants();
+}
+
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem('qibah_cart') || '[]');
+  document.getElementById('cart-count').textContent = cart.reduce((s,i)=>s+i.qty,0)||'٠';
+}
+
+function renderFeatured() {
+  const list = allRestaurants.filter(r=>r.is_open).slice(0,5);
+  if (!list.length) { document.getElementById('featured-scroll').innerHTML=''; return; }
+  document.getElementById('featured-scroll').innerHTML = list.map(r=>`
+    <div class="feat-card" onclick="window.location.href='/pages/menu.html?id=${r.id}'">
+      <div class="feat-img">
+        ${r.banner_url?`<img src="${r.banner_url}" alt="${r.name}" loading="lazy"/>`:`<div style="width:100%;height:100%;background:linear-gradient(135deg,#9d174d,#be185d);display:flex;align-items:center;justify-content:center;font-size:48px">${catIcons[r.category]||'🍽️'}</div>`}
+        <div class="feat-overlay"></div>
+        <div class="feat-badge">مميز</div>
+      </div>
+      <div class="feat-info">
+        <div class="feat-name">${r.name}</div>
+        <div class="feat-meta">
+          <span style="color:#f59e0b;font-weight:500;display:flex;align-items:center;gap:2px"><i class="ti ti-star" style="font-size:11px"></i> ${r.rating||'5.0'}</span>
+          <span>· ${r.delivery_time||'20-35'} دقيقة</span>
+          <span style="color:var(--green)">· ${Number(r.delivery_fee)===0?'مجاني':'SAR '+r.delivery_fee}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function setFilter(f,el) {
+  currentFilter=f;
+  document.querySelectorAll('.fpill').forEach(p=>p.classList.remove('act'));
+  el.classList.add('act');
+  renderRestaurants();
+}
+
+function filterRestaurants() {
+  currentSearch = document.getElementById('search-input').value.toLowerCase();
+  renderRestaurants();
+}
+
+function renderRestaurants() {
+  let list = [...allRestaurants];
+  if (currentFilter!=='all') list=list.filter(r=>r.category===currentFilter);
+  if (currentSearch) list=list.filter(r=>r.name.toLowerCase().includes(currentSearch)||(r.name_ar||'').includes(currentSearch));
+  document.getElementById('rest-count').textContent = list.length + ' مطعم · قبة';
+  if (!list.length) {
+    document.getElementById('rest-list').innerHTML='<div class="empty"><i class="ti ti-search-off"></i>لا توجد مطاعم</div>';
+    return;
+  }
+  document.getElementById('rest-list').innerHTML = list.map(r=>`
+    <div class="rest-card" onclick="window.location.href='/pages/menu.html?id=${r.id}'">
+      <div class="rest-banner">
+        ${r.banner_url?`<img src="${r.banner_url}" alt="${r.name}" loading="lazy"/>`:`<div class="rest-banner-bg">${catIcons[r.category]||'🍽️'}</div>`}
+        <div class="rest-banner-overlay"></div>
+        <div class="rest-logo">
+          ${r.logo_url?`<img src="${r.logo_url}" alt="${r.name}"/>`:`<span style="font-size:20px">${catIcons[r.category]||'🍽️'}</span>`}
+        </div>
+        <div class="rest-status ${r.is_open?'st-open':'st-closed'}">${r.is_open?'● مفتوح':'● مغلق'}</div>
+      </div>
+      <div class="rest-info">
+        <div class="rest-name">${r.name} ${r.name_ar?'· '+r.name_ar:''}</div>
+        <div class="rest-tags">
+          <span class="rest-star"><i class="ti ti-star" style="font-size:11px"></i> ${r.rating||'5.0'}</span>
+          <span class="rest-tag">· ${r.category}</span>
+        </div>
+        <div class="rest-footer">
+          <div class="rest-time-badge"><i class="ti ti-clock" style="font-size:11px"></i>${r.is_open?(r.delivery_time||'20-35')+' دقيقة':'مغلق الآن'}</div>
+          <div style="text-align:right">
+            <div class="${Number(r.delivery_fee)===0?'rest-free':''}" style="${Number(r.delivery_fee)>0?'font-size:10px;color:var(--rose);font-weight:700':''}">
+              ${Number(r.delivery_fee)===0?'توصيل مجاني':'SAR '+r.delivery_fee}
+            </div>
+            <div class="rest-min">حد أدنى SAR ${r.min_order||20}</div>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+window.addEventListener('load', () => { updateCartCount(); loadRestaurants(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#be185d"/>
+  <title>حسابي - خطوة التوصيل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <style>
+    :root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f1f1f;--muted:#6b7280;--border:#f0e4e9;--bg:#f9f9f9;--white:#fff;--green:#16a34a}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:90px;direction:rtl}
+
+    /* HEADER */
+    .header{background:linear-gradient(135deg,#9d174d,#be185d);padding:30px 16px 24px;text-align:center;position:relative;overflow:hidden}
+    .header::before{content:'';position:absolute;width:160px;height:160px;background:rgba(255,255,255,0.05);border-radius:50%;left:-40px;top:-40px}
+    .avatar{width:80px;height:80px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:36px;color:#fff;border:3px solid rgba(255,255,255,0.3)}
+    .user-name{font-size:18px;font-weight:700;color:#fff;margin-bottom:4px}
+    .user-phone{font-size:13px;color:#fce7f3}
+    .edit-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;padding:6px 16px;border-radius:20px;font-size:12px;cursor:pointer;margin-top:10px;font-family:'Tajawal',sans-serif;font-weight:500}
+
+    /* QUICK STATS */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px;margin-top:-20px;position:relative;z-index:2}
+    .stat-card{background:#fff;border:0.5px solid var(--border);border-radius:14px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+    .stat-val{font-size:20px;font-weight:700;color:var(--rose)}
+    .stat-label{font-size:10px;color:var(--muted);margin-top:3px}
+
+    /* SECTIONS */
+    .section{padding:0 16px 8px}
+    .section-title{font-size:12px;color:var(--muted);font-weight:700;padding:12px 0 6px;text-transform:uppercase;letter-spacing:0.5px}
+    .menu-list{background:#fff;border-radius:16px;border:0.5px solid var(--border);overflow:hidden}
+    .menu-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background 0.15s}
+    .menu-item:last-child{border-bottom:none}
+    .menu-item:active{background:var(--rose-soft)}
+    .menu-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .menu-text{flex:1}
+    .menu-title{font-size:14px;font-weight:500;color:var(--text)}
+    .menu-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .menu-arrow{color:var(--muted);font-size:16px}
+    .menu-badge{background:var(--rose);color:#fff;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700}
+
+    /* LANGUAGE TOGGLE */
+    .lang-toggle{display:flex;gap:6px}
+    .lang-btn{padding:4px 12px;border-radius:20px;border:1.5px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all 0.2s}
+    .lang-btn.active{background:var(--rose);color:#fff;border-color:var(--rose)}
+    .lang-btn:not(.active){background:var(--bg);color:var(--muted)}
+
+    /* APP VERSION */
+    .app-footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
+    .app-logo{font-size:24px;margin-bottom:4px}
+
+    /* GLASS NAV */
+    .glass-nav-wrap{position:fixed;bottom:0;right:50%;transform:translateX(50%);width:100%;max-width:480px;padding:8px 16px 12px;background:linear-gradient(to top,rgba(249,249,249,1) 60%,rgba(249,249,249,0));pointer-events:none;z-index:200}
+    .glass-nav{background:rgba(255,255,255,0.82);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:0.5px solid rgba(255,255,255,0.95);border-radius:26px;padding:8px 6px;display:grid;grid-template-columns:repeat(4,1fr);box-shadow:0 4px 28px rgba(0,0,0,0.09);pointer-events:all}
+    .gnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 4px;border-radius:20px}
+    .gnav-icon{font-size:22px;color:var(--muted)}
+    .gnav-icon.act{color:var(--rose)}
+    .gnav-label{font-size:10px;color:var(--muted);font-weight:700}
+    .gnav-label.act{color:var(--rose)}
+    .gnav-dot{width:4px;height:4px;background:var(--rose);border-radius:50%;margin:0 auto;opacity:0}
+    .gnav-dot.act{opacity:1}
+    .toast{position:fixed;bottom:100px;right:50%;transform:translateX(50%);background:#1f1f1f;color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999;font-family:'Tajawal',sans-serif}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+
+<!-- PROFILE HEADER -->
+<div class="header">
+  <div class="avatar"><i class="ti ti-user" aria-hidden="true"></i></div>
+  <div class="user-name" id="user-name">مرحباً بك!</div>
+  <div class="user-phone" id="user-phone">سجّل دخولك للمتابعة</div>
+  <button class="edit-btn" onclick="showToast('قريباً - تسجيل الدخول')">
+    <i class="ti ti-edit" style="font-size:14px" aria-hidden="true"></i>
+    تعديل الملف
+  </button>
+</div>
+
+<!-- QUICK STATS -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-val" id="orders-count">٠</div>
+    <div class="stat-label">طلباتي</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val">🌹</div>
+    <div class="stat-label">قبة</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val">قبة</div>
+    <div class="stat-label">منطقتي</div>
+  </div>
+</div>
+
+<!-- MY ORDERS -->
+<div class="section">
+  <div class="section-title">طلباتي</div>
+  <div class="menu-list">
+    <div class="menu-item" onclick="window.location.href='/pages/order-tracking.html'">
+      <div class="menu-icon" style="background:#fff1f6">
+        <i class="ti ti-map-pin" style="color:var(--rose)" aria-hidden="true"></i>
+      </div>
+      <div class="menu-text">
+        <div class="menu-title">تتبع الطلب الحالي</div>
+        <div class="menu-sub" id="active-order-sub">تابع طلبك مباشرة</div>
+      </div>
+      <div class="menu-badge" id="active-badge" style="display:none">نشط</div>
+      <i class="ti ti-chevron-left menu-arrow" aria-hidden="true"></i>
+    </div>
+    <div class="menu-item" id="last-order-row" style="display:none" onclick="window.location.href='/pages/order-tracking.html'">
+      <div class="menu-icon" style="background:#f0fdf4">
+        <i class="ti ti-clock" style="color:var(--green)" aria-hidden="true"></i>
+      </div>
+      <div class="menu-text">
+        <div class="menu-title" id="last-order-num">آخر طلب</div>
+        <div class="menu-sub" id="last-order-sub">اضغط لتتبع الطلب</div>
+      </div>
+      <i class="ti ti-chevron-left menu-arrow" aria-hidden="true"></i>
+    </div>
+    <div class="menu-item" onclick="showToast('قريباً - سجل الطلبات')">
+      <div class="menu-icon" style="background:#f0fdf4">
+        <i class="ti ti-clipboard-list" style="color:var(--green)" aria-hidden="true"></i>
+      </div>
+      <div class="menu-text">
+        <div class="menu-title">جميع طلباتي</div>
+        <div class="menu-sub">سجل طلباتك السابقة</div>
+      </div>
+      <i class="ti ti-chevron-left menu-arrow" aria-hidden="true"></i>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="section">
+  <div class="section-title">الإعدادات</div>
+  <div class="menu-list">
+
+    <!-- LANGUAGE -->
+    <div class="menu-item">
+      <div class="menu-icon" style="background:#fffbeb">
+        <i class="ti ti-language" style="color:#d97706" aria-hidden="true"></i>
+      </div>
+      <div class="menu-text">
+        <div class="menu-title">اللغة</div>
+        <div class="menu-sub">Language</div>
+      </div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-ar" onclick="setLang('ar')">العربية</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">English</button>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="menu-item" onclick="showToast('قريباً - إعدادات الإشعارات')">
+      <div class="menu-icon" style="background:#eff6ff">
+        <i class="ti ti-bell" style="color:#2563eb" aria-hidden="true"></i>
+      </div>
+      <div class="menu-text">
+        <div class="menu-title">الإشعارات</div>
+        <div class="menu-sub">تحكم في الإشعارات والتنبيهات</div>
+      </div>
+      <i class="ti ti-chevron-left menu-arrow" aria-hidden="true"></i>
+    </div>
+
+    <!-- SAVED ADDRESSES -->
+    <div class="menu-item" onclick="showToast('قريباً - العناوين المحفوظة')">
+      <div class="menu-icon" style="background:#f0fdf4">
+        <i class="ti ti-map-pin" style="color:var(--green)" aria-hidden="true"></i>
+      </div>
+      <div class="menu-text">
+        <div class="menu-title">عناويني</div>
+        <div class="menu-sub">إدارة عناوين التوصيل</div>
+      </div>
+      <i class="ti ti-chevron-left menu-arrow" aria-hidden="true"></i>
+    </div>
+  </div>
+</div>
+
+<!-- SUPPORT -->
+<div class="section">
+  <div class="section-title">الدعم والمساعدة</div>
+  <div class="menu-list">
+    <div class="menu-item" onclick="openWASupport()">
+      <div class="menu-icon" style="background:#f0fdf4">
+        <i class="ti ti-brand-whatsapp" style="color:#16a34a" aria-hidden="true"></i>
+      </div>
+      <div class="menu-text">
+        <div class="menu-title">تواصل معنا</div>
+        <div class="menu-sub">دعم فوري عبر واتساب</div>
+      </div>
+      <i class="ti ti-chevron-left menu-arrow" aria-hidden="true"></i>
+    </div>
+    <div class="menu-item" onclick="showToast('قريباً - الأسئلة الشائعة')">
+      <div class="menu-icon" style="background:#fff1f6">
+        <i class="ti ti-help-circle" style="color:var(--rose)" aria-hidden="true"></i>
+      </div>
+      <div class="menu-text">
+        <div class="menu-title">الأسئلة الشائعة</div>
+        <div class="menu-sub">إجابات على أسئلتك</div>
+      </div>
+      <i class="ti ti-chevron-left menu-arrow" aria-hidden="true"></i>
+    </div>
+    <div class="menu-item" onclick="showPrivacyPolicy()">
+      <div class="menu-icon" style="background:#f3f4f6">
+        <i class="ti ti-shield-check" style="color:#6b7280" aria-hidden="true"></i>
+      </div>
+      <div class="menu-text">
+        <div class="menu-title">سياسة الخصوصية</div>
+        <div class="menu-sub">الشروط والأحكام</div>
+      </div>
+      <i class="ti ti-chevron-left menu-arrow" aria-hidden="true"></i>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="section">
+  <div class="section-title">عن التطبيق</div>
+  <div class="menu-list">
+    <div class="menu-item">
+      <div class="menu-icon" style="background:#fff1f6">
+        <i class="ti ti-info-circle" style="color:var(--rose)" aria-hidden="true"></i>
+      </div>
+      <div class="menu-text">
+        <div class="menu-title">قبة · Qibah Store</div>
+        <div class="menu-sub">الإصدار 1.0.0 · قبة، الرياض</div>
+      </div>
+      <span style="font-size:10px;background:var(--rose-soft);color:var(--rose);padding:2px 8px;border-radius:20px;font-weight:700">v1.0</span>
+    </div>
+  </div>
+</div>
+
+<!-- PRIVACY POLICY MODAL -->
+<div id="privacy-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;padding:1.5rem;width:100%;max-width:480px;max-height:80vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:16px;font-weight:700">سياسة الخصوصية</div>
+      <button onclick="document.getElementById('privacy-modal').style.display='none'" style="background:var(--bg);border:none;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">
+        <i class="ti ti-x" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div style="font-size:13px;color:var(--text);line-height:2">
+      <p style="margin-bottom:12px"><strong>متجر قبة - قبة، الرياض</strong></p>
+      <p style="margin-bottom:12px">نحن في قبة نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية.</p>
+      <p style="margin-bottom:8px"><strong>البيانات التي نجمعها:</strong></p>
+      <p style="margin-bottom:12px">· اسمك ورقم هاتفك لإتمام الطلب<br>· موقعك الجغرافي لتوصيل طلبك<br>· صورة الباب لمساعدة السائق</p>
+      <p style="margin-bottom:8px"><strong>كيف نستخدم بياناتك:</strong></p>
+      <p style="margin-bottom:12px">· تنفيذ طلبك وتوصيله<br>· التواصل معك عبر واتساب<br>· تحسين خدماتنا</p>
+      <p style="margin-bottom:8px"><strong>لا نبيع بياناتك لأي طرف ثالث.</strong></p>
+      <p style="color:var(--muted)">للتواصل: support@qibah.app</p>
+    </div>
+  </div>
+</div>
+
+<div class="app-footer">
+  <div class="app-logo">🌹</div>
+  <div style="font-weight:700;color:var(--rose);margin-bottom:4px">قبة</div>
+  <div>توصيل سريع في قبة · الرياض</div>
+</div>
+
+<div class="glass-nav-wrap">
+  <nav class="glass-nav">
+    <div class="gnav-item" onclick="window.location.href='/'">
+      <i class="ti ti-home gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">الرئيسية</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/pages/restaurants.html'">
+      <i class="ti ti-tools-kitchen-2 gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">المطاعم</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/pages/supermarket.html'">
+      <i class="ti ti-building-store gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">سوبرماركت</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item" >
+      <i class="ti ti-user-circle gnav-icon act" aria-hidden="true"></i>
+      <span class="gnav-label act">حسابي</span>
+      <div class="gnav-dot act"></div>
+    </div>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function setLang(lang) {
+  localStorage.setItem('qibah_lang', lang);
+  document.getElementById('btn-ar').className = 'lang-btn' + (lang==='ar'?' active':'');
+  document.getElementById('btn-en').className = 'lang-btn' + (lang==='en'?' active':'');
+  if (lang === 'en') {
+    showToast('English mode - Coming soon!');
+  } else {
+    showToast('تم التبديل للعربية ✓');
+  }
+}
+
+function openWASupport() {
+  const msg = encodeURIComponent('مرحباً، أحتاج مساعدة من تطبيق قبة 🌹');
+  window.open('https://api.whatsapp.com/send?phone=966503098962&text=' + msg, '_blank');
+}
+
+function showPrivacyPolicy() {
+  document.getElementById('privacy-modal').style.display = 'flex';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+window.addEventListener('load', () => {
+  const lastOrder = localStorage.getItem('qibah_last_order_num');
+  const lastCart  = JSON.parse(localStorage.getItem('qibah_last_cart') || '[]');
+  if (lastOrder) {
+    document.getElementById('active-badge').style.display = 'block';
+    document.getElementById('orders-count').textContent = '١';
+    document.getElementById('active-order-sub').textContent = 'طلب #' + lastOrder + ' · جاري التوصيل';
+    document.getElementById('last-order-row').style.display = 'flex';
+    document.getElementById('last-order-num').textContent = 'طلب #' + lastOrder;
+    const total = lastCart.reduce((s,i) => s + i.price*i.qty, 0);
+    document.getElementById('last-order-sub').textContent = lastCart.length + ' منتجات · SAR ' + total.toFixed(0);
+  }
+  const lang = localStorage.getItem('qibah_lang') || 'ar';
+  document.getElementById('btn-ar').className = 'lang-btn' + (lang==='ar'?' active':'');
+  document.getElementById('btn-en').className = 'lang-btn' + (lang==='en'?' active':'');
+});
+</script>
+</body>
+</html>

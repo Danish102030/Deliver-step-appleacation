@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#be185d"/>
+  <title>تتبع الطلب - خطوة التوصيل</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f1f1f;--muted:#6b7280;--border:#f0e4e9;--bg:#f9f9f9;--white:#fff;--green:#16a34a;--green-light:#f0fdf4}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:'Quicksand',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:30px}
+
+    /* TOPBAR */
+    .topbar{background:var(--rose);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(190,24,93,0.2)}
+    .btn-back{background:rgba(255,255,255,0.2);border:none;color:#fff;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+    .topbar-title{font-size:16px;font-weight:500;color:#fff;flex:1}
+    .order-pill{background:rgba(255,255,255,0.2);color:#fff;font-size:11px;padding:4px 12px;border-radius:20px;font-weight:500}
+
+    /* HERO */
+    .hero{background:var(--rose-dark);padding:24px 16px 32px;text-align:center;position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;width:180px;height:180px;background:rgba(255,255,255,0.04);border-radius:50%;right:-50px;top:-50px}
+    .hero::after{content:'';position:absolute;width:120px;height:120px;background:rgba(255,255,255,0.03);border-radius:50%;left:-30px;bottom:-30px}
+    .status-ring{width:80px;height:80px;margin:0 auto 16px;position:relative;z-index:1}
+    .ring-outer{width:80px;height:80px;border-radius:50%;border:3px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center}
+    .ring-outer::before{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);animation:ping 2s ease-in-out infinite}
+    @keyframes ping{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.1);opacity:0.1}}
+    .ring-inner{width:62px;height:62px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff}
+    .hero-title{font-size:20px;font-weight:500;color:#fff;margin-bottom:6px;position:relative;z-index:1}
+    .hero-sub{font-size:12px;color:#fce7f3;margin-bottom:16px;line-height:1.6;position:relative;z-index:1}
+    .eta-wrap{background:rgba(255,255,255,0.15);border-radius:14px;padding:12px 24px;display:inline-flex;align-items:center;gap:10px;position:relative;z-index:1}
+    .eta-num{font-size:30px;font-weight:600;color:#fff;line-height:1}
+    .eta-unit{font-size:11px;color:#fce7f3;text-align:right}
+
+    /* BODY */
+    .body{padding:16px;display:flex;flex-direction:column;gap:12px}
+    .card{background:var(--white);border:0.5px solid var(--border);border-radius:16px;padding:14px;margin-top:-20px;position:relative;z-index:2;box-shadow:0 4px 20px rgba(0,0,0,0.06)}
+    .card+.card{margin-top:0;box-shadow:none}
+    .card-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+    .card-title i{color:var(--rose);font-size:16px}
+
+    /* DISTANCE */
+    .dist-card{background:var(--rose-soft);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px;border:0.5px solid var(--rose-light)}
+    .dist-icon{width:38px;height:38px;background:var(--rose);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
+    .dist-val{font-size:16px;font-weight:500;color:var(--rose-dark)}
+    .dist-label{font-size:10px;color:var(--muted)}
+    .live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;margin-right:auto;animation:live-pulse 1.5s infinite;flex-shrink:0}
+    @keyframes live-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
+
+    /* TIMELINE */
+    .tl-row{display:flex;gap:12px;align-items:flex-start}
+    .tl-left{display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0}
+    .tl-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all 0.3s}
+    .tl-done{background:var(--rose);color:#fff}
+    .tl-active{background:var(--rose-soft);border:2px solid var(--rose);color:var(--rose);animation:pulse-step 1.5s infinite}
+    @keyframes pulse-step{0%,100%{box-shadow:0 0 0 0 rgba(190,24,93,0.3)}50%{box-shadow:0 0 0 6px rgba(190,24,93,0)}}
+    .tl-inactive{background:#f3f4f6;color:var(--muted)}
+    .tl-line{width:2px;flex:1;min-height:20px;margin:3px 0;transition:background 0.3s}
+    .tl-line-done{background:var(--rose)}
+    .tl-line-empty{background:var(--border)}
+    .tl-body{padding-bottom:14px;flex:1}
+    .tl-name{font-size:13px;font-weight:500}
+    .tl-name-done{color:var(--text)}
+    .tl-name-active{color:var(--rose)}
+    .tl-name-inactive{color:var(--muted);font-weight:400}
+    .tl-time{font-size:11px;color:var(--muted);margin-top:2px}
+    .tl-desc{font-size:11px;color:var(--rose-dark);background:var(--rose-soft);padding:6px 10px;border-radius:8px;margin-top:6px;line-height:1.5}
+
+    /* RIDER */
+    .rider-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .rider-av{width:50px;height:50px;background:var(--rose-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--rose);flex-shrink:0;border:2px solid var(--rose-light)}
+    .rider-name{font-size:14px;font-weight:500}
+    .rider-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .rider-stars{display:flex;align-items:center;gap:2px;margin-top:3px;font-size:11px;color:#f59e0b;font-weight:500}
+    .online-badge{background:var(--green-light);color:var(--green);font-size:9px;padding:3px 8px;border-radius:20px;font-weight:500;align-self:flex-start;flex-shrink:0}
+    .rider-btns{display:flex;gap:8px}
+    .rbtn{flex:1;border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;font-family:'Quicksand',sans-serif;transition:opacity 0.2s}
+    .rbtn:active{opacity:0.8}
+    .rbtn-call{background:var(--green-light);color:var(--green)}
+    .rbtn-wa{background:var(--rose-soft);color:var(--rose)}
+
+    /* SUMMARY */
+    .item-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:0.5px solid var(--border)}
+    .item-row:last-of-type{border-bottom:none}
+    .total-row{display:flex;justify-content:space-between;font-size:15px;font-weight:500;padding:10px 0 0;border-top:1px solid var(--border);margin-top:4px}
+    .total-row .v{color:var(--rose-dark)}
+
+    /* BUTTONS */
+    .btns-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .abtn{border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:'Quicksand',sans-serif;transition:all 0.2s}
+    .abtn:active{transform:scale(0.98)}
+    .abtn-map{background:var(--rose);color:#fff;box-shadow:0 4px 12px rgba(190,24,93,0.25)}
+    .abtn-home{background:var(--rose-soft);color:var(--rose);border:0.5px solid var(--rose-light)}
+
+    /* RATING */
+    .rating-card{background:var(--rose-soft);border-radius:16px;padding:16px;text-align:center;border:0.5px solid var(--rose-light)}
+    .star-btn{font-size:32px;color:var(--border);cursor:pointer;transition:color 0.15s;background:none;border:none;padding:0 4px}
+    .star-btn.lit{color:#f59e0b}
+
+    /* WA NOTICE */
+    .wa-box{background:var(--green-light);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px}
+    .wa-text{font-size:12px;color:#15803d;line-height:1.7}
+
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f1f1f;color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999;font-family:'Quicksand',sans-serif}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <button class="btn-back" onclick="history.back()" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+  <div class="topbar-title">تتبع الطلب</div>
+  <div class="order-pill" id="order-num-display">#DS-0000</div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="status-ring">
+    <div class="ring-outer">
+      <div class="ring-inner" id="hero-icon-wrap">
+        <i class="ti ti-circle-check" id="hero-icon" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+  <div class="hero-title" id="hero-title">تم تأكيد طلبك!</div>
+  <div class="hero-sub" id="hero-sub">نحن نستعد لتحضير طلبك الآن</div>
+  <div class="eta-wrap" id="eta-wrap">
+    <i class="ti ti-clock" style="font-size:20px;color:#fce7f3" aria-hidden="true"></i>
+    <div>
+      <div class="eta-num" id="eta-num">28</div>
+      <div class="eta-unit">دقيقة للوصول</div>
+    </div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- ETA CARD - floating -->
+  <div class="card" id="eta-float-card">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <i class="ti ti-clock" style="font-size:18px;color:var(--rose)" aria-hidden="true"></i>
+        <div>
+          <div style="font-size:11px;color:var(--muted)">وقت التسليم المتوقع</div>
+          <div style="font-size:14px;font-weight:500" id="eta-time-display">3:26 م</div>
+        </div>
+      </div>
+      <div style="text-align:left">
+        <div style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--green)">
+          <div class="live-dot"></div>
+          تتبع مباشر
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">قبة · الرياض</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISTANCE (shows when rider on way) -->
+  <div class="dist-card" id="dist-card" style="display:none">
+    <div class="dist-icon"><i class="ti ti-motorbike" aria-hidden="true"></i></div>
+    <div>
+      <div class="dist-val" id="dist-val">1.2 كم</div>
+      <div class="dist-label">المسافة المتبقية</div>
+    </div>
+    <div class="live-dot" style="margin-right:auto"></div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="card" style="margin-top:0">
+    <div class="card-title"><i class="ti ti-route" aria-hidden="true"></i>حالة الطلب</div>
+    <div id="timeline"></div>
+  </div>
+
+  <!-- RIDER CARD -->
+  <div class="card">
+    <div class="card-title"><i class="ti ti-motorbike" aria-hidden="true"></i>السائق</div>
+    <div class="rider-top">
+      <div class="rider-av"><i class="ti ti-user" aria-hidden="true"></i></div>
+      <div style="flex:1">
+        <div class="rider-name" id="rider-name">جاري التعيين...</div>
+        <div class="rider-sub">سائق التوصيل · قبة</div>
+        <div class="rider-stars">
+          <i class="ti ti-star" style="font-size:12px" aria-hidden="true"></i>
+          <i class="ti ti-star" style="font-size:12px" aria-hidden="true"></i>
+          <i class="ti ti-star" style="font-size:12px" aria-hidden="true"></i>
+          <i class="ti ti-star" style="font-size:12px" aria-hidden="true"></i>
+          <i class="ti ti-star-half" style="font-size:12px" aria-hidden="true"></i>
+          <span style="margin-right:3px;color:var(--muted)">4.8</span>
+        </div>
+      </div>
+      <div class="online-badge">● متاح</div>
+    </div>
+    <div class="rider-btns">
+      <button class="rbtn rbtn-call" id="call-btn" onclick="callRider()">
+        <i class="ti ti-phone" style="font-size:14px" aria-hidden="true"></i> اتصال
+      </button>
+      <button class="rbtn rbtn-wa" id="wa-btn" onclick="waRider()">
+        <i class="ti ti-brand-whatsapp" style="font-size:14px" aria-hidden="true"></i> واتساب
+      </button>
+    </div>
+  </div>
+
+  <!-- ORDER SUMMARY -->
+  <div class="card">
+    <div class="card-title"><i class="ti ti-receipt" aria-hidden="true"></i>تفاصيل الطلب</div>
+    <div id="order-items"></div>
+    <div class="total-row">
+      <span>المجموع</span>
+      <span class="v" id="order-total">SAR 0</span>
+    </div>
+    <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);display:flex;justify-content:space-between;font-size:12px">
+      <span style="color:var(--muted)">طريقة الدفع</span>
+      <span style="font-weight:500" id="order-payment">نقداً عند الاستلام</span>
+    </div>
+  </div>
+
+  <!-- ADDRESS -->
+  <div class="card">
+    <div class="card-title"><i class="ti ti-map-pin" aria-hidden="true"></i>عنوان التوصيل</div>
+    <div style="font-size:13px;color:var(--text);line-height:1.7" id="order-address">قبة · الرياض</div>
+    <div id="maps-btn-wrap" style="margin-top:8px;display:none">
+      <a id="maps-btn" href="#" target="_blank"
+        style="display:inline-flex;align-items:center;gap:5px;background:var(--green-light);color:var(--green);font-size:11px;padding:5px 12px;border-radius:20px;text-decoration:none;font-weight:500">
+        <i class="ti ti-map" style="font-size:12px" aria-hidden="true"></i> فتح في خرائط جوجل
+      </a>
+    </div>
+  </div>
+
+  <!-- WA NOTICE -->
+  <div class="wa-box">
+    <i class="ti ti-brand-whatsapp" style="font-size:28px;color:#16a34a;flex-shrink:0" aria-hidden="true"></i>
+    <div class="wa-text" id="wa-notice">
+      تم إرسال تفاصيل الطلب إلى فريقنا على واتساب.<br>
+      سيتم تعيين السائق والتواصل معك قريباً.
+    </div>
+  </div>
+
+  <!-- ACTION BUTTONS -->
+  <div class="btns-row">
+    <button class="abtn abtn-map" id="track-btn" onclick="openMaps()">
+      <i class="ti ti-map-pin" style="font-size:16px" aria-hidden="true"></i>
+      تتبع السائق
+    </button>
+    <button class="abtn abtn-home" onclick="window.location.href='/'">
+      <i class="ti ti-home" style="font-size:16px" aria-hidden="true"></i>
+      الرئيسية
+    </button>
+  </div>
+
+  <!-- RATING (after delivery) -->
+  <div class="rating-card" id="rating-card" style="display:none">
+    <div class="card-title" style="justify-content:center;margin-bottom:10px">
+      <i class="ti ti-star" aria-hidden="true"></i>
+      قيّم تجربتك
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:10px">كيف كانت تجربتك مع قبة؟</div>
+    <div style="display:flex;justify-content:center;gap:6px;margin-bottom:8px">
+      <button class="star-btn" onclick="rate(1)" aria-label="نجمة واحدة"><i class="ti ti-star" aria-hidden="true"></i></button>
+      <button class="star-btn" onclick="rate(2)" aria-label="نجمتان"><i class="ti ti-star" aria-hidden="true"></i></button>
+      <button class="star-btn" onclick="rate(3)" aria-label="ثلاث نجوم"><i class="ti ti-star" aria-hidden="true"></i></button>
+      <button class="star-btn" onclick="rate(4)" aria-label="أربع نجوم"><i class="ti ti-star" aria-hidden="true"></i></button>
+      <button class="star-btn" onclick="rate(5)" aria-label="خمس نجوم"><i class="ti ti-star" aria-hidden="true"></i></button>
+    </div>
+    <div style="font-size:12px;color:var(--muted)" id="rate-label">اضغط للتقييم</div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL = 'https://vjuhxpttssmyomqqomdx.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+/* ---- Order steps config ---- */
+const STEPS = [
+  {key:'pending',    icon:'ti-circle-check', name:'تم تأكيد الطلب',      heroTitle:'تم تأكيد طلبك!',      heroSub:'نحن نستعد لتحضير طلبك الآن', heroIcon:'ti-circle-check', eta:28, dist:false},
+  {key:'preparing',  icon:'ti-tools-kitchen-2', name:'جاري التحضير',      heroTitle:'جاري تحضير طلبك',      heroSub:'المطعم يجهز طلبك بعناية الآن', heroIcon:'ti-tools-kitchen-2', eta:20, dist:false},
+  {key:'assigned',   icon:'ti-check',        name:'السائق استلم الطلب',   heroTitle:'السائق في الطريق!',     heroSub:'السائق استلم طلبك وفي طريقه إليك', heroIcon:'ti-motorbike', eta:12, dist:true},
+  {key:'on_the_way', icon:'ti-motorbike',    name:'السائق في الطريق',     heroTitle:'السائق قريب منك!',      heroSub:'لا تقلق، طلبك في طريقه إليك', heroIcon:'ti-motorbike', eta:5, dist:true},
+  {key:'delivered',  icon:'ti-home',         name:'تم التسليم',           heroTitle:'تم التسليم! 🎉',        heroSub:'استمتع بطلبك، شكراً لاختيارك قبة', heroIcon:'ti-circle-check', eta:0, dist:false},
+];
+
+/* ---- State ---- */
+let currentOrder  = null;
+let currentStep   = 0;
+let riderPhone    = null;
+let gpsLat = null, gpsLng = null;
+
+/* ---- Init ---- */
+window.addEventListener('load', () => {
+  loadOrderData();
+  setEtaTime();
+});
+
+function setEtaTime() {
+  const arrival = new Date();
+  arrival.setMinutes(arrival.getMinutes() + 28);
+  document.getElementById('eta-time-display').textContent =
+    arrival.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
+}
+
+/* ---- Load order from localStorage ---- */
+function loadOrderData() {
+  const orderNum  = localStorage.getItem('qibah_last_order_num') || 'DS-0000';
+  const cart      = JSON.parse(localStorage.getItem('qibah_last_cart') || '[]');
+  const payment   = localStorage.getItem('qibah_last_payment') || 'cod';
+  const address   = localStorage.getItem('qibah_last_address') || 'قبة · الرياض';
+  const lat       = localStorage.getItem('qibah_last_lat');
+  const lng       = localStorage.getItem('qibah_last_lng');
+  const rest      = JSON.parse(localStorage.getItem('qibah_last_restaurant') || 'null');
+
+  gpsLat = lat; gpsLng = lng;
+
+  document.getElementById('order-num-display').textContent = '#' + orderNum;
+  document.getElementById('order-address').textContent = address;
+
+  if (lat && lng) {
+    document.getElementById('maps-btn').href = `https://maps.google.com/?q=${lat},${lng}`;
+    document.getElementById('maps-btn-wrap').style.display = 'block';
+  }
+
+  const payLabels = {cod:'نقداً عند الاستلام', card:'بطاقة / STC Pay', apple:'Apple Pay', bank:'تحويل بنكي'};
+  document.getElementById('order-payment').textContent = payLabels[payment] || 'نقداً عند الاستلام';
+
+  if (cart.length) {
+    const sub = cart.reduce((s,i) => s + i.price*i.qty, 0);
+    document.getElementById('order-items').innerHTML = cart.map(i => `
+      <div class="item-row">
+        <span style="color:var(--muted)">${i.name} × ${i.qty}</span>
+        <span style="font-weight:500">SAR ${(i.price*i.qty).toFixed(2)}</span>
+      </div>`).join('');
+    document.getElementById('order-total').textContent = 'SAR ' + sub.toFixed(2);
+  }
+
+  if (rest) {
+    document.getElementById('wa-notice').innerHTML =
+      `تم إرسال الطلب إلى <strong>${rest.name}</strong> للتحضير.<br>سيتم تعيين السائق قريباً.`;
+  }
+
+  // Load from Supabase
+  loadFromSupabase(orderNum);
+
+  // Set random rider from your team
+  const riders = [
+    {name:'إحسان', phone:'0508112376'},
+    {name:'عدنان', phone:'0534611858'},
+    {name:'جميل', phone:'0546788065'},
+    {name:'لقمان', phone:'0535313266'},
+    {name:'عادل', phone:'0559239794'},
+  ];
+  const rider = riders[Math.floor(Math.random() * riders.length)];
+  document.getElementById('rider-name').textContent = rider.name;
+  riderPhone = rider.phone;
+
+  // Render timeline
+  updateUI(0);
+
+  // Auto refresh every 30s
+  setInterval(() => loadFromSupabase(orderNum), 30000);
+}
+
+async function loadFromSupabase(orderNum) {
+  try {
+    const {data} = await sb.from('orders')
+      .select('order_status, rider_name, delivery_lat, delivery_lng')
+      .eq('order_number', orderNum)
+      .single();
+    if (data) {
+      if (data.rider_name) document.getElementById('rider-name').textContent = data.rider_name;
+      const stepIdx = STEPS.findIndex(s => s.key === data.order_status);
+      if (stepIdx >= 0 && stepIdx !== currentStep) {
+        currentStep = stepIdx;
+        updateUI(stepIdx);
+      }
+    }
+  } catch(e) {}
+}
+
+/* ---- Update UI based on step ---- */
+function updateUI(stepIdx) {
+  const step = STEPS[stepIdx];
+
+  // Hero
+  document.getElementById('hero-title').textContent = step.heroTitle;
+  document.getElementById('hero-sub').textContent   = step.heroSub;
+  document.getElementById('hero-icon').className    = 'ti ' + step.heroIcon;
+  document.getElementById('eta-num').textContent    = step.eta;
+
+  // ETA
+  if (step.eta === 0) {
+    document.getElementById('eta-wrap').style.display = 'none';
+    document.getElementById('eta-float-card').style.display = 'none';
+  }
+
+  // Distance
+  document.getElementById('dist-card').style.display = step.dist ? 'flex' : 'none';
+
+  // Rating card
+  document.getElementById('rating-card').style.display = stepIdx === 4 ? 'block' : 'none';
+
+  // Timeline
+  renderTimeline(stepIdx);
+}
+
+function renderTimeline(active) {
+  const now = new Date();
+  const baseTime = new Date(now.getTime() - active * 8 * 60000);
+
+  document.getElementById('timeline').innerHTML = STEPS.map((s, i) => {
+    const state = i < active ? 'done' : i === active ? 'active' : 'inactive';
+    const isLast = i === STEPS.length - 1;
+    const t = new Date(baseTime.getTime() + i * 8 * 60000);
+    const timeStr = t.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
+    return `
+    <div class="tl-row">
+      <div class="tl-left">
+        <div class="tl-dot tl-${state}">
+          ${state === 'done'
+            ? '<i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i>'
+            : `<i class="ti ${s.icon}" style="font-size:11px" aria-hidden="true"></i>`}
+        </div>
+        ${!isLast ? `<div class="tl-line ${i < active ? 'tl-line-done':'tl-line-empty'}"></div>` : ''}
+      </div>
+      <div class="tl-body">
+        <div class="tl-name tl-name-${state}">${s.name}</div>
+        ${state !== 'inactive' ? `<div class="tl-time">${timeStr}</div>` : ''}
+        ${state === 'active' && i === 3 ? `<div class="tl-desc">السائق على بُعد 1.2 كم منك</div>` : ''}
+        ${state === 'active' && i === 2 ? `<div class="tl-desc">السائق في طريقه لاستلام طلبك من المطعم</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ---- Actions ---- */
+function callRider() {
+  if (riderPhone) window.location.href = 'tel:' + riderPhone;
+  else showToast('جاري تعيين السائق...');
+}
+
+function waRider() {
+  if (riderPhone) {
+    const msg = encodeURIComponent('مرحباً، أنا في انتظار طلبي');
+    window.open(`https://api.whatsapp.com/send?phone=966${riderPhone.substring(1)}&text=${msg}`, '_blank');
+  } else showToast('جاري تعيين السائق...');
+}
+
+function openMaps() {
+  if (gpsLat && gpsLng) {
+    window.open(`https://maps.google.com/?q=${gpsLat},${gpsLng}`, '_blank');
+  } else showToast('الموقع غير متاح');
+}
+
+/* ---- Rating ---- */
+const rateLabels = ['','ليس جيداً 😞','يمكن أن يكون أفضل 😐','كان جيداً 🙂','جيد جداً 😊','ممتاز! 🌟'];
+function rate(n) {
+  document.querySelectorAll('.star-btn').forEach((s,i) => s.className = 'star-btn'+(i<n?' lit':''));
+  document.getElementById('rate-label').textContent = rateLabels[n];
+  showToast('شكراً على تقييمك!');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ETA countdown
+setInterval(() => {
+  const el = document.getElementById('eta-num');
+  const v = parseInt(el.textContent);
+  if (v > 1) el.textContent = v - 1;
+}, 60000);
+</script>
+</body>
+</html>

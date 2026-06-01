@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#be185d"/>
+  <title>منتجات - خطوة التوصيل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f1f1f;--muted:#6b7280;--border:#f0e4e9;--bg:#f5f5f5;--white:#fff;--green:#16a34a}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:100px;direction:rtl}
+
+    /* TOPBAR */
+    .topbar{background:var(--rose);padding:11px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+    .btn-back{background:rgba(255,255,255,0.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+    .topbar-title{font-size:16px;font-weight:700;color:#fff;flex:1}
+    .cart-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0}
+    .cart-dot{position:absolute;top:-4px;left:-4px;width:16px;height:16px;background:#fff;color:var(--rose);border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+    /* SEARCH */
+    .search-wrap{background:var(--rose-dark);padding:0 16px 10px}
+    .search-box{background:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px}
+    .search-box input{border:none;outline:none;font-size:13px;color:var(--text);width:100%;font-family:'Tajawal',sans-serif;background:transparent;direction:rtl}
+
+    /* INFO BAR */
+    .info-bar{background:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border)}
+    .info-count{font-size:12px;color:var(--muted);font-weight:500}
+    .sort-btn{background:var(--bg);border:0.5px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;gap:4px;color:var(--muted)}
+
+    /* PRODUCTS GRID */
+    .products-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:14px 16px}
+    .product-card{background:#fff;border-radius:14px;overflow:hidden;border:0.5px solid var(--border);cursor:pointer;transition:transform 0.15s;position:relative}
+    .product-card:active{transform:scale(0.97)}
+    .product-img-wrap{height:140px;overflow:hidden;position:relative;background:#f9f9f9;display:flex;align-items:center;justify-content:center}
+    .product-img-wrap img{width:100%;height:100%;object-fit:cover}
+    .out-stock-overlay{position:absolute;inset:0;background:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center}
+    .out-stock-badge{background:#fee2e2;color:#dc2626;font-size:10px;padding:4px 10px;border-radius:20px;font-weight:700}
+    .product-info{padding:8px 10px 10px}
+    .product-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.4;min-height:34px}
+    .product-price{font-size:14px;font-weight:700;color:var(--rose-dark)}
+    .product-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+    .add-btn{width:30px;height:30px;background:var(--rose);color:#fff;border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;transition:background 0.15s}
+    .add-btn:active{background:var(--rose-dark)}
+    .qty-ctrl{display:flex;align-items:center;gap:4px}
+    .qty-btn{width:26px;height:26px;border-radius:7px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px}
+    .qty-m{background:var(--rose-light);color:var(--rose)}
+    .qty-p{background:var(--rose);color:#fff}
+    .qty-n{font-size:13px;font-weight:700;min-width:18px;text-align:center}
+
+    /* SKELETON */
+    .skel{background:linear-gradient(90deg,#f0e4e9 25%,#fce7f3 50%,#f0e4e9 75%);background-size:200% 100%;animation:shim 1.5s infinite;border-radius:14px}
+    @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    /* CART BAR */
+    .cart-bar{position:fixed;bottom:16px;right:50%;transform:translateX(50%);width:calc(100% - 32px);max-width:448px;background:var(--rose);border-radius:16px;padding:14px 16px;display:none;align-items:center;justify-content:space-between;cursor:pointer;box-shadow:0 8px 24px rgba(190,24,93,0.4);z-index:100;font-family:'Tajawal',sans-serif}
+    .cart-bar.show{display:flex}
+    .cart-pill{background:rgba(255,255,255,0.25);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px}
+
+    /* EMPTY */
+    .empty{text-align:center;padding:4rem 2rem;color:var(--muted)}
+    .empty i{font-size:56px;opacity:0.3;display:block;margin-bottom:1rem}
+
+    /* NAV */
+    .glass-nav-wrap{position:fixed;bottom:0;right:50%;transform:translateX(50%);width:100%;max-width:480px;padding:8px 16px 12px;background:linear-gradient(to top,rgba(245,245,245,1) 60%,rgba(245,245,245,0));pointer-events:none;z-index:99}
+    .glass-nav{background:rgba(255,255,255,0.85);backdrop-filter:blur(24px);border:0.5px solid rgba(255,255,255,0.95);border-radius:26px;padding:8px 6px;display:grid;grid-template-columns:repeat(4,1fr);box-shadow:0 4px 28px rgba(0,0,0,0.09);pointer-events:all}
+    .gnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 4px;border-radius:20px;transition:background 0.2s}
+    .gnav-item:active{background:rgba(190,24,93,0.08)}
+    .gnav-icon{font-size:22px;color:var(--muted)}
+    .gnav-icon.act{color:var(--rose)}
+    .gnav-label{font-size:10px;color:var(--muted);font-weight:700}
+    .gnav-label.act{color:var(--rose)}
+    .gnav-dot{width:4px;height:4px;background:var(--rose);border-radius:50%;margin:0 auto;opacity:0}
+    .gnav-dot.act{opacity:1}
+
+    .toast{position:fixed;bottom:100px;right:50%;transform:translateX(50%);background:#1f1f1f;color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999;font-family:'Tajawal',sans-serif}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="btn-back" onclick="history.back()" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+  <div class="topbar-title" id="page-title">جاري التحميل...</div>
+  <button class="cart-btn" onclick="window.location.href='/pages/cart.html'" aria-label="السلة">
+    <i class="ti ti-shopping-cart" style="font-size:18px"></i>
+    <div class="cart-dot" id="cart-count">٠</div>
+  </button>
+</div>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <i class="ti ti-search" style="font-size:16px;color:var(--rose)" aria-hidden="true"></i>
+    <input type="text" id="search-input" placeholder="ابحث في المنتجات..." oninput="searchProducts(this.value)"/>
+  </div>
+</div>
+
+<div class="info-bar">
+  <div class="info-count" id="products-count">جاري التحميل...</div>
+  <button class="sort-btn" onclick="toggleSort()">
+    <i class="ti ti-arrows-sort" style="font-size:13px" aria-hidden="true"></i>
+    <span id="sort-label">الأقل سعراً</span>
+  </button>
+</div>
+
+<div class="products-grid" id="products-grid">
+  <div class="skel" style="height:220px"></div>
+  <div class="skel" style="height:220px"></div>
+  <div class="skel" style="height:220px"></div>
+  <div class="skel" style="height:220px"></div>
+</div>
+
+<!-- CART BAR -->
+<div class="cart-bar" id="cart-bar" onclick="window.location.href='/pages/cart.html'">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="cart-pill" id="cart-count-pill">٠ منتج</div>
+    <div style="font-size:14px;font-weight:700;color:#fff">عرض السلة</div>
+  </div>
+  <div style="font-size:15px;font-weight:700;color:#fff" id="cart-total">٠ ريال</div>
+</div>
+
+<!-- GLASS NAV -->
+<div class="glass-nav-wrap">
+  <nav class="glass-nav">
+    <div class="gnav-item" onclick="window.location.href='/'">
+      <i class="ti ti-home gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">الرئيسية</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/pages/restaurants.html'">
+      <i class="ti ti-tools-kitchen-2 gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">المطاعم</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/pages/supermarket.html'">
+      <i class="ti ti-building-store gnav-icon act" aria-hidden="true"></i>
+      <span class="gnav-label act">سوبرماركت</span>
+      <div class="gnav-dot act"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/pages/account.html'">
+      <i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">حسابي</span>
+      <div class="gnav-dot"></div>
+    </div>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+let allProducts=[], cart={}, sortAsc=true, categoryName='';
+
+/* ---- Init ---- */
+window.addEventListener('load', async () => {
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get('cat') || '';
+  // Try sessionStorage first (avoids encoding issues completely)
+  const stored = sessionStorage.getItem('qibah_cat') || '';
+  try { categoryName = stored || decodeURIComponent(raw).trim(); }
+  catch(e) { categoryName = stored || raw.trim(); }
+
+  document.getElementById('page-title').textContent = categoryName || 'المنتجات';
+  document.title = categoryName + ' - قبة';
+  loadCartFromStorage();
+  await loadProducts();
+});
+
+async function loadProducts() {
+  try {
+    // Load ALL active products then filter client-side
+    // This avoids any server-side Arabic encoding issues
+    const {data, error} = await sb
+      .from('supermarket_products')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order');
+
+    if (error) { allProducts = []; renderProducts([]); return; }
+
+    const all = data || [];
+
+    // Filter by category if specified
+    if (categoryName) {
+      // Normalize both strings for comparison
+      const normalize = s => s.trim().replace(/\s+/g,' ');
+      allProducts = all.filter(p =>
+        normalize(p.category_name) === normalize(categoryName)
+      );
+      // If still empty try includes match
+      if (!allProducts.length) {
+        allProducts = all.filter(p =>
+          p.category_name.includes(categoryName.substring(0,4)) ||
+          categoryName.includes(p.category_name.substring(0,4))
+        );
+      }
+    } else {
+      allProducts = all;
+    }
+  } catch(e) { allProducts = []; }
+  renderProducts(allProducts);
+}
+
+/* ---- Render products ---- */
+function renderProducts(list) {
+  document.getElementById('products-count').textContent = list.length + ' منتج';
+  if (!list.length) {
+    document.getElementById('products-grid').innerHTML = `
+      <div class="empty" style="grid-column:span 2">
+        <i class="ti ti-package" aria-hidden="true"></i>
+        لا توجد منتجات في هذه الفئة حالياً
+      </div>`;
+    return;
+  }
+  document.getElementById('products-grid').innerHTML = list.map(p => {
+    const qty = cart[p.id]?.qty || 0;
+    const inStock = p.in_stock !== false;
+    return `
+    <div class="product-card" id="pc-${p.id}">
+      <div class="product-img-wrap">
+        ${p.image_url
+          ? `<img src="${p.image_url}" alt="${p.name}" loading="lazy"/>`
+          : `<i class="ti ti-shopping-bag" style="font-size:48px;color:var(--border)" aria-hidden="true"></i>`}
+        ${!inStock ? `<div class="out-stock-overlay"><span class="out-stock-badge">نفذت الكمية</span></div>` : ''}
+      </div>
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-footer">
+          <div class="product-price">SAR ${p.price.toFixed(2)}</div>
+          ${inStock
+            ? `<div id="ctrl-${p.id}">
+                ${qty > 0
+                  ? `<div class="qty-ctrl">
+                      <button class="qty-btn qty-m" onclick="changeQty('${p.id}',-1,event)"><i class="ti ti-minus" style="font-size:10px"></i></button>
+                      <span class="qty-n">${qty}</span>
+                      <button class="qty-btn qty-p" onclick="changeQty('${p.id}',1,event)"><i class="ti ti-plus" style="font-size:10px"></i></button>
+                    </div>`
+                  : `<button class="add-btn" onclick="changeQty('${p.id}',1,event)" aria-label="أضف"><i class="ti ti-plus" style="font-size:14px"></i></button>`
+                }
+              </div>`
+            : ''
+          }
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ---- Cart functions ---- */
+function changeQty(id, delta, e) {
+  if (e) e.stopPropagation();
+  const prod = allProducts.find(p => p.id === id);
+  if (!prod) return;
+  if (!cart[id]) cart[id] = {item: prod, qty: 0};
+  cart[id].qty = Math.max(0, cart[id].qty + delta);
+  if (cart[id].qty === 0) delete cart[id];
+  saveCartToStorage();
+  updateCartBar();
+  updateCtrl(id);
+  if (delta > 0) showToast('تمت الإضافة ✓');
+}
+
+function updateCtrl(id) {
+  const ctrl = document.getElementById('ctrl-'+id);
+  if (!ctrl) return;
+  const qty = cart[id]?.qty || 0;
+  ctrl.innerHTML = qty > 0
+    ? `<div class="qty-ctrl">
+        <button class="qty-btn qty-m" onclick="changeQty('${id}',-1,event)"><i class="ti ti-minus" style="font-size:10px"></i></button>
+        <span class="qty-n">${qty}</span>
+        <button class="qty-btn qty-p" onclick="changeQty('${id}',1,event)"><i class="ti ti-plus" style="font-size:10px"></i></button>
+       </div>`
+    : `<button class="add-btn" onclick="changeQty('${id}',1,event)" aria-label="أضف"><i class="ti ti-plus" style="font-size:14px"></i></button>`;
+}
+
+function saveCartToStorage() {
+  const items = Object.values(cart).map(c => ({
+    id:    c.item.id,
+    name:  c.item.name,
+    price: c.item.price,
+    qty:   c.qty,
+    image: c.item.image_url || '',
+  }));
+  localStorage.setItem('qibah_cart', JSON.stringify(items));
+  localStorage.removeItem('qibah_restaurant');
+  localStorage.removeItem('qibah_delivery_fee');
+}
+
+function loadCartFromStorage() {
+  const saved = JSON.parse(localStorage.getItem('qibah_cart') || '[]');
+  saved.forEach(i => { cart[i.id] = {item:i, qty:i.qty}; });
+  updateCartBar();
+  const count = saved.reduce((s,i) => s+i.qty, 0);
+  document.getElementById('cart-count').textContent = count || '٠';
+}
+
+function updateCartBar() {
+  const items = Object.values(cart);
+  const count = items.reduce((s,i) => s+i.qty, 0);
+  const total = items.reduce((s,i) => s+(i.item.price*i.qty), 0);
+  const bar = document.getElementById('cart-bar');
+  document.getElementById('cart-count').textContent = count || '٠';
+  if (count > 0) {
+    bar.classList.add('show');
+    document.getElementById('cart-count-pill').textContent = count + ' منتج';
+    document.getElementById('cart-total').textContent = 'SAR ' + total.toFixed(2);
+  } else {
+    bar.classList.remove('show');
+  }
+}
+
+/* ---- Search ---- */
+function searchProducts(q) {
+  const filtered = q
+    ? allProducts.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.name.includes(q))
+    : allProducts;
+  renderProducts(filtered);
+  // Restore qty controls
+  Object.keys(cart).forEach(id => updateCtrl(id));
+}
+
+/* ---- Sort ---- */
+function toggleSort() {
+  sortAsc = !sortAsc;
+  document.getElementById('sort-label').textContent = sortAsc ? 'الأقل سعراً' : 'الأعلى سعراً';
+  allProducts.sort((a,b) => sortAsc ? a.price-b.price : b.price-a.price);
+  renderProducts(allProducts);
+  Object.keys(cart).forEach(id => updateCtrl(id));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1500);
+}
+</script>
+</body>
+</html>
