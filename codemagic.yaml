@@ -6,27 +6,20 @@ workflows:
     integrations:
       app_store_connect: Codemagic
     environment:
+      xcode: latest-stable
       vars:
         BUNDLE_ID: com.deliverystep.app
         XCODE_PROJECT: ios/DeliveryStep.xcodeproj
         XCODE_SCHEME: DeliveryStep
     scripts:
-      - name: Generate App Icon and fix Info.plist
+      - name: Verify icon and Info.plist
         script: |
-          SOURCE="play_store_icon_512.png"
           ICONSET="ios/DeliveryStep/Assets.xcassets/AppIcon.appiconset"
-          echo "Source icon dimensions:"
-          sips -g pixelWidth -g pixelHeight "$SOURCE"
-          # Upscale to 1024x1024 - matches AppIcon_1024.png reference in Contents.json
-          sips -z 1024 1024 "$SOURCE" --out "$ICONSET/AppIcon_1024.png"
-          echo "Generated AppIcon_1024.png dimensions:"
+          echo "=== AppIcon_1024.png ==="
           sips -g pixelWidth -g pixelHeight "$ICONSET/AppIcon_1024.png"
-          echo "Contents.json:"
+          echo "=== Contents.json ==="
           cat "$ICONSET/Contents.json"
-          # Ensure CFBundleIconName is set in Info.plist
-          /usr/libexec/PlistBuddy -c "Add :CFBundleIconName string AppIcon" ios/DeliveryStep/Info.plist 2>/dev/null || \
-          /usr/libexec/PlistBuddy -c "Set :CFBundleIconName AppIcon" ios/DeliveryStep/Info.plist
-          echo "CFBundleIconName value:"
+          echo "=== CFBundleIconName in Info.plist ==="
           /usr/libexec/PlistBuddy -c "Print :CFBundleIconName" ios/DeliveryStep/Info.plist
       - name: Set up keychain
         script: keychain initialize
