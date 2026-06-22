@@ -28,8 +28,8 @@ workflows:
           keychain add-certificates
       - name: Create App Store provisioning profile
         script: |
-          app-store-connect provisioning-profiles create \
-            --bundle-id "$BUNDLE_ID" \
+          app-store-connect create-profile \
+            "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --save
       - name: Set up code signing
