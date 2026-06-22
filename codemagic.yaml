@@ -21,17 +21,19 @@ workflows:
         script: |
           openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 \
             -out /tmp/dist_key.pem
-          app-store-connect certificates create \
+          CERT_OUTPUT=$(app-store-connect certificates create \
             --type IOS_DISTRIBUTION \
             --certificate-key @file:/tmp/dist_key.pem \
-            --save
+            --save 2>&1)
+          echo "$CERT_OUTPUT"
+          CERT_ID=$(echo "$CERT_OUTPUT" | grep "^Id:" | awk '{print $2}')
+          echo "Certificate ID: $CERT_ID"
           keychain add-certificates
-          CERT_ID=$(app-store-connect list-certificates \
-            --type IOS_DISTRIBUTION --json | \
-            python3 -c "import sys,json; certs=json.load(sys.stdin); certs.sort(key=lambda c:c.get('attributes',{}).get('expirationDate',''),reverse=True); print(certs[0]['id'])")
-          echo "Using certificate: $CERT_ID"
-          app-store-connect create-profile \
-            "$BUNDLE_ID" \
+          BUNDLE_RESOURCE_ID=$(app-store-connect bundle-ids list \
+            --identifier "$BUNDLE_ID" 2>&1 | grep "^Id:" | head -1 | awk '{print $2}')
+          echo "Bundle Resource ID: $BUNDLE_RESOURCE_ID"
+          app-store-connect profiles create \
+            "$BUNDLE_RESOURCE_ID" \
             --type IOS_APP_STORE \
             --certificate-ids "$CERT_ID" \
             --save
