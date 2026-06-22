@@ -3,9 +3,9 @@ workflows:
     name: iOS App Store Release
     max_build_duration: 60
     instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: Codemagic
     environment:
-      integrations:
-        app_store_connect: Codemagic
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.deliverystep.app
@@ -14,7 +14,7 @@ workflows:
         XCODE_PROJECT: ios/DeliveryStep.xcodeproj
         XCODE_SCHEME: DeliveryStep
     scripts:
-      - name: Generate App Icon
+      - name: Generate App Icon (1024x1024) from play store icon
         script: |
           sips -z 1024 1024 play_store_icon_512.png \
             --out ios/DeliveryStep/Assets.xcassets/AppIcon.appiconset/AppIcon_1024.png
