@@ -50,6 +50,10 @@ workflows:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
     publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        cancel_previous_submissions: true
       email:
         recipients:
           - ihsanullah.danish5000@gmail.com
