@@ -11,10 +11,16 @@ workflows:
         XCODE_PROJECT: ios/DeliveryStep.xcodeproj
         XCODE_SCHEME: DeliveryStep
     scripts:
-      - name: Generate App Icon (1024x1024) from play store icon
+      - name: Generate all App Icons and fix Info.plist
         script: |
-          sips -z 1024 1024 play_store_icon_512.png \
-            --out ios/DeliveryStep/Assets.xcassets/AppIcon.appiconset/AppIcon_1024.png
+          SOURCE="play_store_icon_512.png"
+          ICONSET="ios/DeliveryStep/Assets.xcassets/AppIcon.appiconset"
+          for size in 20 29 40 58 60 76 80 87 120 152 167 180 1024; do
+            sips -z $size $size "$SOURCE" --out "$ICONSET/Icon-${size}.png"
+          done
+          python3 -c "import json,sys; d={'images':[{'filename':'Icon-40.png','idiom':'iphone','scale':'2x','size':'20x20'},{'filename':'Icon-60.png','idiom':'iphone','scale':'3x','size':'20x20'},{'filename':'Icon-58.png','idiom':'iphone','scale':'2x','size':'29x29'},{'filename':'Icon-87.png','idiom':'iphone','scale':'3x','size':'29x29'},{'filename':'Icon-80.png','idiom':'iphone','scale':'2x','size':'40x40'},{'filename':'Icon-120.png','idiom':'iphone','scale':'3x','size':'40x40'},{'filename':'Icon-120.png','idiom':'iphone','scale':'2x','size':'60x60'},{'filename':'Icon-180.png','idiom':'iphone','scale':'3x','size':'60x60'},{'filename':'Icon-20.png','idiom':'ipad','scale':'1x','size':'20x20'},{'filename':'Icon-40.png','idiom':'ipad','scale':'2x','size':'20x20'},{'filename':'Icon-29.png','idiom':'ipad','scale':'1x','size':'29x29'},{'filename':'Icon-58.png','idiom':'ipad','scale':'2x','size':'29x29'},{'filename':'Icon-40.png','idiom':'ipad','scale':'1x','size':'40x40'},{'filename':'Icon-80.png','idiom':'ipad','scale':'2x','size':'40x40'},{'filename':'Icon-76.png','idiom':'ipad','scale':'1x','size':'76x76'},{'filename':'Icon-152.png','idiom':'ipad','scale':'2x','size':'76x76'},{'filename':'Icon-167.png','idiom':'ipad','scale':'2x','size':'83.5x83.5'},{'filename':'Icon-1024.png','idiom':'ios-marketing','scale':'1x','size':'1024x1024'}],'info':{'author':'xcode','version':1}}; json.dump(d,sys.stdout,indent=2)" > "$ICONSET/Contents.json"
+          /usr/libexec/PlistBuddy -c "Add :CFBundleIconName string AppIcon" ios/DeliveryStep/Info.plist 2>/dev/null || \
+          /usr/libexec/PlistBuddy -c "Set :CFBundleIconName AppIcon" ios/DeliveryStep/Info.plist
       - name: Set up keychain
         script: keychain initialize
       - name: Create certificate and provisioning profile
