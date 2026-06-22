@@ -29,8 +29,10 @@ workflows:
           CERT_ID=$(echo "$CERT_OUTPUT" | grep "^Id:" | awk '{print $2}')
           echo "Certificate ID: $CERT_ID"
           keychain add-certificates
-          BUNDLE_RESOURCE_ID=$(app-store-connect bundle-ids list \
-            --identifier "$BUNDLE_ID" 2>&1 | grep "^Id:" | head -1 | awk '{print $2}')
+          ALL_BUNDLES=$(app-store-connect list-bundle-ids 2>&1)
+          echo "$ALL_BUNDLES"
+          BUNDLE_RESOURCE_ID=$(echo "$ALL_BUNDLES" | \
+            awk '/^Id:/{id=$2} /com\.deliverystep\.app/{print id; exit}')
           echo "Bundle Resource ID: $BUNDLE_RESOURCE_ID"
           app-store-connect profiles create \
             "$BUNDLE_RESOURCE_ID" \
