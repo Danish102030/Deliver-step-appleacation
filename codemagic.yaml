@@ -14,7 +14,7 @@ workflows:
         XCODE_PROJECT: ios/DeliveryStep.xcodeproj
         XCODE_SCHEME: DeliveryStep
     scripts:
-      - name: Generate App Icon (1024x1024) from play store icon
+      - name: Generate App Icon
         script: |
           sips -z 1024 1024 play_store_icon_512.png \
             --out ios/DeliveryStep/Assets.xcassets/AppIcon.appiconset/AppIcon_1024.png
