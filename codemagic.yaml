@@ -6,7 +6,6 @@ workflows:
     integrations:
       app_store_connect: Codemagic
     environment:
-      xcode: latest-stable
       vars:
         BUNDLE_ID: com.deliverystep.app
         XCODE_PROJECT: ios/DeliveryStep.xcodeproj
