@@ -8,8 +8,12 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            WebView(url: URL(string: "https://deliverystep.app/")!)
+            // Pink fills safe area top (status bar background on all pages)
+            Color(red: 190/255, green: 24/255, blue: 93/255)
                 .ignoresSafeArea()
+
+            WebView(url: URL(string: "https://deliverystep.app/")!)
+                .ignoresSafeArea(edges: .bottom)
 
             if isLoading {
                 ZStack {
@@ -57,6 +61,10 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            // Force white status bar text so it's visible on the pink background
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                scene.windows.forEach { $0.overrideUserInterfaceStyle = .dark }
+            }
             checkNetwork()
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 withAnimation(.easeOut(duration: 0.4)) { isLoading = false }
