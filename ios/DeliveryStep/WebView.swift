@@ -57,6 +57,14 @@ struct WebView: UIViewRepresentable {
             webView.scrollView.refreshControl?.endRefreshing()
         }
 
+        // Handle window.open() calls (e.g. WhatsApp links) — open with system app
+        func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+            if let url = navigationAction.request.url {
+                UIApplication.shared.open(url)
+            }
+            return nil
+        }
+
         func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
             let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in completionHandler() })
