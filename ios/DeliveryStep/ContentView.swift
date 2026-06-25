@@ -4,6 +4,7 @@ import Network
 struct ContentView: View {
     @State private var isLoading = true
     @State private var isOffline = false
+    @State private var networkStarted = false
     private let monitor = NWPathMonitor()
 
     var body: some View {
@@ -61,10 +62,6 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            // Force white status bar text so it's visible on the pink background
-            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-                scene.windows.forEach { $0.overrideUserInterfaceStyle = .dark }
-            }
             checkNetwork()
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 withAnimation(.easeOut(duration: 0.4)) { isLoading = false }
@@ -73,6 +70,8 @@ struct ContentView: View {
     }
 
     func checkNetwork() {
+        guard !networkStarted else { return }
+        networkStarted = true
         monitor.pathUpdateHandler = { path in
             DispatchQueue.main.async {
                 isOffline = path.status != .satisfied
