@@ -80,8 +80,9 @@ struct WebView: UIViewRepresentable {
 
         private func topViewController() -> UIViewController? {
             UIApplication.shared.connectedScenes
+                .filter { $0.activationState == .foregroundActive }
                 .compactMap { $0 as? UIWindowScene }
-                .first?.windows.first?.rootViewController
+                .first?.keyWindow?.rootViewController
         }
     }
 }
