@@ -1,4 +1,54 @@
 workflows:
+  android-rider-apk:
+    name: Android Rider APK
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      android_signing:
+        - deliverystep_keystore
+      vars:
+        PACKAGE_NAME: com.deliverstep.app
+        APP_NAME: Delivery Step Rider
+      node: 22
+      java: 21
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install
+      - name: Sync Capacitor
+        script: |
+          npx cap sync android
+      - name: Verify google-services.json
+        script: |
+          if [ ! -f "android/app/google-services.json" ]; then
+            echo "ERROR: google-services.json missing"
+            exit 1
+          fi
+          echo "google-services.json OK"
+      - name: Build signed release APK
+        script: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew assembleRelease
+          echo "=== Built APKs ==="
+          find . -name "*.apk" -type f
+      - name: Rename APK
+        script: |
+          find android -name "*.apk" -type f | while read apk; do
+            dir=$(dirname "$apk")
+            cp "$apk" "$dir/DeliveryStepRider.apk"
+          done
+    artifacts:
+      - android/app/build/outputs/**/*.apk
+      - android/app/build/outputs/mapping/**/*.txt
+    publishing:
+      email:
+        recipients:
+          - ihsanullah.danish5000@gmail.com
+        notify:
+          success: true
+          failure: true
+
   ios-app-store:
     name: iOS App Store Release
     max_build_duration: 60
