@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "909895024559",
+    "project_id": "delivery-step-7a9ad",
+    "storage_bucket": "delivery-step-7a9ad.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:909895024559:android:99bee4000b0866d7c1395a",
+        "android_client_info": {
+          "package_name": "com.deliverstep.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCN7oGiG1o8jsTgnEDPzoirUlkqTL5n1U0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
