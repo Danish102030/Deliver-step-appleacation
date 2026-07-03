@@ -1,9 +1,9 @@
 {
   "appId": "com.deliverstep.app",
-  "appName": "خطوة التوصيل",
+  "appName": "Rider",
   "webDir": "www",
   "server": {
-    "url": "https://deliverystep.app",
+    "url": "https://deliverystep.app/rider.html",
     "cleartext": false
   },
   "plugins": {
