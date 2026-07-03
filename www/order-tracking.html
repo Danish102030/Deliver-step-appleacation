@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<meta name="theme-color" content="#be185d"/>
+<title>تتبع الطلب - خطوة التوصيل</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f1f1f;--muted:#6b7280;--border:#f0e4e9;--bg:#f9f9f9;--white:#fff;--green:#16a34a;--green-bg:#dcfce7;--amber:#d97706;--purple:#7c3aed}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:30px;direction:rtl;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+
+/* TOPBAR */
+.topbar{background:var(--rose);padding:11px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(190,24,93,0.2)}
+.btn-back{background:rgba(255,255,255,0.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:700;color:#fff;flex:1;text-align:center}
+.order-pill{background:rgba(255,255,255,0.2);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;white-space:nowrap}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#9d174d,#be185d);padding:14px 16px 52px;text-align:center}
+.num-label{font-size:10px;color:rgba(255,255,255,0.8);margin-bottom:3px}
+.num-val{font-size:26px;font-weight:700;color:#fff;letter-spacing:3px}
+.num-time{font-size:10px;color:rgba(255,255,255,0.7);margin-top:3px}
+
+/* MAIN ANIMATION CARD */
+.anim-card{background:var(--white);margin:0 16px;margin-top:-38px;border-radius:22px;padding:22px 16px 18px;box-shadow:0 6px 28px rgba(0,0,0,0.1);position:relative;z-index:2;margin-bottom:14px}
+
+/* CIRCLE */
+.circle-wrap{display:flex;justify-content:center;margin-bottom:14px}
+.circle-outer{width:140px;height:140px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center}
+.svg-ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.circle-inner{width:108px;height:108px;background:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;box-shadow:inset 0 2px 10px rgba(0,0,0,0.06)}
+
+/* STEP 2 - Cooking */
+.cooking-wrap{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center}
+.pan{font-size:34px;animation:panShake 0.5s ease-in-out infinite;display:block}
+@keyframes panShake{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}}
+.steam{position:absolute;top:-10px;left:50%;transform:translateX(-50%);display:flex;gap:5px}
+.s-puff{width:6px;height:6px;background:#d1d5db;border-radius:50%;animation:steamUp 1.2s ease-in-out infinite}
+.s-puff:nth-child(2){animation-delay:0.4s}
+.s-puff:nth-child(3){animation-delay:0.8s}
+@keyframes steamUp{0%{opacity:0.9;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-16px) scale(2.5)}}
+.knife{font-size:18px;position:absolute;bottom:0px;right:-4px;animation:knifeChop 0.5s ease-in-out infinite}
+@keyframes knifeChop{0%,100%{transform:rotate(-25deg)}50%{transform:rotate(25deg)}}
+
+/* STEP 3 - Rider */
+.moto-wrap{position:relative;width:58px;height:46px;display:flex;align-items:center;justify-content:center}
+.moto{font-size:36px;animation:motoGo 0.7s ease-in-out infinite}
+@keyframes motoGo{0%,100%{transform:translateX(-4px) rotate(-3deg)}50%{transform:translateX(4px) rotate(3deg)}}
+.wheel-l{position:absolute;bottom:3px;left:3px;width:9px;height:9px;border:2.5px solid #374151;border-radius:50%;border-top-color:transparent;animation:spin 0.35s linear infinite}
+.wheel-r{position:absolute;bottom:3px;right:3px;width:9px;height:9px;border:2.5px solid #374151;border-radius:50%;border-top-color:transparent;animation:spin 0.35s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.road-lines{position:absolute;bottom:-4px;left:-6px;display:flex;gap:5px}
+.rl{width:14px;height:2px;background:#e5e7eb;border-radius:1px;animation:lineMove 0.35s linear infinite}
+.rl:nth-child(2){animation-delay:0.12s}
+.rl:nth-child(3){animation-delay:0.24s}
+@keyframes lineMove{0%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(-22px)}}
+
+/* LABELS */
+.anim-label{font-size:15px;font-weight:700;color:var(--text);text-align:center;margin-bottom:3px}
+.anim-sub{font-size:11px;color:var(--muted);text-align:center;margin-bottom:14px}
+
+/* ETA */
+.eta-row{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--rose-soft);border-radius:10px;padding:8px 16px;border:0.5px solid var(--rose-light);margin-bottom:14px;display:none}
+.live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:livePulse 1.5s infinite;flex-shrink:0}
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.eta-num{font-size:20px;font-weight:700;color:var(--rose)}
+.eta-txt{font-size:11px;color:var(--rose-dark);font-weight:500}
+
+/* MINI STEPS */
+.prog-steps{display:flex;align-items:flex-start}
+.ps{display:flex;flex-direction:column;align-items:center;flex:1}
+.ps-dot{width:11px;height:11px;border-radius:50%;margin-bottom:5px;flex-shrink:0;transition:all .4s}
+.pd-done{background:var(--green)}
+.pd-active{background:var(--rose);animation:dotPulse 1.2s infinite}
+.pd-wait{background:#e5e7eb}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 0 0 rgba(190,24,93,0.3)}50%{box-shadow:0 0 0 6px rgba(190,24,93,0)}}
+.ps-lbl{font-size:9px;font-weight:700;text-align:center;line-height:1.3;transition:color .4s}
+.pl-d{color:var(--green)}.pl-a{color:var(--rose)}.pl-w{color:#9ca3af}
+.ps-line{flex:1;height:2px;margin-top:5px;transition:background .4s}
+.pl-done{background:var(--green)}.pl-wait{background:#e5e7eb}
+
+/* CARDS */
+.card{background:var(--white);border:0.5px solid var(--border);border-radius:16px;padding:14px;margin-bottom:12px}
+.card-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card-title i{color:var(--rose);font-size:15px}
+
+/* RIDER CARD */
+.rider-row{display:flex;align-items:center;gap:12px}
+.rider-av{width:46px;height:46px;background:var(--rose-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid var(--rose-light)}
+.rider-name{font-size:14px;font-weight:700;color:var(--text)}
+.rider-status{font-size:10px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:4px;margin-top:2px}
+.rider-actions{margin-right:auto;display:flex;gap:8px}
+.r-btn{width:36px;height:36px;border-radius:9px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:transform .15s}
+.r-btn:active{transform:scale(0.9)}
+.r-call{background:#f0fdf4;color:var(--green)}
+.r-wa{background:var(--rose-soft);color:var(--rose)}
+
+/* ORDER ITEMS */
+.item-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:0.5px solid var(--border)}
+.item-row:last-of-type{border-bottom:none}
+.item-img{width:40px;height:40px;border-radius:8px;background:var(--rose-soft);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden}
+.item-img img{width:100%;height:100%;object-fit:cover}
+.item-name{flex:1;font-size:12px;font-weight:700;color:var(--text)}
+.item-qty{font-size:10px;color:var(--muted);margin-top:1px}
+.item-price{font-size:12px;font-weight:700;color:var(--rose)}
+
+/* TOTALS */
+.totals{margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border)}
+.total-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:2px 0}
+.total-final{display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:var(--text);padding:9px 0 0;border-top:1px solid var(--border);margin-top:6px}
+.total-final span:last-child{color:var(--rose)}
+
+/* ACTION BTNS */
+.action-row{display:flex;gap:8px;padding:0 16px;margin-bottom:14px}
+.act-btn{flex:1;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:transform .15s}
+.act-btn:active{transform:scale(0.97)}
+.act-rose{background:var(--rose);color:#fff}
+.act-white{background:var(--white);color:var(--text);border:0.5px solid var(--border)}
+
+/* RATING */
+.stars-row{display:flex;gap:10px;justify-content:center;margin-top:8px}
+.star-btn{font-size:30px;cursor:pointer;transition:transform .2s;filter:grayscale(1);background:none;border:none}
+.star-btn.lit{filter:none;transform:scale(1.15)}
+
+/* ADDR */
+.addr-row{display:flex;align-items:flex-start;gap:10px}
+.addr-ic{width:32px;height:32px;background:var(--rose-soft);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--rose);font-size:15px;flex-shrink:0}
+.addr-text{flex:1;font-size:12px;color:var(--muted);line-height:1.6}
+.map-btn{background:var(--rose-soft);color:var(--rose);border:0.5px solid var(--rose-light);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="btn-back" onclick="goBack()" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+  <div class="topbar-title">تتبع طلبك</div>
+  <div class="order-pill" id="topbar-order">#DS-XXXX</div>
+</div>
+
+<div class="hero">
+  <div class="num-label">رقم طلبك</div>
+  <div class="num-val" id="hero-num">#DS-XXXX</div>
+  <div class="num-time" id="hero-time">جاري التحميل...</div>
+</div>
+
+<div style="padding:0 16px">
+
+  <!-- MAIN ANIMATION CARD -->
+  <div class="anim-card">
+    <div class="circle-wrap">
+      <div class="circle-outer">
+        <svg class="svg-ring" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="63" fill="none" stroke="#f3f4f6" stroke-width="6"/>
+          <circle id="ring-prog" cx="70" cy="70" r="63" fill="none" stroke="#16a34a" stroke-width="6"
+            stroke-linecap="round" stroke-dasharray="396" stroke-dashoffset="297"
+            style="transition:stroke-dashoffset 0.8s ease,stroke 0.5s ease"/>
+        </svg>
+        <div class="circle-inner">
+          <div id="anim-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="anim-label" id="anim-label">تم استلام طلبك! ✅</div>
+    <div class="anim-sub" id="anim-sub">سيتم تجهيز طلبك قريباً</div>
+
+    <div class="eta-row" id="eta-row">
+      <div class="live-dot"></div>
+      <div class="eta-num" id="eta-num">٢٠-٣٠</div>
+      <div class="eta-txt">دقيقة وقت التوصيل</div>
+    </div>
+
+    <div class="prog-steps">
+      <div class="ps"><div class="ps-dot pd-done" id="pd1"></div><div class="ps-lbl pl-d" id="pl1">الطلب</div></div>
+      <div class="ps-line pl-wait" id="pline1"></div>
+      <div class="ps"><div class="ps-dot pd-wait" id="pd2"></div><div class="ps-lbl pl-w" id="pl2">التحضير</div></div>
+      <div class="ps-line pl-wait" id="pline2"></div>
+      <div class="ps"><div class="ps-dot pd-wait" id="pd3"></div><div class="ps-lbl pl-w" id="pl3">في الطريق</div></div>
+      <div class="ps-line pl-wait" id="pline3"></div>
+      <div class="ps"><div class="ps-dot pd-wait" id="pd4"></div><div class="ps-lbl pl-w" id="pl4">التسليم</div></div>
+    </div>
+  </div>
+
+  <!-- RIDER CARD -->
+  <div class="card" id="rider-card" style="display:none">
+    <div class="card-title"><i class="ti ti-motorbike"></i> السائق</div>
+    <div class="rider-row">
+      <div class="rider-av">🛵</div>
+      <div>
+        <div class="rider-name" id="rider-name">-</div>
+        <div class="rider-status"><div class="live-dot"></div> في الطريق إليك</div>
+      </div>
+      <div class="rider-actions">
+        <button class="r-btn r-call" id="rider-call" aria-label="اتصال"><i class="ti ti-phone" style="font-size:16px"></i></button>
+        <button class="r-btn r-wa" id="rider-wa" aria-label="واتساب"><i class="ti ti-brand-whatsapp" style="font-size:16px"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER ITEMS -->
+  <div class="card" id="items-card">
+    <div class="card-title"><i class="ti ti-shopping-bag"></i> تفاصيل طلبك</div>
+    <div id="items-list"><div style="text-align:center;padding:1rem;color:var(--muted);font-size:12px">جاري التحميل...</div></div>
+    <div class="totals" id="totals-wrap" style="display:none">
+      <div class="total-row"><span>المجموع</span><span id="t-sub">-</span></div>
+      <div class="total-row"><span>التوصيل</span><span id="t-del">-</span></div>
+      <div class="total-row" id="t-disc-row" style="display:none"><span>الخصم</span><span id="t-disc" style="color:var(--green)">-</span></div>
+      <div class="total-final"><span>الإجمالي</span><span id="t-total">-</span></div>
+    </div>
+  </div>
+
+  <!-- ADDRESS -->
+  <div class="card" id="addr-card" style="display:none">
+    <div class="card-title"><i class="ti ti-map-pin"></i> عنوان التوصيل</div>
+    <div class="addr-row">
+      <div class="addr-ic"><i class="ti ti-map-pin"></i></div>
+      <div class="addr-text" id="addr-text">-</div>
+      <button class="map-btn" id="map-btn">🗺️ خريطة</button>
+    </div>
+  </div>
+
+  <!-- RATING -->
+  <div class="card" id="rating-card" style="display:none">
+    <div class="card-title"><i class="ti ti-star"></i> قيّم تجربتك</div>
+    <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:6px">كيف كانت تجربتك مع خطوة التوصيل؟</div>
+    <div class="stars-row">
+      <button class="star-btn" onclick="rateOrder(1)" aria-label="نجمة واحدة">⭐</button>
+      <button class="star-btn" onclick="rateOrder(2)" aria-label="نجمتان">⭐</button>
+      <button class="star-btn" onclick="rateOrder(3)" aria-label="ثلاث نجوم">⭐</button>
+      <button class="star-btn" onclick="rateOrder(4)" aria-label="أربع نجوم">⭐</button>
+      <button class="star-btn" onclick="rateOrder(5)" aria-label="خمس نجوم">⭐</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="action-row">
+  <button class="act-btn act-rose" onclick="goHome()"><i class="ti ti-home" style="font-size:16px"></i> الرئيسية</button>
+  <button class="act-btn act-white" id="support-btn"><i class="ti ti-brand-whatsapp" style="font-size:16px"></i> تواصل معنا</button>
+</div>
+
+<script>
+const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
+const OWNER_WA='966503098962';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+const RIDERS=[
+  {name:'Ihsan', phone:'0508112376'},
+  {name:'Adnan', phone:'0534611858'},
+  {name:'Jamil', phone:'0546788065'},
+  {name:'Loqman',phone:'0535313266'},
+  {name:'Adil',  phone:'0559239794'},
+];
+
+// Navigation helpers — use origin-based absolute URL so it works
+// whether opened from the app, Hostinger, or a deep link
+function goHome(){
+  window.location.href=window.location.origin+'/index.html';
+}
+function goBack(){
+  if(window.history.length>1){
+    window.history.back();
+  }else{
+    goHome();
+  }
+}
+
+const STATUS_CFG={
+  pending:{
+    html:'<div style="width:52px;height:52px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:popIn .5s ease"><i class="ti ti-check" style="font-size:24px;color:#16a34a"></i></div>',
+    label:'تم استلام طلبك! ✅',sub:'سيتم تجهيز طلبك قريباً',
+    step:1,ring:'#16a34a',offset:297,eta:false
+  },
+  assigned:{
+    html:'<div class="cooking-wrap"><div class="steam"><div class="s-puff"></div><div class="s-puff"></div><div class="s-puff"></div></div><div class="pan">🍳</div><div class="knife">🔪</div></div>',
+    label:'جاري تجهيز طلبك 🍳',sub:'المطعم يعمل على تحضير طلبك الآن',
+    step:2,ring:'#f59e0b',offset:198,eta:true,etaNum:'٢٠-٣٠'
+  },
+  on_the_way:{
+    html:'<div class="moto-wrap"><div class="moto">🛵</div><div class="wheel-l"></div><div class="wheel-r"></div><div class="road-lines"><div class="rl"></div><div class="rl"></div><div class="rl"></div></div></div>',
+    label:'السائق في الطريق إليك 🛵',sub:'طلبك على الطريق الآن!',
+    step:3,ring:'#7c3aed',offset:99,eta:true,etaNum:'١٠-٢٠'
+  },
+  delivered:{
+    html:'<div style="display:flex;flex-direction:column;align-items:center;gap:5px"><div style="font-size:34px;animation:houseBounce .8s ease infinite alternate">🏠</div><div style="display:flex;gap:5px"><span style="font-size:13px;animation:spTwinkle .8s ease-in-out infinite">✨</span><span style="font-size:13px;animation:spTwinkle .8s ease-in-out .27s infinite">🌹</span><span style="font-size:13px;animation:spTwinkle .8s ease-in-out .54s infinite">✨</span></div></div>',
+    label:'تم التسليم بنجاح! 🎉',sub:'نتمنى أن ينال طلبك إعجابك 🌹',
+    step:4,ring:'#be185d',offset:0,eta:false
+  },
+};
+
+const style=document.createElement('style');
+style.textContent=`
+@keyframes popIn{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes panShake{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}}
+@keyframes steamUp{0%{opacity:.9;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-16px) scale(2.5)}}
+@keyframes knifeChop{0%,100%{transform:rotate(-25deg)}50%{transform:rotate(25deg)}}
+@keyframes motoGo{0%,100%{transform:translateX(-4px) rotate(-3deg)}50%{transform:translateX(4px) rotate(3deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes lineMove{0%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(-22px)}}
+@keyframes houseBounce{0%{transform:scale(1)}100%{transform:scale(1.12)}}
+@keyframes spTwinkle{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+`;
+document.head.appendChild(style);
+
+let currentOrder=null;
+
+window.addEventListener('load',()=>{
+  const orderNum=(localStorage.getItem('qibah_last_order_num')||'').replace('QIB-','DS-');
+  const displayNum=orderNum||'DS-XXXX';
+  document.getElementById('hero-num').textContent='#'+displayNum;
+  document.getElementById('topbar-order').textContent='#'+displayNum;
+
+  setupSupportBtn(displayNum);
+  showStatus('pending');
+
+  if(orderNum&&orderNum!=='DS-XXXX'){
+    loadOrder(orderNum);
+    setInterval(()=>loadOrder(orderNum),20000);
+  }else{
+    loadFromLocalStorage();
+  }
+});
+
+async function loadOrder(num){
+  try{
+    const{data}=await sb.from('orders').select('*').eq('order_number',num).single();
+    if(data){currentOrder=data;renderOrder(data);loadOrderItems(data.id);}
+    else loadFromLocalStorage();
+  }catch(e){loadFromLocalStorage();}
+}
+
+async function loadOrderItems(orderId){
+  try{
+    const{data}=await sb.from('order_items').select('*').eq('order_id',orderId);
+    if(data&&data.length) renderItems(data);
+    else loadItemsFromLS();
+  }catch(e){loadItemsFromLS();}
+}
+
+function renderOrder(o){
+  const time=new Date(o.created_at).toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
+  const payLabel={cod:'نقداً',card:'POS',bank:'تحويل بنكي',apple:'Apple Pay'}[o.payment_method]||o.payment_method||'';
+  document.getElementById('hero-time').textContent='اليوم · '+time+(payLabel?' · '+payLabel:'');
+
+  if(o.delivery_address){
+    document.getElementById('addr-card').style.display='block';
+    document.getElementById('addr-text').textContent=o.delivery_address;
+    if(o.delivery_lat){
+      document.getElementById('map-btn').onclick=()=>window.open('https://maps.google.com/?q='+o.delivery_lat+','+o.delivery_lng,'_blank');
+    }
+  }
+
+  if(o.rider_name){
+    document.getElementById('rider-card').style.display='block';
+    document.getElementById('rider-name').textContent=o.rider_name;
+    const r=RIDERS.find(x=>x.name===o.rider_name);
+    if(r){
+      document.getElementById('rider-call').onclick=()=>window.location.href='tel:'+r.phone;
+      document.getElementById('rider-wa').onclick=()=>window.open('https://api.whatsapp.com/send?phone=966'+r.phone.substring(1),'_blank');
+    }
+  }
+
+  showStatus(o.order_status||'pending');
+  if(o.order_status==='delivered') document.getElementById('rating-card').style.display='block';
+}
+
+function showStatus(status){
+  const cfg=STATUS_CFG[status]||STATUS_CFG.pending;
+  document.getElementById('anim-content').innerHTML=cfg.html;
+  document.getElementById('anim-label').textContent=cfg.label;
+  document.getElementById('anim-sub').textContent=cfg.sub;
+
+  const ring=document.getElementById('ring-prog');
+  ring.style.stroke=cfg.ring;
+  ring.style.strokeDashoffset=cfg.offset;
+
+  const etaRow=document.getElementById('eta-row');
+  etaRow.style.display=cfg.eta?'flex':'none';
+  if(cfg.eta) document.getElementById('eta-num').textContent=cfg.etaNum;
+
+  for(let i=1;i<=4;i++){
+    const dot=document.getElementById('pd'+i);
+    const lbl=document.getElementById('pl'+i);
+    if(i<cfg.step){dot.className='ps-dot pd-done';lbl.className='ps-lbl pl-d';}
+    else if(i===cfg.step){dot.className='ps-dot pd-active';lbl.className='ps-lbl pl-a';}
+    else{dot.className='ps-dot pd-wait';lbl.className='ps-lbl pl-w';}
+  }
+  for(let i=1;i<=3;i++){
+    document.getElementById('pline'+i).className='ps-line '+(i<cfg.step?'pl-done':'pl-wait');
+  }
+}
+
+function renderItems(items){
+  document.getElementById('items-list').innerHTML=items.map(i=>`
+    <div class="item-row">
+      <div class="item-img">🛍️</div>
+      <div style="flex:1">
+        <div class="item-name">${i.product_name}</div>
+        <div class="item-qty">× ${i.quantity}</div>
+      </div>
+      <div class="item-price">SAR ${Number(i.total_price).toFixed(2)}</div>
+    </div>`).join('');
+  const sub=items.reduce((s,i)=>s+Number(i.total_price),0);
+  showTotals(sub,currentOrder);
+}
+
+function loadItemsFromLS(){
+  const cart=JSON.parse(localStorage.getItem('qibah_last_cart')||'[]');
+  if(!cart.length){document.getElementById('items-list').innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted);font-size:12px">لا توجد تفاصيل</div>';return;}
+  document.getElementById('items-list').innerHTML=cart.map(i=>`
+    <div class="item-row">
+      <div class="item-img">${i.image?'<img src="'+i.image+'" alt="'+i.name+'"/>':'🛍️'}</div>
+      <div style="flex:1">
+        <div class="item-name">${i.name}</div>
+        <div class="item-qty">× ${i.qty}</div>
+      </div>
+      <div class="item-price">SAR ${(i.price*i.qty).toFixed(2)}</div>
+    </div>`).join('');
+  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  showTotals(sub,null);
+}
+
+function loadFromLocalStorage(){
+  const time=new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('hero-time').textContent='اليوم · '+time;
+  const addr=localStorage.getItem('qibah_last_address');
+  const lat=localStorage.getItem('qibah_last_lat');
+  const lng=localStorage.getItem('qibah_last_lng');
+  if(addr){
+    document.getElementById('addr-card').style.display='block';
+    document.getElementById('addr-text').textContent=addr;
+    if(lat) document.getElementById('map-btn').onclick=()=>window.open('https://maps.google.com/?q='+lat+','+lng,'_blank');
+  }
+  showStatus('on_the_way');
+  loadItemsFromLS();
+}
+
+function showTotals(sub,order){
+  const del=order?Number(order.delivery_fee||0):5.5;
+  const disc=order?Number(order.discount||0):0;
+  const tot=sub+del-disc;
+  document.getElementById('t-sub').textContent='SAR '+sub.toFixed(2);
+  document.getElementById('t-del').textContent=del===0?'مجاني':'SAR '+del.toFixed(2);
+  if(disc>0){document.getElementById('t-disc-row').style.display='flex';document.getElementById('t-disc').textContent='-SAR '+disc.toFixed(2);}
+  document.getElementById('t-total').textContent='SAR '+tot.toFixed(2);
+  document.getElementById('totals-wrap').style.display='block';
+}
+
+function setupSupportBtn(num){
+  const msg='مرحباً خطوة التوصيل! لدي استفسار عن طلبي رقم #'+num;
+  document.getElementById('support-btn').onclick=()=>window.open('https://api.whatsapp.com/send?phone='+OWNER_WA+'&text='+encodeURIComponent(msg),'_blank');
+}
+
+function rateOrder(stars){
+  document.querySelectorAll('.star-btn').forEach((el,i)=>el.classList.toggle('lit',i<stars));
+  setTimeout(()=>{
+    document.getElementById('rating-card').innerHTML=
+      '<div style="text-align:center;padding:10px">'+
+        '<div style="font-size:30px;margin-bottom:6px">🌹</div>'+
+        '<div style="font-size:14px;font-weight:700;color:var(--text)">شكراً على تقييمك!</div>'+
+        '<div style="font-size:11px;color:var(--muted);margin-top:4px">نسعى دائماً لتحسين خدمتنا</div>'+
+      '</div>';
+  },800);
+}
+</script>
+<script src="capacitor-init.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "appId": "com.deliverstep.app",
+  "appName": "خطوة التوصيل",
+  "webDir": "www",
+  "server": {
+    "url": "https://deliverystep.app",
+    "cleartext": false
+  },
+  "plugins": {
+    "StatusBar": {
+      "backgroundColor": "#be185d",
+      "style": "LIGHT",
+      "overlaysWebView": false
+    },
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#be185d",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false
+    },
+    "PushNotifications": {
+      "presentationOptions": [
+        "badge",
+        "sound",
+        "alert"
+      ]
+    }
+  },
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  }
+}
