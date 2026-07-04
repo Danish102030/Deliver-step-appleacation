@@ -4,7 +4,7 @@ android {
     namespace "com.deliverstep.app"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.deliverstep.app"
+        applicationId "com.deliverystep.rider"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 4

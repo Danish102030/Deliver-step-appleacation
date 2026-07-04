@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Rider</string>
     <string name="title_activity_main">Rider</string>
-    <string name="package_name">com.deliverstep.app</string>
-    <string name="custom_url_scheme">com.deliverstep.app</string>
+    <string name="package_name">com.deliverystep.rider</string>
+    <string name="custom_url_scheme">com.deliverystep.rider</string>
 </resources>
