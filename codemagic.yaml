@@ -4,6 +4,8 @@ workflows:
     max_build_duration: 60
     instance_type: mac_mini_m2
     environment:
+      groups:
+        - ftp
       android_signing:
         - deliverystep_keystore
       vars:
@@ -38,6 +40,17 @@ workflows:
             dir=$(dirname "$apk")
             cp "$apk" "$dir/DeliveryStepRider.apk"
           done
+      - name: Upload APK to website (deliverystep.app/rider-app.apk)
+        script: |
+          APK=$(find android -name "app-release.apk" -type f | head -1)
+          if [ -z "$APK" ]; then APK=$(find android -name "*-release.apk" -type f | head -1); fi
+          if [ -z "$APK" ]; then echo "No APK found, skipping upload"; exit 0; fi
+          if [ -z "$FTP_HOST" ]; then echo "FTP not configured — skipping upload (add FTP_HOST/FTP_USER/FTP_PASS env vars)"; exit 0; fi
+          echo "Uploading $APK -> rider-app.apk"
+          curl --show-error --fail --ssl -T "$APK" "ftp://$FTP_HOST/public_html/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs \
+            || curl --show-error --fail -T "$APK" "ftp://$FTP_HOST/public_html/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs \
+            || curl --show-error --fail -T "$APK" "ftp://$FTP_HOST/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs
+          echo "Done -> https://deliverystep.app/rider-app.apk"
     artifacts:
       - android/app/build/outputs/**/*.apk
       - android/app/build/outputs/mapping/**/*.txt
