@@ -42,13 +42,18 @@ workflows:
           done
       - name: Upload APK to website (deliverystep.app/rider-app.apk)
         script: |
-          echo "=== APKs present ==="
-          find android -name "*.apk" -type f
-          # Prefer the release / renamed APK; fall back to any APK
-          APK=$(find android -name "*.apk" -type f | grep -iE 'DeliveryStepRider|release' | head -1)
-          if [ -z "$APK" ]; then APK=$(find android -name "*.apk" -type f | head -1); fi
-          if [ -z "$APK" ]; then echo "No APK found, skipping upload"; exit 0; fi
-          if [ -z "$FTP_HOST" ]; then echo "FTP not configured — skipping upload (add FTP_HOST/FTP_USER/FTP_PASS env vars)"; exit 0; fi
+          BUILD_DIR="${CM_BUILD_DIR:-$(pwd)}"
+          echo "PWD=$(pwd)  CM_BUILD_DIR=$CM_BUILD_DIR  ->  searching in: $BUILD_DIR"
+          echo "=== APKs found ==="
+          find "$BUILD_DIR" -name "*.apk" -type f 2>/dev/null | tee /tmp/apks.txt
+          APK=$(grep -iE 'release|DeliveryStepRider' /tmp/apks.txt | head -1)
+          if [ -z "$APK" ]; then APK=$(head -1 /tmp/apks.txt); fi
+          if [ -z "$APK" ]; then
+            echo "No APK found. Listing build/outputs tree for debugging:"
+            find "$BUILD_DIR" -type d -name outputs -exec sh -c 'find "$1" -type f' _ {} \; 2>/dev/null
+            exit 0
+          fi
+          if [ -z "$FTP_HOST" ]; then echo "FTP not configured — skipping upload"; exit 0; fi
           echo "Uploading: $APK  ->  rider-app.apk"
           curl --show-error --fail --ssl -T "$APK" "ftp://$FTP_HOST/public_html/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs \
             || curl --show-error --fail -T "$APK" "ftp://$FTP_HOST/public_html/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs \
