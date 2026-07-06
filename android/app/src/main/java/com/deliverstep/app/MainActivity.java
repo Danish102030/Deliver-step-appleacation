@@ -37,7 +37,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         isForeground = true;
         // When the app comes to front (e.g. launched from a lock-screen alert),
@@ -52,7 +52,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         isForeground = false;
     }
