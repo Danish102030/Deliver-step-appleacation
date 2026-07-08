@@ -2,9 +2,15 @@ package com.deliverstep.app;
 
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
 
 import com.getcapacitor.BridgeActivity;
 
@@ -17,6 +23,64 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         showWhenLockedAndTurnScreenOn();
+        setupNativeBridge();
+        // "Go Online" mode: keep the app alive so order alerts always arrive
+        // (default ON — riders are online whenever they open the app).
+        if (prefs().getBoolean("online", true)) {
+            RiderForegroundService.start(this);
+            requestBatteryExemptionOnce();
+        }
+    }
+
+    private SharedPreferences prefs() {
+        return getSharedPreferences("rider_prefs", MODE_PRIVATE);
+    }
+
+    private void setupNativeBridge() {
+        try {
+            if (getBridge() != null && getBridge().getWebView() != null) {
+                getBridge().getWebView().addJavascriptInterface(new RiderNative(), "RiderNative");
+            }
+        } catch (Exception ignore) {}
+    }
+
+    /** Simple bridge so rider.html can toggle Online mode: window.RiderNative.goOnline() etc. */
+    public class RiderNative {
+        @JavascriptInterface
+        public void goOnline() {
+            prefs().edit().putBoolean("online", true).apply();
+            runOnUiThread(() -> {
+                RiderForegroundService.start(MainActivity.this);
+                requestBatteryExemptionOnce();
+            });
+        }
+
+        @JavascriptInterface
+        public void goOffline() {
+            prefs().edit().putBoolean("online", false).apply();
+            runOnUiThread(() -> RiderForegroundService.stop(MainActivity.this));
+        }
+
+        @JavascriptInterface
+        public boolean isOnline() {
+            return prefs().getBoolean("online", true);
+        }
+    }
+
+    /** Ask Android to exempt us from battery optimization (key for itel/Tecno/Xiaomi). */
+    private void requestBatteryExemptionOnce() {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+                if (pm != null && !pm.isIgnoringBatteryOptimizations(getPackageName())
+                        && !prefs().getBoolean("asked_battery", false)) {
+                    prefs().edit().putBoolean("asked_battery", true).apply();
+                    Intent i = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                    i.setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(i);
+                }
+            }
+        } catch (Exception ignore) {}
     }
 
     private void showWhenLockedAndTurnScreenOn() {
@@ -37,7 +101,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         isForeground = true;
         // When the app comes to front (e.g. launched from a lock-screen alert),
@@ -52,7 +116,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         isForeground = false;
     }
