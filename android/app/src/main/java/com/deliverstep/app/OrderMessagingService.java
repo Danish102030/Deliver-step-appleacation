@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
+import android.os.PowerManager;
 import android.provider.Settings;
 
 import androidx.core.app.NotificationCompat;
@@ -49,6 +50,43 @@ public class OrderMessagingService extends FirebaseMessagingService {
         if (MainActivity.isForeground) return;
 
         showFullScreenAlert(title, body, data.get("order_id"));
+        wakeScreen();
+        launchDirectlyIfPermitted(data.get("order_id"));
+    }
+
+    /** Force the screen on so the alert is visible immediately. */
+    private void wakeScreen() {
+        try {
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            if (pm != null) {
+                PowerManager.WakeLock wl = pm.newWakeLock(
+                        PowerManager.FULL_WAKE_LOCK
+                                | PowerManager.ACQUIRE_CAUSES_WAKEUP
+                                | PowerManager.ON_AFTER_RELEASE,
+                        "deliverystep:order_alert");
+                wl.acquire(10000);
+            }
+        } catch (Exception ignore) {}
+    }
+
+    /**
+     * OEMs like itel/Tecno/Xiaomi often swallow full-screen intents. Apps with
+     * the "Display over other apps" permission are exempt from Android's
+     * background-activity-launch restriction, so we open the accept screen
+     * directly — the guaranteed path used by delivery/VoIP apps.
+     */
+    private void launchDirectlyIfPermitted(String orderId) {
+        try {
+            boolean canOverlay = Build.VERSION.SDK_INT < Build.VERSION_CODES.M
+                    || Settings.canDrawOverlays(this);
+            if (!canOverlay) return;
+            Intent launch = new Intent(this, MainActivity.class);
+            launch.setAction(Intent.ACTION_MAIN);
+            launch.addCategory(Intent.CATEGORY_LAUNCHER);
+            launch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            if (orderId != null) launch.putExtra("open_order", orderId);
+            startActivity(launch);
+        } catch (Exception ignore) {}
     }
 
     private void showFullScreenAlert(String title, String body, String orderId) {

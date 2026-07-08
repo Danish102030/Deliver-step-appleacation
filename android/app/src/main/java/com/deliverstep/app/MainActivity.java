@@ -28,7 +28,9 @@ public class MainActivity extends BridgeActivity {
         // (default ON — riders are online whenever they open the app).
         if (prefs().getBoolean("online", true)) {
             RiderForegroundService.start(this);
-            requestBatteryExemptionOnce();
+            if (!requestBatteryExemptionOnce()) {
+                requestOverlayPermissionOnce();
+            }
         }
     }
 
@@ -51,7 +53,9 @@ public class MainActivity extends BridgeActivity {
             prefs().edit().putBoolean("online", true).apply();
             runOnUiThread(() -> {
                 RiderForegroundService.start(MainActivity.this);
-                requestBatteryExemptionOnce();
+                if (!requestBatteryExemptionOnce()) {
+                    requestOverlayPermissionOnce();
+                }
             });
         }
 
@@ -68,7 +72,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     /** Ask Android to exempt us from battery optimization (key for itel/Tecno/Xiaomi). */
-    private void requestBatteryExemptionOnce() {
+    private boolean requestBatteryExemptionOnce() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -78,7 +82,27 @@ public class MainActivity extends BridgeActivity {
                     Intent i = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
                     i.setData(Uri.parse("package:" + getPackageName()));
                     startActivity(i);
+                    return true;
                 }
+            }
+        } catch (Exception ignore) {}
+        return false;
+    }
+
+    /**
+     * Ask for "Display over other apps" — with it granted, the order alert can
+     * open the accept screen DIRECTLY even when the app is in the background
+     * (the reliable path on itel/Tecno/Xiaomi where full-screen intents are blocked).
+     */
+    private void requestOverlayPermissionOnce() {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                    && !Settings.canDrawOverlays(this)
+                    && !prefs().getBoolean("asked_overlay", false)) {
+                prefs().edit().putBoolean("asked_overlay", true).apply();
+                Intent i = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivity(i);
             }
         } catch (Exception ignore) {}
     }
