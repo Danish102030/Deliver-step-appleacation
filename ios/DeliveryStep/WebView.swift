@@ -11,6 +11,23 @@ struct WebView: UIViewRepresentable {
         config.allowsInlineMediaPlayback = true
         config.mediaTypesRequiringUserActionForPlayback = []
 
+        // ── Native haptics bridge ──────────────────────────────────────────────
+        // The website calls navigator.vibrate() on "add to cart". iOS Safari ignores
+        // that, so we override it to post a message here and fire the Taptic Engine.
+        let contentController = WKUserContentController()
+        contentController.add(context.coordinator, name: "haptic")
+        let hapticJS = """
+        (function(){
+          function fire(p){ try{ window.webkit.messageHandlers.haptic.postMessage(String(p||'')); }catch(e){} }
+          navigator.vibrate = function(p){ fire(p); return true; };
+          window.dsHaptic = fire;
+        })();
+        """
+        contentController.addUserScript(
+            WKUserScript(source: hapticJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        )
+        config.userContentController = contentController
+
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = context.coordinator
         webView.uiDelegate = context.coordinator
@@ -28,8 +45,16 @@ struct WebView: UIViewRepresentable {
 
     func updateUIView(_ uiView: WKWebView, context: Context) {}
 
-    class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
+    class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
         weak var webView: WKWebView?
+
+        // Fires the native Taptic Engine when the web page requests a haptic.
+        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            guard message.name == "haptic" else { return }
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.prepare()
+            generator.impactOccurred()
+        }
 
         @objc func refresh(_ sender: UIRefreshControl) {
             webView?.reload()
