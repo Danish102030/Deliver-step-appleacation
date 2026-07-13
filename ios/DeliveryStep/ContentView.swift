@@ -2,7 +2,6 @@ import SwiftUI
 import Network
 
 struct ContentView: View {
-    @State private var isLoading = true
     @State private var isOffline = false
     @State private var networkStarted = false
     private let monitor = NWPathMonitor()
@@ -15,27 +14,6 @@ struct ContentView: View {
 
             WebView(url: URL(string: "https://deliverystep.app/")!)
                 .ignoresSafeArea(edges: .bottom)
-
-            if isLoading {
-                ZStack {
-                    Color(red: 190/255, green: 24/255, blue: 93/255)
-                        .ignoresSafeArea()
-                    VStack(spacing: 16) {
-                        Text("خطوة")
-                            .font(.system(size: 48, weight: .black))
-                            .foregroundColor(.white)
-                        Text("DELIVER STEP")
-                            .font(.system(size: 13, weight: .semibold))
-                            .tracking(4)
-                            .foregroundColor(.white.opacity(0.85))
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .scaleEffect(1.2)
-                            .padding(.top, 8)
-                    }
-                }
-                .transition(.opacity)
-            }
 
             if isOffline {
                 ZStack {
@@ -63,9 +41,6 @@ struct ContentView: View {
         }
         .onAppear {
             checkNetwork()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                withAnimation(.easeOut(duration: 0.4)) { isLoading = false }
-            }
         }
     }
 
@@ -82,9 +57,5 @@ struct ContentView: View {
 
     func retry() {
         isOffline = false
-        isLoading = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-            withAnimation { isLoading = false }
-        }
     }
 }

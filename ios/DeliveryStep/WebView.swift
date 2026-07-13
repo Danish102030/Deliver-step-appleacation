@@ -33,6 +33,8 @@ struct WebView: UIViewRepresentable {
         webView.uiDelegate = context.coordinator
         webView.allowsBackForwardNavigationGestures = true
         webView.scrollView.bounces = true
+        // Transparent during load so the brand-pink behind shows instead of a white flash
+        webView.isOpaque = false
 
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(context.coordinator, action: #selector(Coordinator.refresh(_:)), for: .valueChanged)
