@@ -79,6 +79,13 @@
         <meta-data
             android:name="com.transistorsoft.locationmanager.license"
             android:value="eyJhbGciOiJFZERTQSIsImtpZCI6ImVkMjU1MTktbWFpbi12MSJ9.eyJvcyI6ImFuZHJvaWQiLCJhcHBfaWQiOiJjb20uZGVsaXZlcnlzdGVwLnJpZGVyIiwib3JkZXJfbnVtYmVyIjoiIiwicmVuZXdhbF91cmwiOiIiLCJjdXN0b21lcl9pZCI6IiIsInByb2R1Y3QiOiJjYXBhY2l0b3ItYmFja2dyb3VuZC1nZW9sb2NhdGlvbiIsImtleV92ZXJzaW9uIjoxLCJhbGxvd2VkX3N1ZmZpeGVzIjpbIi5kZXYiLCIuZGV2ZWxvcG1lbnQiLCIuc3RhZ2luZyIsIi5zdGFnZSIsIi5xYSIsIi51YXQiLCIudGVzdCIsIi5kZWJ1ZyJdLCJtYXhfYnVpbGRfc3RhbXAiOjIwMjYwOTE3LCJncmFjZV9idWlsZHMiOjAsImVudGl0bGVtZW50cyI6WyJjb3JlIiwicG9seWdvbi1nZW9mZW5jaW5nIl0sImlhdCI6MTc4NzA3MzM2MywiZXhwIjoxNzg5NjY1MzYzLCJ0cmlhbCI6dHJ1ZSwidHJpYWxfZGF5cyI6MzB9.rhh08fA-GEZm85yuH3oW7orOTkpndI6utuTv1NWR3JovEpaJutANRPZP-4mo-C4yTql5SHJXls65qxm_FyOYAQ" />
+
+        <!-- Disable Huawei AGConnect auto-init. We do not ship agconnect-services.json and the
+             riders use normal (Google) phones; without this the app crashes at launch. -->
+        <provider
+            android:name="com.huawei.agconnect.core.provider.AGConnectInitializeProvider"
+            android:authorities="${applicationId}.AGCInitializeProvider"
+            tools:node="remove" />
     </application>
 
     <!-- Permissions -->
