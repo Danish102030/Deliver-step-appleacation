@@ -27,60 +27,52 @@ workflows:
             exit 1
           fi
           echo "google-services.json OK"
-      - name: Build signed release APK
+      - name: Build APK and upload to website
         script: |
           cd android
           chmod +x ./gradlew
           ./gradlew assembleRelease
           echo "=== Built APKs ==="
           find . -name "*.apk" -type f
-      - name: Rename APK
-        script: |
-          find android -name "*.apk" -type f | while read apk; do
-            dir=$(dirname "$apk")
-            cp "$apk" "$dir/DeliveryStepRider.apk"
-          done
-      - name: GET APK DOWNLOAD LINK (open this step after the build)
-        script: |
-          echo "Looking for the built APK..."
-          # search the likely folders first (relative to the project), then the whole disk as a fallback
-          APK=$(find . android "$CM_BUILD_DIR" -type f -name "*-release.apk" 2>/dev/null | head -1)
-          [ -z "$APK" ] && APK=$(find . android "$CM_BUILD_DIR" -type f -name "*.apk" 2>/dev/null | head -1)
-          [ -z "$APK" ] && APK=$(find / -type f -name "app-release.apk" 2>/dev/null | head -1)
-          [ -z "$APK" ] && APK=$(find / -type f -name "*.apk" 2>/dev/null | grep -i release | head -1)
-          if [ -z "$APK" ]; then
-            echo "Still no APK. Contents of any build outputs folder:"
-            find . -type d -name outputs -exec sh -c 'ls -laR "$1"' _ {} \; 2>/dev/null
+          # We are inside android/ now. Take ONLY our app's release APK (never the SDK's apks).
+          APK=$(find . -path "*app/build/outputs/apk/release/*-release.apk" -type f | head -1)
+          [ -z "$APK" ] && APK=$(find . -path "*outputs/apk/release*" -name "*.apk" -type f | head -1)
+          [ -z "$APK" ] && APK=$(find . -path "*outputs*" -name "*-release.apk" -type f | head -1)
+          if [ -z "$APK" ]; then echo "ERROR: our release APK was not produced"; exit 1; fi
+          echo "Our APK: $APK  ($(du -h "$APK" | cut -f1))"
+
+          if [ -z "$FTP_HOST" ] || [ -z "$FTP_USER" ] || [ -z "$FTP_PASS" ]; then
+            echo "FTP login not set in Codemagic 'ftp' group — cannot upload to website."
             exit 0
           fi
-          echo "APK found: $APK  ($(du -h "$APK" | cut -f1))"
 
-          # If the Hostinger FTP login is saved in Codemagic, also update the permanent website link
-          if [ -n "$FTP_HOST" ] && [ -n "$FTP_USER" ] && [ -n "$FTP_PASS" ]; then
-            for P in "public_html" "domains/deliverystep.app/public_html" "public_html/deliverystep.app"; do
-              if curl --show-error --fail --ssl -T "$APK" "ftp://$FTP_HOST/$P/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs ; then
-                echo "Website updated: https://deliverystep.app/rider-app.apk"; break
-              fi
-            done
+          echo "Uploading to Hostinger (host: $FTP_HOST) ..."
+          UP=0
+          for P in "public_html" "domains/deliverystep.app/public_html" "public_html/deliverystep.app"; do
+            echo "-> /$P  (secure FTP, skip cert check)"
+            if curl --show-error --fail --ssl-reqd -k -T "$APK" "ftp://$FTP_HOST/$P/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs ; then
+              UP=1; echo "UPLOADED via secure FTP to /$P"; break
+            fi
+            echo "-> /$P  (plain FTP)"
+            if curl --show-error --fail -T "$APK" "ftp://$FTP_HOST/$P/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs ; then
+              UP=1; echo "UPLOADED via plain FTP to /$P"; break
+            fi
+          done
+          echo ""
+          echo "=================================================================="
+          echo "=================================================================="
+          if [ "$UP" = "1" ]; then
+            echo ""
+            echo "   DONE! Open this on the phone to install:"
+            echo ""
+            echo "        https://deliverystep.app/rider-app.apk"
+            echo ""
+          else
+            echo ""
+            echo "   Upload failed on all folders. Double-check FTP_HOST/FTP_USER/FTP_PASS"
+            echo "   in Codemagic (from Hostinger -> Files -> FTP Accounts)."
+            echo ""
           fi
-
-          # Always: make a public download link (no Hostinger needed)
-          echo "Creating download link..."
-          LINK=$(curl -sS -F "reqtype=fileupload" -F "fileToUpload=@$APK" https://catbox.moe/user/api.php || true)
-          case "$LINK" in
-            http*) : ;;
-            *) LINK=$(curl -sS -A "DeliveryStepRider/1.0" -F "file=@$APK" https://0x0.st || true) ;;
-          esac
-          echo ""
-          echo "=================================================================="
-          echo "=================================================================="
-          echo ""
-          echo "   >>>  DOWNLOAD THE RIDER APP ON YOUR PHONE FROM THIS LINK:"
-          echo ""
-          echo "        $LINK"
-          echo ""
-          echo "   (open that link in the phone browser -> it installs the app)"
-          echo ""
           echo "=================================================================="
           echo "=================================================================="
     artifacts:
