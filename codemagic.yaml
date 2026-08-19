@@ -42,23 +42,30 @@ workflows:
           done
       - name: GET APK DOWNLOAD LINK (open this step after the build)
         script: |
-          BUILD_DIR="${CM_BUILD_DIR:-$(pwd)}"
-          APK=$(find "$BUILD_DIR" -name "*.apk" -type f 2>/dev/null | grep -iE 'release' | head -1)
-          [ -z "$APK" ] && APK=$(find "$BUILD_DIR" -name "*.apk" -type f 2>/dev/null | head -1)
-          if [ -z "$APK" ]; then echo "No APK found"; exit 0; fi
-          echo "APK: $APK  ($(du -h "$APK" | cut -f1))"
+          echo "Looking for the built APK..."
+          # search the likely folders first (relative to the project), then the whole disk as a fallback
+          APK=$(find . android "$CM_BUILD_DIR" -type f -name "*-release.apk" 2>/dev/null | head -1)
+          [ -z "$APK" ] && APK=$(find . android "$CM_BUILD_DIR" -type f -name "*.apk" 2>/dev/null | head -1)
+          [ -z "$APK" ] && APK=$(find / -type f -name "app-release.apk" 2>/dev/null | head -1)
+          [ -z "$APK" ] && APK=$(find / -type f -name "*.apk" 2>/dev/null | grep -i release | head -1)
+          if [ -z "$APK" ]; then
+            echo "Still no APK. Contents of any build outputs folder:"
+            find . -type d -name outputs -exec sh -c 'ls -laR "$1"' _ {} \; 2>/dev/null
+            exit 0
+          fi
+          echo "APK found: $APK  ($(du -h "$APK" | cut -f1))"
 
           # If the Hostinger FTP login is saved in Codemagic, also update the permanent website link
           if [ -n "$FTP_HOST" ] && [ -n "$FTP_USER" ] && [ -n "$FTP_PASS" ]; then
             for P in "public_html" "domains/deliverystep.app/public_html" "public_html/deliverystep.app"; do
               if curl --show-error --fail --ssl -T "$APK" "ftp://$FTP_HOST/$P/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs ; then
-                echo "Website link updated: https://deliverystep.app/rider-app.apk"; break
+                echo "Website updated: https://deliverystep.app/rider-app.apk"; break
               fi
             done
           fi
 
-          # Always: make a no-setup public download link (works without Hostinger)
-          echo "=== Creating a download link ==="
+          # Always: make a public download link (no Hostinger needed)
+          echo "Creating download link..."
           LINK=$(curl -sS -F "reqtype=fileupload" -F "fileToUpload=@$APK" https://catbox.moe/user/api.php || true)
           case "$LINK" in
             http*) : ;;
@@ -68,7 +75,7 @@ workflows:
           echo "=================================================================="
           echo "=================================================================="
           echo ""
-          echo "   DOWNLOAD THE RIDER APP ON YOUR PHONE FROM THIS LINK:"
+          echo "   >>>  DOWNLOAD THE RIDER APP ON YOUR PHONE FROM THIS LINK:"
           echo ""
           echo "        $LINK"
           echo ""
