@@ -40,53 +40,42 @@ workflows:
             dir=$(dirname "$apk")
             cp "$apk" "$dir/DeliveryStepRider.apk"
           done
-      - name: Upload APK to website (deliverystep.app/rider-app.apk)
+      - name: GET APK DOWNLOAD LINK (open this step after the build)
         script: |
           BUILD_DIR="${CM_BUILD_DIR:-$(pwd)}"
-          echo "=== Finding the built APK ==="
           APK=$(find "$BUILD_DIR" -name "*.apk" -type f 2>/dev/null | grep -iE 'release' | head -1)
           [ -z "$APK" ] && APK=$(find "$BUILD_DIR" -name "*.apk" -type f 2>/dev/null | head -1)
-          if [ -z "$APK" ]; then echo "No APK found — nothing to upload."; exit 0; fi
+          if [ -z "$APK" ]; then echo "No APK found"; exit 0; fi
           echo "APK: $APK  ($(du -h "$APK" | cut -f1))"
 
-          # --- Check the FTP login is saved in Codemagic ---
-          MISSING=""
-          [ -z "$FTP_HOST" ] && MISSING="$MISSING FTP_HOST"
-          [ -z "$FTP_USER" ] && MISSING="$MISSING FTP_USER"
-          [ -z "$FTP_PASS" ] && MISSING="$MISSING FTP_PASS"
-          if [ -n "$MISSING" ]; then
-            echo "======================================================================"
-            echo "NOT UPLOADED. These are not saved in Codemagic yet:$MISSING"
-            echo "Fix: Codemagic -> your app -> Settings (gear) -> Environment variables"
-            echo "     Add to the variable group named 'ftp':"
-            echo "       FTP_HOST  (from Hostinger -> Files -> FTP Accounts, the FTP IP/host)"
-            echo "       FTP_USER  (the FTP username)"
-            echo "       FTP_PASS  (the FTP password)  <- tick 'Secure'"
-            echo "Then run the build again."
-            echo "======================================================================"
-            exit 0
+          # If the Hostinger FTP login is saved in Codemagic, also update the permanent website link
+          if [ -n "$FTP_HOST" ] && [ -n "$FTP_USER" ] && [ -n "$FTP_PASS" ]; then
+            for P in "public_html" "domains/deliverystep.app/public_html" "public_html/deliverystep.app"; do
+              if curl --show-error --fail --ssl -T "$APK" "ftp://$FTP_HOST/$P/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs ; then
+                echo "Website link updated: https://deliverystep.app/rider-app.apk"; break
+              fi
+            done
           fi
-          echo "FTP login is saved. Host = $FTP_HOST"
 
-          # --- Try the common Hostinger web-root folders until one works ---
-          OK=0
-          for P in "public_html" "domains/deliverystep.app/public_html" "public_html/deliverystep.app"; do
-            echo "-> trying folder: /$P"
-            if curl --show-error --fail --ssl -T "$APK" "ftp://$FTP_HOST/$P/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs ; then
-              echo "SUCCESS -> uploaded to /$P"
-              echo "Your download link: https://deliverystep.app/rider-app.apk"
-              OK=1; break
-            fi
-            # retry same folder without TLS (some Hostinger servers use plain FTP)
-            if curl --show-error --fail -T "$APK" "ftp://$FTP_HOST/$P/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs ; then
-              echo "SUCCESS (plain FTP) -> uploaded to /$P"
-              echo "Your download link: https://deliverystep.app/rider-app.apk"
-              OK=1; break
-            fi
-          done
-          if [ "$OK" != "1" ]; then
-            echo "Upload failed on every folder. Re-check the FTP_HOST / FTP_USER / FTP_PASS values from Hostinger."
-          fi
+          # Always: make a no-setup public download link (works without Hostinger)
+          echo "=== Creating a download link ==="
+          LINK=$(curl -sS -F "reqtype=fileupload" -F "fileToUpload=@$APK" https://catbox.moe/user/api.php || true)
+          case "$LINK" in
+            http*) : ;;
+            *) LINK=$(curl -sS -A "DeliveryStepRider/1.0" -F "file=@$APK" https://0x0.st || true) ;;
+          esac
+          echo ""
+          echo "=================================================================="
+          echo "=================================================================="
+          echo ""
+          echo "   DOWNLOAD THE RIDER APP ON YOUR PHONE FROM THIS LINK:"
+          echo ""
+          echo "        $LINK"
+          echo ""
+          echo "   (open that link in the phone browser -> it installs the app)"
+          echo ""
+          echo "=================================================================="
+          echo "=================================================================="
     artifacts:
       - android/app/build/outputs/**/*.apk
       - android/app/build/outputs/mapping/**/*.txt
