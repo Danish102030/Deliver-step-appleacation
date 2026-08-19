@@ -43,22 +43,50 @@ workflows:
       - name: Upload APK to website (deliverystep.app/rider-app.apk)
         script: |
           BUILD_DIR="${CM_BUILD_DIR:-$(pwd)}"
-          echo "PWD=$(pwd)  CM_BUILD_DIR=$CM_BUILD_DIR  ->  searching in: $BUILD_DIR"
-          echo "=== APKs found ==="
-          find "$BUILD_DIR" -name "*.apk" -type f 2>/dev/null | tee /tmp/apks.txt
-          APK=$(grep -iE 'release|DeliveryStepRider' /tmp/apks.txt | head -1)
-          if [ -z "$APK" ]; then APK=$(head -1 /tmp/apks.txt); fi
-          if [ -z "$APK" ]; then
-            echo "No APK found. Listing build/outputs tree for debugging:"
-            find "$BUILD_DIR" -type d -name outputs -exec sh -c 'find "$1" -type f' _ {} \; 2>/dev/null
+          echo "=== Finding the built APK ==="
+          APK=$(find "$BUILD_DIR" -name "*.apk" -type f 2>/dev/null | grep -iE 'release' | head -1)
+          [ -z "$APK" ] && APK=$(find "$BUILD_DIR" -name "*.apk" -type f 2>/dev/null | head -1)
+          if [ -z "$APK" ]; then echo "No APK found — nothing to upload."; exit 0; fi
+          echo "APK: $APK  ($(du -h "$APK" | cut -f1))"
+
+          # --- Check the FTP login is saved in Codemagic ---
+          MISSING=""
+          [ -z "$FTP_HOST" ] && MISSING="$MISSING FTP_HOST"
+          [ -z "$FTP_USER" ] && MISSING="$MISSING FTP_USER"
+          [ -z "$FTP_PASS" ] && MISSING="$MISSING FTP_PASS"
+          if [ -n "$MISSING" ]; then
+            echo "======================================================================"
+            echo "NOT UPLOADED. These are not saved in Codemagic yet:$MISSING"
+            echo "Fix: Codemagic -> your app -> Settings (gear) -> Environment variables"
+            echo "     Add to the variable group named 'ftp':"
+            echo "       FTP_HOST  (from Hostinger -> Files -> FTP Accounts, the FTP IP/host)"
+            echo "       FTP_USER  (the FTP username)"
+            echo "       FTP_PASS  (the FTP password)  <- tick 'Secure'"
+            echo "Then run the build again."
+            echo "======================================================================"
             exit 0
           fi
-          if [ -z "$FTP_HOST" ]; then echo "FTP not configured — skipping upload"; exit 0; fi
-          echo "Uploading: $APK  ->  rider-app.apk"
-          curl --show-error --fail --ssl -T "$APK" "ftp://$FTP_HOST/public_html/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs \
-            || curl --show-error --fail -T "$APK" "ftp://$FTP_HOST/public_html/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs \
-            || curl --show-error --fail -T "$APK" "ftp://$FTP_HOST/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs
-          echo "Done -> https://deliverystep.app/rider-app.apk"
+          echo "FTP login is saved. Host = $FTP_HOST"
+
+          # --- Try the common Hostinger web-root folders until one works ---
+          OK=0
+          for P in "public_html" "domains/deliverystep.app/public_html" "public_html/deliverystep.app"; do
+            echo "-> trying folder: /$P"
+            if curl --show-error --fail --ssl -T "$APK" "ftp://$FTP_HOST/$P/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs ; then
+              echo "SUCCESS -> uploaded to /$P"
+              echo "Your download link: https://deliverystep.app/rider-app.apk"
+              OK=1; break
+            fi
+            # retry same folder without TLS (some Hostinger servers use plain FTP)
+            if curl --show-error --fail -T "$APK" "ftp://$FTP_HOST/$P/rider-app.apk" --user "$FTP_USER:$FTP_PASS" --ftp-create-dirs ; then
+              echo "SUCCESS (plain FTP) -> uploaded to /$P"
+              echo "Your download link: https://deliverystep.app/rider-app.apk"
+              OK=1; break
+            fi
+          done
+          if [ "$OK" != "1" ]; then
+            echo "Upload failed on every folder. Re-check the FTP_HOST / FTP_USER / FTP_PASS values from Hostinger."
+          fi
     artifacts:
       - android/app/build/outputs/**/*.apk
       - android/app/build/outputs/mapping/**/*.txt
