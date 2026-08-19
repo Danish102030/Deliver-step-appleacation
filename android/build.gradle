@@ -21,9 +21,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        // Background-geolocation plugin ships its Android library (tslocationmanager) inside its own libs folder
-        maven { url "${project(':transistorsoft-capacitor-background-geolocation').projectDir}/libs" }
-        maven { url 'https://developer.huawei.com/repo/' }
     }
 }
 
