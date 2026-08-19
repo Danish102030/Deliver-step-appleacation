@@ -37,6 +37,15 @@ android {
     }
 }
 
+// The background-geolocation plugin bundles Huawei Mobile Services (HMS/AGConnect).
+// On a normal Google phone with no Huawei config file, AGConnect initialises at app
+// launch and crashes the app instantly. Riders use Google phones, so we remove all of
+// Huawei's services here. Google location services still work exactly as before.
+configurations.all {
+    exclude group: 'com.huawei.hms'
+    exclude group: 'com.huawei.agconnect'
+}
+
 repositories {
     flatDir{
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
