@@ -135,9 +135,17 @@ workflows:
         script: xcode-project use-profiles
       - name: Build iOS IPA
         script: |
+          set -e
+          # Resolve Swift packages into a stable folder first, then archive using the SAME
+          # folder. This fixes "Missing package product 'FirebaseCore'" during xcodebuild archive.
+          xcodebuild -resolvePackageDependencies \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -clonedSourcePackagesDirPath "$CM_BUILD_DIR/SourcePackages"
           xcode-project build-ipa \
             --project "$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME"
+            --scheme "$XCODE_SCHEME" \
+            --archive-xcargs "COMPILER_INDEX_STORE_ENABLE=NO -clonedSourcePackagesDirPath $CM_BUILD_DIR/SourcePackages"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
