@@ -11,6 +11,8 @@
 		AABBCCDD000000000004BB00 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD000000000003BB00 /* ContentView.swift */; };
 		AABBCCDD000000000004CC00 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD000000000003CC00 /* WebView.swift */; };
 		AABBCCDD000000000004DD00 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AABBCCDD000000000003DD00 /* Assets.xcassets */; };
+		AABBCCDD000000000009AA00 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = AABBCCDD000000000009BB00 /* FirebaseMessaging */; };
+		AABBCCDD000000000009DD00 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = AABBCCDD000000000009EE00 /* FirebaseCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +22,7 @@
 		AABBCCDD000000000003CC00 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		AABBCCDD000000000003DD00 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AABBCCDD000000000003EE00 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AABBCCDD000000000003FF00 /* DeliveryStep.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DeliveryStep.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -27,6 +30,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AABBCCDD000000000009AA00 /* FirebaseMessaging in Frameworks */,
+				AABBCCDD000000000009DD00 /* FirebaseCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -49,6 +54,7 @@
 				AABBCCDD000000000003CC00 /* WebView.swift */,
 				AABBCCDD000000000003DD00 /* Assets.xcassets */,
 				AABBCCDD000000000003EE00 /* Info.plist */,
+				AABBCCDD000000000003FF00 /* DeliveryStep.entitlements */,
 			);
 			path = DeliveryStep;
 			sourceTree = "<group>";
@@ -77,6 +83,10 @@
 			dependencies = (
 			);
 			name = DeliveryStep;
+			packageProductDependencies = (
+				AABBCCDD000000000009BB00 /* FirebaseMessaging */,
+				AABBCCDD000000000009EE00 /* FirebaseCore */,
+			);
 			productName = DeliveryStep;
 			productReference = AABBCCDD000000000002AA00 /* DeliveryStep.app */;
 			productType = "com.apple.product-type.application";
@@ -106,6 +116,9 @@
 				ar,
 			);
 			mainGroup = AABBCCDD000000000000BB00;
+			packageReferences = (
+				AABBCCDD000000000009CC00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			productRefGroup = AABBCCDD000000000000DD00 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -260,6 +273,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DeliveryStep/DeliveryStep.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = A54RXZ7FDR;
@@ -284,6 +298,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DeliveryStep/DeliveryStep.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = A54RXZ7FDR;
@@ -325,6 +340,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AABBCCDD000000000009CC00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.29.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AABBCCDD000000000009BB00 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AABBCCDD000000000009CC00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		AABBCCDD000000000009EE00 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AABBCCDD000000000009CC00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = AABBCCDD000000000000AA00 /* Project object */;
 }
