@@ -12,7 +12,6 @@
 		AABBCCDD000000000004CC00 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABBCCDD000000000003CC00 /* WebView.swift */; };
 		AABBCCDD000000000004DD00 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AABBCCDD000000000003DD00 /* Assets.xcassets */; };
 		AABBCCDD000000000009AA00 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = AABBCCDD000000000009BB00 /* FirebaseMessaging */; };
-		AABBCCDD000000000009DD00 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = AABBCCDD000000000009EE00 /* FirebaseCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,7 +30,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AABBCCDD000000000009AA00 /* FirebaseMessaging in Frameworks */,
-				AABBCCDD000000000009DD00 /* FirebaseCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,7 +83,6 @@
 			name = DeliveryStep;
 			packageProductDependencies = (
 				AABBCCDD000000000009BB00 /* FirebaseMessaging */,
-				AABBCCDD000000000009EE00 /* FirebaseCore */,
 			);
 			productName = DeliveryStep;
 			productReference = AABBCCDD000000000002AA00 /* DeliveryStep.app */;
@@ -357,11 +354,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AABBCCDD000000000009CC00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
-		};
-		AABBCCDD000000000009EE00 /* FirebaseCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = AABBCCDD000000000009CC00 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
