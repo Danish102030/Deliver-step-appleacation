@@ -77,10 +77,10 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         completionHandler()
     }
 
-    // Upsert this device's FCM token into Supabase `device_tokens` (on_conflict=token).
+    // Save this device's FCM token to Supabase device_tokens (same format as the Android app).
     private func saveDeviceToken(_ token: String) {
         let anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgzNDIxNTMsImV4cCI6MjA2MzkxODE1M30.5K2yJFPHXdPT6V0kHBpKADJAmnnxQjFZ4lSTtFIluKo"
-        guard let url = URL(string: "https://vjuhxpttssmyomqqomdx.supabase.co/rest/v1/device_tokens?on_conflict=token") else { return }
+        guard let url = URL(string: "https://vjuhxpttssmyomqqomdx.supabase.co/rest/v1/device_tokens") else { return }
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -90,8 +90,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         let body: [String: Any] = [
             "token": token,
             "platform": "ios",
-            "role": "customer",
-            "last_seen_at": ISO8601DateFormatter().string(from: Date())
+            "last_seen": ISO8601DateFormatter().string(from: Date())
         ]
         req.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
         URLSession.shared.dataTask(with: req).resume()
