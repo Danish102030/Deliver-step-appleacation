@@ -73,6 +73,11 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
+        // Count this tap as a click so the admin's click count + open rate work on iPhone too.
+        let info = response.notification.request.content.userInfo
+        if let nid = (info["notif_id"] as? String) ?? notifIdFromURL(info["url"]) {
+            reportNotifClick(nid)
+        }
         completionHandler()
     }
 
@@ -93,5 +98,26 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         ]
         req.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
         URLSession.shared.dataTask(with: req).resume()
+    }
+
+    // Report a notification tap to Supabase so the admin sees clicks + open rate on iPhone.
+    private func reportNotifClick(_ nid: String) {
+        let anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro"
+        guard !nid.isEmpty,
+              let url = URL(string: "https://vjuhxpttssmyomqqomdx.supabase.co/rest/v1/rpc/increment_notif_click") else { return }
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.setValue(anonKey, forHTTPHeaderField: "apikey")
+        req.setValue("Bearer \(anonKey)", forHTTPHeaderField: "Authorization")
+        req.httpBody = try? JSONSerialization.data(withJSONObject: ["nid": nid], options: [])
+        URLSession.shared.dataTask(with: req).resume()
+    }
+
+    // Fallback: pull the notification id (?n=...) out of the data url.
+    private func notifIdFromURL(_ any: Any?) -> String? {
+        guard let s = any as? String,
+              let comps = URLComponents(string: s) else { return nil }
+        return comps.queryItems?.first(where: { $0.name == "n" })?.value
     }
 }
