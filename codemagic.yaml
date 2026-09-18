@@ -97,6 +97,7 @@ workflows:
         BUNDLE_ID: com.deliverystep.app
         XCODE_PROJECT: ios/DeliveryStep.xcodeproj
         XCODE_SCHEME: DeliveryStep
+        APP_ID: 6782429221
     scripts:
       - name: Verify icon and Info.plist
         script: |
@@ -133,6 +134,19 @@ workflows:
             --save
       - name: Set up code signing
         script: xcode-project use-profiles
+      - name: Auto-increment build number (so uploads never clash)
+        script: |
+          PBX="ios/DeliveryStep.xcodeproj/project.pbxproj"
+          TF=$(app-store-connect get-latest-testflight-build-number "$APP_ID" 2>/dev/null || echo 0)
+          AS=$(app-store-connect get-latest-app-store-build-number "$APP_ID" 2>/dev/null || echo 0)
+          CUR=$(grep -m1 -oE 'CURRENT_PROJECT_VERSION = [0-9]+' "$PBX" | grep -oE '[0-9]+' || echo 0)
+          TF=${TF:-0}; AS=${AS:-0}; CUR=${CUR:-0}
+          MAX=$TF
+          [ "$AS" -gt "$MAX" ] 2>/dev/null && MAX=$AS
+          [ "$CUR" -gt "$MAX" ] 2>/dev/null && MAX=$CUR
+          NEXT=$((MAX + 1))
+          echo "Build numbers -> TestFlight:$TF AppStore:$AS pbxproj:$CUR ; using $NEXT"
+          sed -i '' "s/CURRENT_PROJECT_VERSION = [0-9]*;/CURRENT_PROJECT_VERSION = $NEXT;/g" "$PBX"
       - name: Build iOS IPA
         script: |
           set -e
