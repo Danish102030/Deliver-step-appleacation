@@ -83,6 +83,8 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
 
     // Save this device's FCM token to Supabase device_tokens (same format as the Android app).
     private func saveDeviceToken(_ token: String) {
+        // Remember the token so the website (checkout) can attach it to the order → order-status notifications.
+        UserDefaults.standard.set(token, forKey: "ds_push_token")
         let anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro"
         guard let url = URL(string: "https://vjuhxpttssmyomqqomdx.supabase.co/rest/v1/device_tokens") else { return }
         var req = URLRequest(url: url)

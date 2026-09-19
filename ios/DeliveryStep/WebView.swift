@@ -78,6 +78,11 @@ struct WebView: UIViewRepresentable {
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             webView.scrollView.refreshControl?.endRefreshing()
+            // Hand the push token to the website so checkout can attach it to the order
+            // → the customer gets order-status notifications on iPhone.
+            if let token = UserDefaults.standard.string(forKey: "ds_push_token"), !token.isEmpty {
+                webView.evaluateJavaScript("try{localStorage.setItem('ds_push_token','\(token)');}catch(e){}", completionHandler: nil)
+            }
         }
 
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
