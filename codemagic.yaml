@@ -86,6 +86,72 @@ workflows:
           success: true
           failure: true
 
+  android-customer-playstore:
+    name: Android Customer (Play Store AAB)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      android_signing:
+        - deliverystep_keystore
+      vars:
+        PACKAGE_NAME: com.deliverstep.app
+      node: 22
+      java: 21
+    scripts:
+      - name: Generate customer app (rider base + inlined customer files)
+        script: |
+          set -e
+          rm -rf customer && mkdir -p customer/www
+          echo 'ewogICJuYW1lIjogImRlbGl2ZXItc3RlcC1jdXN0b21lciIsCiAgInZlcnNpb24iOiAiNS4wLjAiLAogICJkZXNjcmlwdGlvbiI6ICLYrti32YjYqSDYp9mE2KrZiNi12YrZhCDigJQgY3VzdG9tZXIgYXBwIChBbmRyb2lkIHdyYXBwZXIgdGhhdCBsb2FkcyB0aGUgbGl2ZSB3ZWJzaXRlICsgcHVzaCBub3RpZmljYXRpb25zKSIsCiAgInByaXZhdGUiOiB0cnVlLAogICJzY3JpcHRzIjogewogICAgInN5bmMiOiAibnB4IGNhcCBzeW5jIGFuZHJvaWQiCiAgfSwKICAiZGVwZW5kZW5jaWVzIjogewogICAgIkBjYXBhY2l0b3IvYW5kcm9pZCI6ICJeNi4wLjAiLAogICAgIkBjYXBhY2l0b3IvYXBwIjogIl42LjAuMCIsCiAgICAiQGNhcGFjaXRvci9jb3JlIjogIl42LjAuMCIsCiAgICAiQGNhcGFjaXRvci9wdXNoLW5vdGlmaWNhdGlvbnMiOiAiXjYuMC4wIiwKICAgICJAY2FwYWNpdG9yL3NwbGFzaC1zY3JlZW4iOiAiXjYuMC4wIiwKICAgICJAY2FwYWNpdG9yL3N0YXR1cy1iYXIiOiAiXjYuMC4wIgogIH0sCiAgImRldkRlcGVuZGVuY2llcyI6IHsKICAgICJAY2FwYWNpdG9yL2NsaSI6ICJeNi4wLjAiCiAgfQp9Cg==' | openssl base64 -A -d > customer/package.json
+          echo 'ewogICJhcHBJZCI6ICJjb20uZGVsaXZlcnN0ZXAuYXBwIiwKICAiYXBwTmFtZSI6ICLYrti32YjYqSDYp9mE2KrZiNi12YrZhCIsCiAgIndlYkRpciI6ICJ3d3ciLAogICJzZXJ2ZXIiOiB7CiAgICAidXJsIjogImh0dHBzOi8vZGVsaXZlcnlzdGVwLmFwcCIsCiAgICAiY2xlYXJ0ZXh0IjogZmFsc2UKICB9LAogICJwbHVnaW5zIjogewogICAgIlN0YXR1c0JhciI6IHsKICAgICAgImJhY2tncm91bmRDb2xvciI6ICIjYmUxODVkIiwKICAgICAgInN0eWxlIjogIkxJR0hUIiwKICAgICAgIm92ZXJsYXlzV2ViVmlldyI6IGZhbHNlCiAgICB9LAogICAgIlNwbGFzaFNjcmVlbiI6IHsKICAgICAgImxhdW5jaFNob3dEdXJhdGlvbiI6IDEyMDAsCiAgICAgICJiYWNrZ3JvdW5kQ29sb3IiOiAiI2JlMTg1ZCIsCiAgICAgICJhbmRyb2lkU3BsYXNoUmVzb3VyY2VOYW1lIjogInNwbGFzaCIsCiAgICAgICJhbmRyb2lkU2NhbGVUeXBlIjogIkNFTlRFUl9DUk9QIiwKICAgICAgInNob3dTcGlubmVyIjogZmFsc2UKICAgIH0sCiAgICAiUHVzaE5vdGlmaWNhdGlvbnMiOiB7CiAgICAgICJwcmVzZW50YXRpb25PcHRpb25zIjogWwogICAgICAgICJiYWRnZSIsCiAgICAgICAgInNvdW5kIiwKICAgICAgICAiYWxlcnQiCiAgICAgIF0KICAgIH0KICB9LAogICJhbmRyb2lkIjogewogICAgImFsbG93TWl4ZWRDb250ZW50IjogZmFsc2UsCiAgICAiY2FwdHVyZUlucHV0IjogdHJ1ZSwKICAgICJ3ZWJDb250ZW50c0RlYnVnZ2luZ0VuYWJsZWQiOiBmYWxzZQogIH0KfQo=' | openssl base64 -A -d > customer/capacitor.config.json
+          echo 'PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImFyIiBkaXI9InJ0bCI+CjxoZWFkPgogIDxtZXRhIGNoYXJzZXQ9InV0Zi04IiAvPgogIDxtZXRhIG5hbWU9InZpZXdwb3J0IiBjb250ZW50PSJ3aWR0aD1kZXZpY2Utd2lkdGgsIGluaXRpYWwtc2NhbGU9MS4wLCB2aWV3cG9ydC1maXQ9Y292ZXIiIC8+CiAgPHRpdGxlPtiu2LfZiNipINin2YTYqtmI2LXZitmEPC90aXRsZT4KICA8c3R5bGU+CiAgICBodG1sLGJvZHl7bWFyZ2luOjA7aGVpZ2h0OjEwMCU7YmFja2dyb3VuZDojYmUxODVkO30KICAgIC53cmFwe3Bvc2l0aW9uOmZpeGVkO2luc2V0OjA7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO2JhY2tncm91bmQ6I2JlMTg1ZDt9CiAgICAudHtjb2xvcjojZmZmO2ZvbnQtZmFtaWx5Oi1hcHBsZS1zeXN0ZW0sJ1NlZ29lIFVJJyxSb2JvdG8sc2Fucy1zZXJpZjtmb250LXNpemU6MjBweDtmb250LXdlaWdodDo2MDA7b3BhY2l0eTouOTU7fQogIDwvc3R5bGU+CjwvaGVhZD4KPGJvZHk+CiAgPCEtLQogICAgVGhpcyBidW5kbGVkIHBhZ2UgaXMgb25seSBhIGJyaWVmIGZhbGxiYWNrLiBUaGUgbmF0aXZlIGFwcCBpcyBjb25maWd1cmVkCiAgICAoY2FwYWNpdG9yLmNvbmZpZy5qc29uIOKGkiBzZXJ2ZXIudXJsKSB0byBsb2FkIHRoZSBsaXZlIHdlYnNpdGUKICAgIGh0dHBzOi8vZGVsaXZlcnlzdGVwLmFwcCwgc28gdGhlIGN1c3RvbWVyIGFsd2F5cyBzZWVzIHRoZSBjdXJyZW50IHNpdGUuCiAgLS0+CiAgPGRpdiBjbGFzcz0id3JhcCI+PGRpdiBjbGFzcz0idCI+2K7Yt9mI2Kkg2KfZhNiq2YjYtdmK2YQ8L2Rpdj48L2Rpdj4KPC9ib2R5Pgo8L2h0bWw+Cg==' | openssl base64 -A -d > customer/www/index.html
+          cp -r android customer/android
+          rm -f customer/android/app/src/main/java/com/deliverstep/app/BootReceiver.java customer/android/app/src/main/java/com/deliverstep/app/OrderMessagingService.java customer/android/app/src/main/java/com/deliverstep/app/RiderForegroundService.java customer/android/capacitor.settings.gradle customer/android/app/capacitor.build.gradle
+          echo 'YXBwbHkgcGx1Z2luOiAnY29tLmFuZHJvaWQuYXBwbGljYXRpb24nCgphbmRyb2lkIHsKICAgIG5hbWVzcGFjZSAiY29tLmRlbGl2ZXJzdGVwLmFwcCIKICAgIGNvbXBpbGVTZGsgcm9vdFByb2plY3QuZXh0LmNvbXBpbGVTZGtWZXJzaW9uCiAgICBkZWZhdWx0Q29uZmlnIHsKICAgICAgICBhcHBsaWNhdGlvbklkICJjb20uZGVsaXZlcnN0ZXAuYXBwIgogICAgICAgIG1pblNka1ZlcnNpb24gcm9vdFByb2plY3QuZXh0Lm1pblNka1ZlcnNpb24KICAgICAgICB0YXJnZXRTZGtWZXJzaW9uIHJvb3RQcm9qZWN0LmV4dC50YXJnZXRTZGtWZXJzaW9uCiAgICAgICAgdmVyc2lvbkNvZGUgMTAKICAgICAgICB2ZXJzaW9uTmFtZSAiNS4wIgogICAgICAgIHRlc3RJbnN0cnVtZW50YXRpb25SdW5uZXIgImFuZHJvaWR4LnRlc3QucnVubmVyLkFuZHJvaWRKVW5pdFJ1bm5lciIKICAgICAgICBhYXB0T3B0aW9ucyB7CiAgICAgICAgICAgICAvLyBGaWxlcyBhbmQgZGlycyB0byBvbWl0IGZyb20gdGhlIHBhY2thZ2VkIGFzc2V0cyBkaXIsIG1vZGlmaWVkIHRvIGFjY29tbW9kYXRlIG1vZGVybiB3ZWIgYXBwcy4KICAgICAgICAgICAgIC8vIERlZmF1bHQ6IGh0dHBzOi8vYW5kcm9pZC5nb29nbGVzb3VyY2UuY29tL3BsYXRmb3JtL2ZyYW1ld29ya3MvYmFzZS8rLzI4MmUxODFiNThjZjcyYjZjYTc3MGRjN2NhNWY5MWYxMzU0NDQ1MDIvdG9vbHMvYWFwdC9BYXB0QXNzZXRzLmNwcCM2MQogICAgICAgICAgICBpZ25vcmVBc3NldHNQYXR0ZXJuICchLnN2bjohLmdpdDohLmRzX3N0b3JlOiEqLnNjYzouKjohQ1ZTOiF0aHVtYnMuZGI6IXBpY2FzYS5pbmk6ISp+JwogICAgICAgIH0KICAgIH0KICAgIHNpZ25pbmdDb25maWdzIHsKICAgICAgICByZWxlYXNlIHsKICAgICAgICAgICAgaWYgKFN5c3RlbS5nZXRlbnYoIkNNX0tFWVNUT1JFX1BBVEgiKSkgewogICAgICAgICAgICAgICAgc3RvcmVGaWxlIGZpbGUoU3lzdGVtLmdldGVudigiQ01fS0VZU1RPUkVfUEFUSCIpKQogICAgICAgICAgICAgICAgc3RvcmVQYXNzd29yZCBTeXN0ZW0uZ2V0ZW52KCJDTV9LRVlTVE9SRV9QQVNTV09SRCIpCiAgICAgICAgICAgICAgICBrZXlBbGlhcyBTeXN0ZW0uZ2V0ZW52KCJDTV9LRVlfQUxJQVMiKQogICAgICAgICAgICAgICAga2V5UGFzc3dvcmQgU3lzdGVtLmdldGVudigiQ01fS0VZX1BBU1NXT1JEIikKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KICAgIGJ1aWxkVHlwZXMgewogICAgICAgIHJlbGVhc2UgewogICAgICAgICAgICBtaW5pZnlFbmFibGVkIGZhbHNlCiAgICAgICAgICAgIHByb2d1YXJkRmlsZXMgZ2V0RGVmYXVsdFByb2d1YXJkRmlsZSgncHJvZ3VhcmQtYW5kcm9pZC50eHQnKSwgJ3Byb2d1YXJkLXJ1bGVzLnBybycKICAgICAgICAgICAgaWYgKFN5c3RlbS5nZXRlbnYoIkNNX0tFWVNUT1JFX1BBVEgiKSkgewogICAgICAgICAgICAgICAgc2lnbmluZ0NvbmZpZyBzaWduaW5nQ29uZmlncy5yZWxlYXNlCiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9Cn0KCnJlcG9zaXRvcmllcyB7CiAgICBmbGF0RGlyewogICAgICAgIGRpcnMgJy4uL2NhcGFjaXRvci1jb3Jkb3ZhLWFuZHJvaWQtcGx1Z2lucy9zcmMvbWFpbi9saWJzJywgJ2xpYnMnCiAgICB9Cn0KCmRlcGVuZGVuY2llcyB7CiAgICBpbXBsZW1lbnRhdGlvbiBmaWxlVHJlZShpbmNsdWRlOiBbJyouamFyJ10sIGRpcjogJ2xpYnMnKQogICAgaW1wbGVtZW50YXRpb24gImFuZHJvaWR4LmFwcGNvbXBhdDphcHBjb21wYXQ6JGFuZHJvaWR4QXBwQ29tcGF0VmVyc2lvbiIKICAgIGltcGxlbWVudGF0aW9uICJhbmRyb2lkeC5jb29yZGluYXRvcmxheW91dDpjb29yZGluYXRvcmxheW91dDokYW5kcm9pZHhDb29yZGluYXRvckxheW91dFZlcnNpb24iCiAgICBpbXBsZW1lbnRhdGlvbiAiYW5kcm9pZHguY29yZTpjb3JlLXNwbGFzaHNjcmVlbjokY29yZVNwbGFzaFNjcmVlblZlcnNpb24iCiAgICBpbXBsZW1lbnRhdGlvbiBwcm9qZWN0KCc6Y2FwYWNpdG9yLWFuZHJvaWQnKQogICAgdGVzdEltcGxlbWVudGF0aW9uICJqdW5pdDpqdW5pdDokanVuaXRWZXJzaW9uIgogICAgYW5kcm9pZFRlc3RJbXBsZW1lbnRhdGlvbiAiYW5kcm9pZHgudGVzdC5leHQ6anVuaXQ6JGFuZHJvaWR4SnVuaXRWZXJzaW9uIgogICAgYW5kcm9pZFRlc3RJbXBsZW1lbnRhdGlvbiAiYW5kcm9pZHgudGVzdC5lc3ByZXNzbzplc3ByZXNzby1jb3JlOiRhbmRyb2lkeEVzcHJlc3NvQ29yZVZlcnNpb24iCiAgICBpbXBsZW1lbnRhdGlvbiBwcm9qZWN0KCc6Y2FwYWNpdG9yLWNvcmRvdmEtYW5kcm9pZC1wbHVnaW5zJykKfQoKYXBwbHkgZnJvbTogJ2NhcGFjaXRvci5idWlsZC5ncmFkbGUnCgp0cnkgewogICAgZGVmIHNlcnZpY2VzSlNPTiA9IGZpbGUoJ2dvb2dsZS1zZXJ2aWNlcy5qc29uJykKICAgIGlmIChzZXJ2aWNlc0pTT04udGV4dCkgewogICAgICAgIGFwcGx5IHBsdWdpbjogJ2NvbS5nb29nbGUuZ21zLmdvb2dsZS1zZXJ2aWNlcycKICAgIH0KfSBjYXRjaChFeGNlcHRpb24gZSkgewogICAgbG9nZ2VyLmluZm8oImdvb2dsZS1zZXJ2aWNlcy5qc29uIG5vdCBmb3VuZCwgZ29vZ2xlLXNlcnZpY2VzIHBsdWdpbiBub3QgYXBwbGllZC4gUHVzaCBOb3RpZmljYXRpb25zIHdvbid0IHdvcmsiKQp9Cg==' | openssl base64 -A -d > customer/android/app/build.gradle
+          echo 'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPG1hbmlmZXN0IHhtbG5zOmFuZHJvaWQ9Imh0dHA6Ly9zY2hlbWFzLmFuZHJvaWQuY29tL2Fway9yZXMvYW5kcm9pZCI+CgogICAgPGFwcGxpY2F0aW9uCiAgICAgICAgYW5kcm9pZDphbGxvd0JhY2t1cD0idHJ1ZSIKICAgICAgICBhbmRyb2lkOmljb249IkBtaXBtYXAvaWNfbGF1bmNoZXIiCiAgICAgICAgYW5kcm9pZDpsYWJlbD0iQHN0cmluZy9hcHBfbmFtZSIKICAgICAgICBhbmRyb2lkOnJvdW5kSWNvbj0iQG1pcG1hcC9pY19sYXVuY2hlcl9yb3VuZCIKICAgICAgICBhbmRyb2lkOnN1cHBvcnRzUnRsPSJ0cnVlIgogICAgICAgIGFuZHJvaWQ6dGhlbWU9IkBzdHlsZS9BcHBUaGVtZSI+CgogICAgICAgIDxhY3Rpdml0eQogICAgICAgICAgICBhbmRyb2lkOmNvbmZpZ0NoYW5nZXM9Im9yaWVudGF0aW9ufGtleWJvYXJkSGlkZGVufGtleWJvYXJkfHNjcmVlblNpemV8bG9jYWxlfHNtYWxsZXN0U2NyZWVuU2l6ZXxzY3JlZW5MYXlvdXR8dWlNb2RlIgogICAgICAgICAgICBhbmRyb2lkOm5hbWU9Ii5NYWluQWN0aXZpdHkiCiAgICAgICAgICAgIGFuZHJvaWQ6bGFiZWw9IkBzdHJpbmcvdGl0bGVfYWN0aXZpdHlfbWFpbiIKICAgICAgICAgICAgYW5kcm9pZDp0aGVtZT0iQHN0eWxlL0FwcFRoZW1lLk5vQWN0aW9uQmFyTGF1bmNoIgogICAgICAgICAgICBhbmRyb2lkOmxhdW5jaE1vZGU9InNpbmdsZVRhc2siCiAgICAgICAgICAgIGFuZHJvaWQ6ZXhwb3J0ZWQ9InRydWUiPgoKICAgICAgICAgICAgPGludGVudC1maWx0ZXI+CiAgICAgICAgICAgICAgICA8YWN0aW9uIGFuZHJvaWQ6bmFtZT0iYW5kcm9pZC5pbnRlbnQuYWN0aW9uLk1BSU4iIC8+CiAgICAgICAgICAgICAgICA8Y2F0ZWdvcnkgYW5kcm9pZDpuYW1lPSJhbmRyb2lkLmludGVudC5jYXRlZ29yeS5MQVVOQ0hFUiIgLz4KICAgICAgICAgICAgPC9pbnRlbnQtZmlsdGVyPgoKICAgICAgICA8L2FjdGl2aXR5PgoKICAgICAgICA8cHJvdmlkZXIKICAgICAgICAgICAgYW5kcm9pZDpuYW1lPSJhbmRyb2lkeC5jb3JlLmNvbnRlbnQuRmlsZVByb3ZpZGVyIgogICAgICAgICAgICBhbmRyb2lkOmF1dGhvcml0aWVzPSIke2FwcGxpY2F0aW9uSWR9LmZpbGVwcm92aWRlciIKICAgICAgICAgICAgYW5kcm9pZDpleHBvcnRlZD0iZmFsc2UiCiAgICAgICAgICAgIGFuZHJvaWQ6Z3JhbnRVcmlQZXJtaXNzaW9ucz0idHJ1ZSI+CiAgICAgICAgICAgIDxtZXRhLWRhdGEKICAgICAgICAgICAgICAgIGFuZHJvaWQ6bmFtZT0iYW5kcm9pZC5zdXBwb3J0LkZJTEVfUFJPVklERVJfUEFUSFMiCiAgICAgICAgICAgICAgICBhbmRyb2lkOnJlc291cmNlPSJAeG1sL2ZpbGVfcGF0aHMiPjwvbWV0YS1kYXRhPgogICAgICAgIDwvcHJvdmlkZXI+CiAgICA8L2FwcGxpY2F0aW9uPgoKICAgIDwhLS0gUGVybWlzc2lvbnMgLS0+CiAgICA8dXNlcy1wZXJtaXNzaW9uIGFuZHJvaWQ6bmFtZT0iYW5kcm9pZC5wZXJtaXNzaW9uLklOVEVSTkVUIiAvPgogICAgPHVzZXMtcGVybWlzc2lvbiBhbmRyb2lkOm5hbWU9ImFuZHJvaWQucGVybWlzc2lvbi5QT1NUX05PVElGSUNBVElPTlMiIC8+CiAgICA8dXNlcy1wZXJtaXNzaW9uIGFuZHJvaWQ6bmFtZT0iYW5kcm9pZC5wZXJtaXNzaW9uLlZJQlJBVEUiIC8+CjwvbWFuaWZlc3Q+Cg==' | openssl base64 -A -d > customer/android/app/src/main/AndroidManifest.xml
+          echo 'cGFja2FnZSBjb20uZGVsaXZlcnN0ZXAuYXBwOwoKaW1wb3J0IGNvbS5nZXRjYXBhY2l0b3IuQnJpZGdlQWN0aXZpdHk7CgpwdWJsaWMgY2xhc3MgTWFpbkFjdGl2aXR5IGV4dGVuZHMgQnJpZGdlQWN0aXZpdHkgewogICAgLy8gU3RhbmRhcmQgQ2FwYWNpdG9yIFdlYlZpZXcgaG9zdC4gVGhlIGFwcCBsb2FkcyB0aGUgbGl2ZSB3ZWJzaXRlCiAgICAvLyAoaHR0cHM6Ly9kZWxpdmVyeXN0ZXAuYXBwKSBhbmQgcmVnaXN0ZXJzIGZvciBwdXNoIG5vdGlmaWNhdGlvbnMKICAgIC8vIGZyb20gdGhlIHdlYiBsYXllciB2aWEgdGhlIEBjYXBhY2l0b3IvcHVzaC1ub3RpZmljYXRpb25zIHBsdWdpbi4KfQo=' | openssl base64 -A -d > customer/android/app/src/main/java/com/deliverstep/app/MainActivity.java
+          echo 'PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0ndXRmLTgnPz4KPHJlc291cmNlcz4KICAgIDxzdHJpbmcgbmFtZT0iYXBwX25hbWUiPtiu2LfZiNipINin2YTYqtmI2LXZitmEPC9zdHJpbmc+CiAgICA8c3RyaW5nIG5hbWU9InRpdGxlX2FjdGl2aXR5X21haW4iPtiu2LfZiNipINin2YTYqtmI2LXZitmEPC9zdHJpbmc+CiAgICA8c3RyaW5nIG5hbWU9InBhY2thZ2VfbmFtZSI+Y29tLmRlbGl2ZXJzdGVwLmFwcDwvc3RyaW5nPgogICAgPHN0cmluZyBuYW1lPSJjdXN0b21fdXJsX3NjaGVtZSI+Y29tLmRlbGl2ZXJzdGVwLmFwcDwvc3RyaW5nPgo8L3Jlc291cmNlcz4K' | openssl base64 -A -d > customer/android/app/src/main/res/values/strings.xml
+          echo "=== customer applicationId / version ==="
+          grep -E "applicationId|versionCode|versionName" customer/android/app/build.gradle
+      - name: Install dependencies
+        script: |
+          cd customer
+          npm install
+      - name: Sync Capacitor (regenerate wiring + copy web assets)
+        script: |
+          cd customer
+          npx cap sync android
+      - name: Verify google-services.json (push notifications)
+        script: |
+          F="customer/android/app/google-services.json"
+          if [ ! -f "$F" ]; then echo "ERROR: $F missing"; exit 1; fi
+          if grep -q "com.deliverstep.app" "$F"; then echo "google-services.json OK (has com.deliverstep.app)"; else echo "ERROR: no com.deliverstep.app entry"; exit 1; fi
+      - name: Build Android App Bundle (AAB) for Play Store
+        script: |
+          cd customer/android
+          chmod +x ./gradlew
+          ./gradlew bundleRelease
+          echo "=== Built AABs ==="
+          find . -path "*outputs/bundle/release/*.aab" -type f
+          AAB=$(find . -path "*app/build/outputs/bundle/release/*.aab" -type f | head -1)
+          if [ -z "$AAB" ]; then echo "ERROR: release AAB was not produced"; exit 1; fi
+          echo "=================================================================="
+          echo "   DONE! Download the .aab from Artifacts, then in Google Play"
+          echo "   Console -> app -> Production (or Internal testing) ->"
+          echo "   Create new release -> upload this .aab."
+          echo "   AAB: $AAB  ($(du -h "$AAB" | cut -f1))"
+          echo "=================================================================="
+    artifacts:
+      - customer/android/app/build/outputs/bundle/**/*.aab
+      - customer/android/app/build/outputs/mapping/**/*.txt
+    publishing:
+      email:
+        recipients:
+          - ihsanullah.danish5000@gmail.com
+        notify:
+          success: true
+          failure: true
+
   ios-app-store:
     name: iOS App Store Release
     max_build_duration: 60
@@ -97,7 +163,6 @@ workflows:
         BUNDLE_ID: com.deliverystep.app
         XCODE_PROJECT: ios/DeliveryStep.xcodeproj
         XCODE_SCHEME: DeliveryStep
-        APP_ID: 6782429221
     scripts:
       - name: Verify icon and Info.plist
         script: |
@@ -134,32 +199,11 @@ workflows:
             --save
       - name: Set up code signing
         script: xcode-project use-profiles
-      - name: Auto-increment build number (so uploads never clash)
-        script: |
-          PBX="ios/DeliveryStep.xcodeproj/project.pbxproj"
-          TF=$(app-store-connect get-latest-testflight-build-number "$APP_ID" 2>/dev/null || echo 0)
-          AS=$(app-store-connect get-latest-app-store-build-number "$APP_ID" 2>/dev/null || echo 0)
-          CUR=$(grep -m1 -oE 'CURRENT_PROJECT_VERSION = [0-9]+' "$PBX" | grep -oE '[0-9]+' || echo 0)
-          TF=${TF:-0}; AS=${AS:-0}; CUR=${CUR:-0}
-          MAX=$TF
-          [ "$AS" -gt "$MAX" ] 2>/dev/null && MAX=$AS
-          [ "$CUR" -gt "$MAX" ] 2>/dev/null && MAX=$CUR
-          NEXT=$((MAX + 1))
-          echo "Build numbers -> TestFlight:$TF AppStore:$AS pbxproj:$CUR ; using $NEXT"
-          sed -i '' "s/CURRENT_PROJECT_VERSION = [0-9]*;/CURRENT_PROJECT_VERSION = $NEXT;/g" "$PBX"
       - name: Build iOS IPA
         script: |
-          set -e
-          # Resolve Swift packages into a stable folder first, then archive using the SAME
-          # folder. This fixes "Missing package product 'FirebaseCore'" during xcodebuild archive.
-          xcodebuild -resolvePackageDependencies \
-            -project "$XCODE_PROJECT" \
-            -scheme "$XCODE_SCHEME" \
-            -clonedSourcePackagesDirPath "$CM_BUILD_DIR/SourcePackages"
           xcode-project build-ipa \
             --project "$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME" \
-            --archive-xcargs "COMPILER_INDEX_STORE_ENABLE=NO -clonedSourcePackagesDirPath $CM_BUILD_DIR/SourcePackages"
+            --scheme "$XCODE_SCHEME"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
