@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#be185d"/>
+  <title>سلة التسوق - خطوة التوصيل</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+  <link rel="preconnect" href="https://vjuhxpttssmyomqqomdx.supabase.co"/>
+  <link rel="stylesheet" href="/ds-lib/tajawal-5.3.0-all.css" onerror="this.onerror=null;this.href='https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&amp;display=swap'"/>
+  <link rel="stylesheet" href="/ds-lib/ds-icons-2.47.0-1.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" media="print" onload="this.media='all'"/>
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"/></noscript>
+  <script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
+  <style>
+    :root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f1f1f;--muted:#6b7280;--border:#f0e4e9;--bg:#f9f9f9;--white:#fff;--green:#16a34a}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:100px;direction:rtl}
+    .topbar{background:var(--rose);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+    .btn-back{background:rgba(255,255,255,0.2);border:none;color:#fff;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+    .topbar-title{font-size:16px;font-weight:700;color:#fff;flex:1}
+    .body{padding:16px;display:flex;flex-direction:column;gap:12px}
+    .card{background:#fff;border:0.5px solid var(--border);border-radius:16px;padding:14px}
+    .card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+    .card-title i{color:var(--rose);font-size:16px}
+    .cart-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+    .cart-item:last-of-type{border-bottom:none}
+    .item-icon{width:50px;height:50px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#f3f0ed;display:flex;align-items:center;justify-content:center;font-size:24px}
+    .item-icon img{width:100%;height:100%;object-fit:cover}
+    .item-body{flex:1}
+    .item-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+    .item-price{font-size:12px;color:var(--rose-dark);font-weight:700}
+    .qty-ctrl{display:flex;align-items:center;gap:8px}
+    .qty-btn{width:28px;height:28px;border-radius:8px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all 0.2s}
+    .qty-m{background:var(--rose-light);color:var(--rose)}
+    .qty-p{background:var(--rose);color:#fff}
+    .qty-n{font-size:14px;font-weight:700;min-width:20px;text-align:center}
+    .row-total{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:0.5px solid var(--border)}
+    .row-total:last-of-type{border-bottom:none}
+    .grand-total{display:flex;justify-content:space-between;font-size:16px;font-weight:700;padding:10px 0 0;border-top:1px solid var(--border);margin-top:6px}
+    .grand-total .v{color:var(--rose-dark)}
+    .empty-cart{text-align:center;padding:4rem 2rem}
+    .empty-cart i{font-size:64px;color:var(--rose-light);display:block;margin-bottom:1rem}
+    .empty-title{font-size:18px;font-weight:700;margin-bottom:8px}
+    .empty-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+    .checkout-bar{position:fixed;bottom:0;right:50%;transform:translateX(50%);width:100%;max-width:480px;background:#fff;border-top:0.5px solid var(--border);padding:12px 16px;z-index:100}
+    .checkout-btn{width:100%;background:var(--rose);color:#fff;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Tajawal',sans-serif;box-shadow:0 4px 12px rgba(190,24,93,0.3);transition:all 0.2s}
+    .checkout-btn:active{background:var(--rose-dark)}
+    .checkout-btn.blocked{background:#9ca3af;font-size:14px}
+    .ds-rule{border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:13.5px;font-weight:700;line-height:1.7}
+    .ds-rule.pause{background:#fef2f2;border:1.5px solid #fca5a5;color:#991b1b}
+    .ds-rule.min{background:#fffbeb;border:1.5px solid #fcd34d;color:#92400e}
+    .ds-rule.max{background:#eff6ff;border:1.5px solid #93c5fd;color:#1e3a8a}
+    .ds-rule a{align-self:flex-start;text-decoration:none;color:#fff;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:800}
+    .ds-rule.min a{background:#b45309}
+    .ds-rule.max a{background:#15803d}
+    .promo-wrap{display:flex;gap:8px;margin-top:10px}
+    .promo-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;outline:none;font-family:'Tajawal',sans-serif;color:var(--text);direction:rtl}
+    .promo-input:focus{border-color:var(--rose)}
+    .promo-btn{background:var(--rose);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif}
+    .toast{position:fixed;bottom:100px;right:50%;transform:translateX(50%);background:#1f1f1f;color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999}
+    .toast.show{opacity:1}
+  </style>
+<style>/* Our logo in light grey wherever a dish or shop has no photo, or the photo link is broken (like Keeta / HungerStation) */
+.ds-ph{background-color:#f4f1ee!important;background-image:url(data:image/webp;base64,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)!important;background-repeat:no-repeat!important;background-position:center!important;background-size:auto 46%!important;font-size:0!important;color:transparent!important}
+.ds-ph-pink{background-color:#be185d!important;background-image:url(data:image/webp;base64,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),linear-gradient(135deg,#9d174d,#be185d)!important;background-repeat:no-repeat,no-repeat!important;background-position:center,center!important;background-size:auto 38%,cover!important;font-size:0!important;color:transparent!important}
+</style>
+<script>function dsPh(img,cls){try{var d=document.createElement('div');d.className=cls||'ds-ph';img.replaceWith(d);}catch(e){}}
+// Shopify photos: ask for a phone-sized copy instead of the full-size original (back to the original if that ever fails)
+function dsImg(u,w){u=u||'';return /^https:\/\/cdn\.shopify\.com\//i.test(u)&&!/[?&]width=/i.test(u)?u+(u.indexOf('?')<0?'?':'&')+'width='+w:u;}
+function dsImgRetry(img){var s=img.getAttribute('src')||'';if(/^https:\/\/cdn\.shopify\.com\//i.test(s)&&/[?&]width=\d+/.test(s)){img.src=s.replace(/[?&]width=\d+/,'');return true;}return false;}</script>
+</head>
+<body>
+<div class="topbar">
+  <button class="btn-back" onclick="history.back()" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+  <div class="topbar-title">سلة التسوق</div>
+  <button onclick="clearCart()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700">مسح الكل</button>
+</div>
+
+<div id="cart-content"></div>
+
+<div class="checkout-bar" id="checkout-bar" style="display:none">
+  <button class="checkout-btn" id="checkout-go" onclick="goCheckout()">
+    <i class="ti ti-shopping-cart-check" style="font-size:20px" aria-hidden="true"></i>
+    إتمام الطلب · <span id="checkout-total">٠ ريال</span>
+  </button>
+  <button class="checkout-btn blocked" id="checkout-blocked" style="display:none" onclick="_cartBlockedTap()"><span id="checkout-block-txt"></span></button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const sb = supabase.createClient('https://vjuhxpttssmyomqqomdx.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro');
+
+let appliedCoupon = null; // {code, discount_percent, discount_amount}
+let _smDeliveryFee = 5.5;
+let _smFreeMin = 200;
+let _twoVendorFee = 7; // delivery fee when the cart has TWO vendors
+let _settingsLoaded = false;
+async function loadDeliverySettings(){
+  try{
+    const{data,error}=await sb.from('settings').select('key,value').in('key',['supermarket_delivery_fee','supermarket_free_delivery_min','supermarket_discount_min','supermarket_discount_fee','two_vendor_delivery_fee','supermarket_min_order','supermarket_max_order','orders_paused','orders_paused_msg']);
+    if(error){console.warn('Settings load error:',error);return;}
+    if(data&&data.length){
+      data.forEach(s=>{
+        if(s.key==='supermarket_delivery_fee'){const v=Number(s.value);if(!isNaN(v))_smDeliveryFee=v;}
+        if(s.key==='supermarket_free_delivery_min'){const v=Number(s.value);if(!isNaN(v))_smFreeMin=v;}
+        if(s.key==='two_vendor_delivery_fee'){const v=Number(s.value);if(!isNaN(v)&&v>0)_twoVendorFee=v;}
+        _dsRule(s.key,s.value);
+      });
+      _settingsLoaded=true;
+    }
+  }catch(e){console.warn('Settings load fail:',e);}
+}
+
+/* ── Two-vendor cart helpers ── */
+const _SM_VENDOR='السوبرماركت';
+function _vendorOf(i){return i.vendor||i.restaurant||_SM_VENDOR;}
+function cartVendors(cart){return [...new Set(cart.map(_vendorOf))];}
+
+/* ═══ Rules from Admin → Settings: pause orders, supermarket minimum / maximum ═══
+   Minimum / maximum count only the supermarket items in the cart. */
+let _smMin=0, _smMax=0, _ordersPaused=false, _pausedMsg='', _smDiscMin=0, _smDiscFee=0;
+// Supermarket delivery: free from _smFreeMin · cheaper fee from _smDiscMin · otherwise the normal fee
+function _smTierOn(){ return _smDiscMin>0&&_smDiscFee<_smDeliveryFee&&!(_smFreeMin>0&&_smDiscMin>=_smFreeMin); }
+function _smFee(sub){ if(_smFreeMin>0&&sub>=_smFreeMin)return 0; if(_smTierOn()&&sub>=_smDiscMin)return _smDiscFee; return _smDeliveryFee; }
+function _smFeeHint(sub){   // "add X SAR → cheaper / free delivery"
+  if(_smFreeMin>0&&sub>=_smFreeMin)return '';
+  if(_smTierOn()&&sub<_smDiscMin)return '🚚 أضف '+_dsFmt(_smDiscMin-sub)+' ريال ويصير التوصيل '+_dsFmt(_smDiscFee)+' ريال بدل '+_dsFmt(_smDeliveryFee);
+  if(_smFreeMin>0)return '🚚 أضف '+_dsFmt(_smFreeMin-sub)+' ريال لتوصيل مجاني';
+  return '';
+}
+const _DS_WA='966560957163';
+function _dsRule(k,v){
+  if(k==='supermarket_min_order'){ const n=Number(v); _smMin=(!isNaN(n)&&n>0)?n:0; }
+  else if(k==='supermarket_max_order'){ const n=Number(v); _smMax=(!isNaN(n)&&n>0)?n:0; }
+  else if(k==='orders_paused') _ordersPaused=String(v)==='1';
+  else if(k==='orders_paused_msg') _pausedMsg=String(v||'').trim();
+  else if(k==='supermarket_discount_min'){ const n=Number(v); _smDiscMin=(!isNaN(n)&&n>0)?n:0; }
+  else if(k==='supermarket_discount_fee'){ const n=Number(v); _smDiscFee=(!isNaN(n)&&n>=0)?n:0; }
+}
+function _dsFmt(n){ return String(Math.round(n*100)/100); }   // 3.5 → "3.5", 8 → "8"
+function _isSmItem(i,isRest){ const v=i.vendor||i.restaurant; return v?v===_SM_VENDOR:!isRest; }
+function _smSubtotal(cart){ const isRest=!!localStorage.getItem('qibah_restaurant'); return cart.filter(i=>_isSmItem(i,isRest)).reduce((s,i)=>s+Number(i.price)*Number(i.qty),0); }
+function _orderBlock(cart){   // null = the order may go ahead
+  if(_ordersPaused)return {kind:'pause',text:_pausedMsg||'الطلبات متوقفة مؤقتاً — نعود قريباً 🙏',short:'⏸️ الطلبات متوقفة مؤقتاً'};
+  const sm=_smSubtotal(cart);
+  if(sm>0&&_smMin>0&&sm<_smMin)return {kind:'min',text:'الحد الأدنى لطلب السوبرماركت '+_dsFmt(_smMin)+' ريال — أضف '+_dsFmt(_smMin-sm)+' ريال لإكمال الطلب',short:'أضف '+_dsFmt(_smMin-sm)+' ريال من السوبرماركت للمتابعة'};
+  if(sm>0&&_smMax>0&&sm>_smMax)return {kind:'max',text:'الحد الأعلى لطلب السوبرماركت '+_dsFmt(_smMax)+' ريال — للطلبات الكبيرة تواصل معنا على واتساب',short:'الطلب أكبر من الحد الأعلى ('+_dsFmt(_smMax)+' ريال)'};
+  return null;
+}
+function _dsRuleCard(b){
+  if(!b)return '';
+  const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const icon=b.kind==='pause'?'⏸️ ':b.kind==='min'?'🛒 ':'📦 ';
+  const act=b.kind==='min'?'<a href="/pages/supermarket.html?v=14">أكمل التسوق</a>'
+    :b.kind==='max'?'<a href="https://wa.me/'+_DS_WA+'?text='+encodeURIComponent('مرحباً، أريد طلب سوبرماركت كبير')+'" target="_blank" rel="noopener">تواصل معنا واتساب</a>':'';
+  return '<div class="ds-rule '+b.kind+'" id="ds-rule"><div>'+icon+esc(b.text)+'</div>'+act+'</div>';
+}
+function _dsApplyButton(b){
+  const go=document.getElementById('checkout-go'), bl=document.getElementById('checkout-blocked');
+  if(!go||!bl)return;
+  go.style.display=b?'none':''; bl.style.display=b?'':'none';
+  if(b)document.getElementById('checkout-block-txt').textContent=b.short;
+}
+function goCheckout(){
+  const b=_orderBlock(JSON.parse(localStorage.getItem('qibah_cart')||'[]'));
+  if(b){ showToast(b.text); _dsApplyButton(b); return; }
+  window.location.href='/pages/checkout.html?v=14';   // ?v= → never an old saved copy
+}
+function _cartBlockedTap(){
+  const b=_orderBlock(JSON.parse(localStorage.getItem('qibah_cart')||'[]'));
+  if(!b){ _dsApplyButton(null); return goCheckout(); }
+  showToast(b.text);
+  const c=document.getElementById('ds-rule'); if(c)c.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+async function loadCart() {
+  if(!_settingsLoaded) await loadDeliverySettings();
+  const cart = JSON.parse(localStorage.getItem('qibah_cart') || '[]');
+  const content = document.getElementById('cart-content');
+  const bar = document.getElementById('checkout-bar');
+
+  if (!cart.length) {
+    bar.style.display = 'none';
+    content.innerHTML = `
+      <div class="empty-cart">
+        <i class="ti ti-shopping-cart" aria-hidden="true"></i>
+        <div class="empty-title">سلتك فارغة!</div>
+        <div class="empty-sub">أضف منتجات من المطاعم والمحلات</div>
+        <button onclick="window.location.href='/?v=14'" style="background:var(--rose);color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif">
+          تصفح المطاعم
+        </button>
+      </div>`;
+    return;
+  }
+
+  const sub = cart.reduce((s,i) => s + i.price*i.qty, 0);
+  const vendors = cartVendors(cart);
+  const twoVendors = vendors.length >= 2;
+  const savedFee = localStorage.getItem('qibah_delivery_fee');
+  const isRest = localStorage.getItem('qibah_restaurant');
+  // Two vendors: flat two-vendor fee (7 SR default)
+  // Restaurant order: use saved restaurant fee
+  // Supermarket order (no restaurant): ALWAYS use latest settings, ignore stale localStorage
+  let del;
+  if(twoVendors){
+    del = _twoVendorFee;
+  }else if(isRest && savedFee !== null){
+    del = Number(savedFee);
+  }else if(vendors.length===1 && vendors[0]!==_SM_VENDOR){
+    // Single restaurant left (e.g. after removing the 2nd vendor) — use its own fee from item tags
+    const vf = cart.find(i => _vendorOf(i)===vendors[0] && i.vendor_fee!=null);
+    del = vf ? Number(vf.vendor_fee) : _smDeliveryFee;
+  }else{
+    del = _smFee(sub);
+    // Clean up stale supermarket fee in localStorage
+    if(!isRest && savedFee !== null) localStorage.removeItem('qibah_delivery_fee');
+  }
+  const disc = appliedCoupon ? appliedCoupon.discount_amount : 0;
+  const tot = sub + del - disc;
+
+  bar.style.display = 'block';
+  document.getElementById('checkout-total').textContent = tot.toFixed(2) + ' ريال';
+  const _blk = _orderBlock(cart);
+  _dsApplyButton(_blk);
+
+  // Vendor banner: single restaurant (classic) OR two-vendor combo
+  const rest = JSON.parse(localStorage.getItem('qibah_restaurant') || 'null');
+  let restBanner = '';
+  if (twoVendors) {
+    restBanner = `
+    <div class="card" style="background:linear-gradient(135deg,#fff7ed,#fff1f6);border-color:#fde4d3">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:40px;height:40px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🛍️</div>
+        <div>
+          <div style="font-size:13px;font-weight:700">طلبك من متجرين: ${vendors.join(' + ')}</div>
+          <div style="font-size:11px;color:#b45309;font-weight:700">رسوم التوصيل من متجرين: ${_twoVendorFee} ريال 🛵</div>
+        </div>
+      </div>
+    </div>`;
+  } else if (rest) {
+    restBanner = `
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:40px;height:40px;background:var(--rose-soft);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🍽️</div>
+        <div>
+          <div style="font-size:13px;font-weight:700">${rest.name}</div>
+          <div style="font-size:11px;color:var(--muted)">طلبك من هذا المطعم</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // Items grouped by vendor (headers only when 2 vendors)
+  const groups = {};
+  cart.forEach(i => { const v=_vendorOf(i); (groups[v]=groups[v]||[]).push(i); });
+  const itemRow = item => `
+          <div class="cart-item">
+            <div class="item-icon${item.image ? '' : ' ds-ph'}">
+              ${item.image ? `<img src="${dsImg(item.image,160)}" alt="${item.name}" loading="lazy" decoding="async" onerror="dsImgRetry(this)||(this.parentNode.classList.add('ds-ph'),this.remove())"/>` : ''}
+            </div>
+            <div class="item-body">
+              <div class="item-name">${item.name}</div>
+              <div class="item-price">SAR ${item.price.toFixed(2)}</div>
+            </div>
+            <div class="qty-ctrl">
+              <button class="qty-btn qty-m" onclick="changeQty('${item.id}',-1)"><i class="ti ti-minus" style="font-size:11px"></i></button>
+              <span class="qty-n">${item.qty}</span>
+              <button class="qty-btn qty-p" onclick="changeQty('${item.id}',1)"><i class="ti ti-plus" style="font-size:11px"></i></button>
+            </div>
+          </div>`;
+  const itemsHtml = vendors.map(v => `
+        ${twoVendors?`<div style="display:flex;align-items:center;gap:6px;background:var(--rose-soft);border-radius:8px;padding:6px 10px;margin:8px 0 2px;font-size:12px;font-weight:700;color:var(--rose-dark)">🏪 ${v}</div>`:''}
+        ${groups[v].map(itemRow).join('')}`).join('');
+
+  content.innerHTML = `
+    <div class="body">
+      ${_dsRuleCard(_blk)}
+      ${restBanner}
+      <div class="card">
+        <div class="card-title"><i class="ti ti-shopping-bag" aria-hidden="true"></i>منتجاتي (${cart.reduce((s,i)=>s+i.qty,0)} منتج)</div>
+        ${itemsHtml}
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-ticket" aria-hidden="true"></i>رمز الخصم</div>
+        <div class="promo-wrap">
+          <input class="promo-input" id="promo-input" placeholder="أدخل رمز الخصم"/>
+          <button class="promo-btn" onclick="applyPromo()">تطبيق</button>
+        </div>
+        <div id="promo-msg" style="font-size:12px;margin-top:6px;display:none"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-receipt" aria-hidden="true"></i>ملخص الطلب</div>
+        <div class="row-total"><span style="color:var(--muted)">المجموع الفرعي</span><span>SAR ${sub.toFixed(2)}</span></div>
+        <div class="row-total"><span style="color:var(--muted)">رسوم التوصيل${twoVendors?' (متجرين)':''}</span><span id="del-val" style="color:${del===0?'var(--green)':'inherit'}">${del===0?'مجاني 🎉':'SAR '+del.toFixed(2)}</span></div>
+        ${twoVendors?`<div style="font-size:11px;color:#b45309;background:#fffbeb;border-radius:8px;padding:7px 10px;margin:6px 0">🛵 لأن طلبك من متجرين مختلفين، رسوم التوصيل ${_twoVendorFee} ريال</div>`:''}
+        ${(!twoVendors&&!isRest&&vendors.length===1&&vendors[0]===_SM_VENDOR&&_smFeeHint(sub))?`<div id="sm-fee-hint" style="font-size:11.5px;font-weight:700;color:#15803d;background:#f0fdf4;border-radius:8px;padding:7px 10px;margin:6px 0">${_smFeeHint(sub)}</div>`:''}
+        ${disc>0?`<div class="row-total"><span style="color:var(--muted)">الخصم (${appliedCoupon.code} ${appliedCoupon.discount_percent}%)</span><span style="color:var(--green)">-SAR ${disc.toFixed(2)}</span></div>`:''}
+        <div class="grand-total"><span>الإجمالي</span><span class="v">SAR ${tot.toFixed(2)}</span></div>
+      </div>
+    </div>`;
+}
+
+function changeQty(id, delta) {
+  let cart = JSON.parse(localStorage.getItem('qibah_cart') || '[]');
+  const idx = cart.findIndex(i => i.id === id);
+  if (idx >= 0) {
+    cart[idx].qty = Math.max(0, cart[idx].qty + delta);
+    if (cart[idx].qty === 0) cart.splice(idx, 1);
+  }
+  localStorage.setItem('qibah_cart', JSON.stringify(cart));
+  loadCart();
+}
+
+function clearCart() {
+  if (!confirm('هل تريد مسح السلة؟')) return;
+  localStorage.removeItem('qibah_cart');
+  localStorage.removeItem('qibah_restaurant');
+  localStorage.removeItem('qibah_delivery_fee');
+  loadCart();
+  showToast('تم مسح السلة');
+}
+
+async function applyPromo() {
+  const code = document.getElementById('promo-input').value.trim().toUpperCase();
+  const msg = document.getElementById('promo-msg');
+  const btn = document.querySelector('.promo-btn');
+  if (!code) return;
+
+  msg.style.display = 'block';
+  msg.style.color = 'var(--muted)';
+  msg.textContent = '...جاري التحقق';
+  btn.disabled = true;
+
+  try {
+    const { data, error } = await sb.from('coupons').select('*').eq('code', code).single();
+
+    if (error || !data) {
+      msg.style.color = '#be185d';
+      msg.textContent = 'رمز الخصم غير صحيح';
+      appliedCoupon = null;
+      loadCart();
+      btn.disabled = false;
+      return;
+    }
+
+    if (!data.is_active) {
+      msg.style.color = '#be185d';
+      msg.textContent = 'هذا الكود غير نشط حالياً';
+      appliedCoupon = null;
+      loadCart();
+      btn.disabled = false;
+      return;
+    }
+
+    if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      msg.style.color = '#be185d';
+      msg.textContent = 'انتهت صلاحية هذا الكود';
+      appliedCoupon = null;
+      loadCart();
+      btn.disabled = false;
+      return;
+    }
+
+    if (data.max_uses && data.used_count >= data.max_uses) {
+      msg.style.color = '#be185d';
+      msg.textContent = 'تم استنفاد استخدامات هذا الكود';
+      appliedCoupon = null;
+      loadCart();
+      btn.disabled = false;
+      return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem('qibah_cart') || '[]');
+    const sub = cart.reduce((s,i) => s + i.price*i.qty, 0);
+
+    if (data.min_order_amount > 0 && sub < data.min_order_amount) {
+      msg.style.color = '#be185d';
+      msg.textContent = `الحد الأدنى للطلب ${data.min_order_amount} ريال لاستخدام هذا الكود`;
+      appliedCoupon = null;
+      loadCart();
+      btn.disabled = false;
+      return;
+    }
+
+    const discountAmount = +(sub * data.discount_percent / 100).toFixed(2);
+    appliedCoupon = { code: data.code, discount_percent: data.discount_percent, discount_amount: discountAmount };
+    msg.style.color = '#16a34a';
+    msg.textContent = `✓ تم تطبيق الخصم! خصم ${data.discount_percent}% = ${discountAmount} ريال`;
+    loadCart();
+  } catch(e) {
+    msg.style.color = '#be185d';
+    msg.textContent = 'حدث خطأ، حاول مرة أخرى';
+  }
+  btn.disabled = false;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+window.addEventListener('load', async () => {
+  await loadDeliverySettings();
+  await loadCart();
+});
+</script>
+</body>
+</html>
