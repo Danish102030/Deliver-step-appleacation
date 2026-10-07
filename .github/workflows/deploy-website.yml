@@ -1,0 +1,69 @@
+# Puts the website on Hostinger by itself.
+# When files inside website/ change on the main branch, only those files are uploaded to public_html
+# (FTP, encrypted when the server allows it). Nothing on the server is ever deleted, and files that are
+# not in website/ (other pages, PHP files, .htaccess, photos) are never touched.
+#
+# One-time setup (repository → Settings → Secrets and variables → Actions → New repository secret):
+#   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD   — from hPanel → Files → FTP Accounts
+#   FTP_DIR (optional)                       — only if the site folder is not found automatically
+# Until these are added, this workflow only prints a note and uploads nothing.
+name: Deploy website to Hostinger
+
+on:
+  push:
+    branches: [main]
+    paths: ['website/**']
+  workflow_dispatch:
+    inputs:
+      all_files:
+        description: 'Upload every file in website/ (not only the ones changed by the last commit)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-website
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      READY: ${{ secrets.FTP_SERVER != '' && secrets.FTP_USERNAME != '' && secrets.FTP_PASSWORD != '' }}
+    steps:
+      - name: FTP details not added yet
+        if: env.READY != 'true'
+        run: echo "::warning::Add the FTP_SERVER, FTP_USERNAME and FTP_PASSWORD secrets to turn on automatic website updates. Nothing was uploaded."
+
+      - uses: actions/checkout@v4
+        if: env.READY == 'true'
+        with:
+          fetch-depth: 0
+
+      - name: List the website files to upload
+        if: env.READY == 'true'
+        env:
+          BEFORE: ${{ github.event.before }}
+          ALL: ${{ github.event_name == 'workflow_dispatch' && inputs.all_files }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "push" ] && [ -n "$BEFORE" ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null \
+             && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            git diff --name-only --diff-filter=AMR "$BEFORE" "$GITHUB_SHA" -- website/ > files.txt
+          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "$ALL" != "true" ]; then
+            git diff --name-only --diff-filter=AMR "$GITHUB_SHA~1" "$GITHUB_SHA" -- website/ > files.txt
+          else
+            git ls-files website/ > files.txt
+          fi
+          echo "Files to upload:"; cat files.txt
+
+      - name: Upload to Hostinger
+        if: env.READY == 'true'
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ secrets.FTP_DIR }}
+        run: python3 .github/scripts/deploy_website.py files.txt

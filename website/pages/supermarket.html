@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#be185d"/>
+  <title>سوبرماركت - خطوة التوصيل</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+  <link rel="preconnect" href="https://vjuhxpttssmyomqqomdx.supabase.co"/>
+  <!-- Fonts + icons come from our own server (kept 1 year on the phone) and are ready with the first paint — no icon/font flash -->
+  <link rel="stylesheet" href="/ds-lib/tajawal-5.3.0-all.css" onerror="this.onerror=null;this.href='https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&amp;display=swap'"/>
+  <link rel="stylesheet" href="/ds-lib/ds-icons-2.47.0-1.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" media="print" onload="this.media='all'"/>
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"/></noscript>
+  <style>
+    :root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f1f1f;--muted:#6b7280;--border:#f0e4e9;--bg:#f5f5f5;--white:#fff;--green:#16a34a}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+    body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px));direction:rtl}
+    .topbar{background:var(--rose);padding:11px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+    .btn-back{background:rgba(255,255,255,0.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+    .topbar-title{font-size:16px;font-weight:700;color:#fff;flex:1}
+    .cart-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0}
+    .cart-dot{position:absolute;top:-4px;left:-4px;width:16px;height:16px;background:#fff;color:var(--rose);border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .search-wrap{background:var(--rose-dark);padding:0 16px 10px}
+    .search-box{background:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px}
+    .search-box input{border:none;outline:none;font-size:13px;color:var(--text);width:100%;font-family:'Tajawal',sans-serif;background:transparent;direction:rtl}
+    .promo-banner{margin:12px 16px 0;border-radius:16px;overflow:hidden;position:relative;height:85px;display:flex;align-items:center;padding:16px;background:linear-gradient(135deg,#9d174d,#7c3aed)}
+    .promo-banner::before{content:'';position:absolute;width:110px;height:110px;background:rgba(255,255,255,0.06);border-radius:50%;left:-20px;top:-20px}
+    .promo-text{flex:1;position:relative;z-index:1}
+    .promo-title{font-size:15px;font-weight:700;color:#fff}
+    .promo-sub{font-size:11px;color:#fce7f3;margin-top:3px}
+    .promo-cta{background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;position:relative;z-index:1;white-space:nowrap}
+    .sec-head{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px}
+    .sec-title{font-size:15px;font-weight:700;color:var(--text)}
+    .sec-count{font-size:11px;color:var(--muted);background:#f3f4f6;padding:2px 10px;border-radius:20px}
+    .cats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 12px 16px}
+    .cat-card{background:#fff;border-radius:14px;overflow:hidden;cursor:pointer;border:0.5px solid var(--border);transition:transform 0.15s}
+    .cat-card:active{transform:scale(0.95)}
+    .cat-img-wrap{width:100%;aspect-ratio:1/1;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:8px;position:relative}
+    .cat-img-wrap img{width:85%;height:85%;object-fit:contain;transition:transform 0.3s}
+    .cat-card:active .cat-img-wrap img{transform:scale(1.08)}
+    .cat-name{font-size:11px;font-weight:700;color:var(--text);text-align:center;padding:5px 6px 9px;line-height:1.3}
+    /* Premium category-tile skeleton (matches the real .cat-card shape) */
+    .skel{background:linear-gradient(90deg,#f0e4e9 25%,#fce7f3 50%,#f0e4e9 75%);background-size:200% 100%;animation:shim 1.5s infinite;border-radius:10px}
+    @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .sktile{background:#fff;border-radius:14px;overflow:hidden;border:0.5px solid var(--border)}
+    .sktile .s-timg{width:100%;aspect-ratio:1/1}
+    .sktile .s-tnm{height:11px;border-radius:6px;margin:8px auto 12px;width:62%}
+    .offer-strip{margin:0 16px 16px;background:#fff;border-radius:14px;border:0.5px solid var(--border);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .offer-btn{background:var(--rose);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap;flex-shrink:0}
+    .glass-nav-wrap{position:fixed;bottom:0;right:50%;transform:translateX(50%);width:100%;max-width:480px;padding:8px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,rgba(245,245,245,1) 60%,rgba(245,245,245,0));pointer-events:none;z-index:200;will-change:transform}
+    .glass-nav{background:rgba(255,255,255,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:0.5px solid rgba(255,255,255,0.95);border-radius:26px;padding:8px 6px;display:grid;grid-template-columns:repeat(4,1fr);box-shadow:0 4px 28px rgba(0,0,0,0.09);pointer-events:all}
+    .gnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 4px;border-radius:20px;transition:background 0.2s}
+    .gnav-item:active{background:rgba(190,24,93,0.08)}
+    .gnav-icon{font-size:22px;color:var(--muted)}
+    .gnav-icon.act{color:var(--rose)}
+    .gnav-label{font-size:10px;color:var(--muted);font-weight:700}
+    .gnav-label.act{color:var(--rose)}
+    .gnav-dot{width:4px;height:4px;background:var(--rose);border-radius:50%;margin:0 auto;opacity:0}
+    .gnav-dot.act{opacity:1}
+    @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  </style>
+<style>
+/* Native-app feel: text is NOT selectable / copyable; form fields (name, phone, search, notes) stay usable */
+*{-webkit-touch-callout:none}
+html,body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;-moz-user-select:text;-ms-user-select:text;user-select:text;-webkit-touch-callout:default}
+img{-webkit-user-drag:none}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="btn-back" onclick="window.location.href='/?v=14'" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+  <button class="btn-back" id="back-btn" style="display:none" onclick="resetToMain()" aria-label="رجوع للفئات"><i class="ti ti-arrow-right"></i></button>
+  <div class="topbar-title" id="page-heading">سوبرماركت · قبة</div>
+  <button class="cart-btn" onclick="window.location.href='/pages/cart.html?v=14'" aria-label="السلة">
+    <i class="ti ti-shopping-cart" style="font-size:18px"></i>
+    <div class="cart-dot" id="cart-count">٠</div>
+  </button>
+</div>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <i class="ti ti-search" style="font-size:16px;color:var(--rose)" aria-hidden="true"></i>
+    <input type="text" placeholder="ابحث عن أي منتج... حليب، بيبسي، أرز" readonly onclick="window.DSSearch&&DSSearch.open()" style="cursor:pointer"/>
+  </div>
+</div>
+
+<div class="promo-banner">
+  <div class="promo-text">
+    <div class="promo-title" id="promo-title">توصيل مجاني</div>
+    <div class="promo-sub" id="promo-sub">على الطلبات فوق ٢٠٠ ريال · قبة</div>
+  </div>
+  <button class="promo-cta" onclick="window.location.href='/pages/catalog.html'">تسوق الآن</button>
+</div>
+
+<div class="sec-head">
+  <div class="sec-title">تسوق حسب الفئة</div>
+  <div class="sec-count" id="cat-count">١٢ فئة</div>
+</div>
+
+<div class="cats-grid" id="cats-grid">
+  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
+  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
+  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
+  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
+  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
+  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
+  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
+  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
+  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
+</div>
+
+<div class="offer-strip">
+  <div>
+    <div style="font-size:13px;font-weight:700;color:var(--text)">عروض اليوم</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:2px">خصم حتى ٤٠٪ على منتجات مختارة</div>
+  </div>
+  <button class="offer-btn" onclick="window.location.href='/pages/catalog.html'">شاهد العروض</button>
+</div>
+
+<div class="glass-nav-wrap">
+  <nav class="glass-nav">
+    <div class="gnav-item" onclick="window.location.href='/?v=14'">
+      <i class="ti ti-home gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">الرئيسية</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/pages/restaurants.html'">
+      <i class="ti ti-tools-kitchen-2 gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">المطاعم</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item">
+      <i class="ti ti-building-store gnav-icon act" aria-hidden="true"></i>
+      <span class="gnav-label act">سوبرماركت</span>
+      <div class="gnav-dot act"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/pages/account.html'">
+      <i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">حسابي</span>
+      <div class="gnav-dot"></div>
+    </div>
+  </nav>
+</div>
+
+
+<script src="/dssearch.js" defer></script>
+<script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
+<script>
+const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
+let sb=null;
+
+let allCats = [];
+
+const FRUIT_VEG_ID = 'a5fbf689-76ef-43ae-a440-4b8e8e9c0e6e';
+
+async function loadCatsFromDB() {
+  try {
+    const {data,error} = await sb.from('supermarket_categories')
+      .select('*')
+      .eq('is_active',true)
+      .is('parent_name', null)
+      .order('sort_order');
+    let cats = (!error && data && data.length) ? data : getDefaultCats();
+    // If fruits & vegetables is missing from results, fetch it directly by ID
+    if (!cats.find(c => c.id === FRUIT_VEG_ID)) {
+      try {
+        const {data:fv} = await sb.from('supermarket_categories')
+          .select('*').eq('id', FRUIT_VEG_ID).single();
+        if (fv) cats = [fv, ...cats];
+      } catch(e2) {}
+    }
+    allCats = cats;
+    try { sessionStorage.setItem('qibah_sm_cats', JSON.stringify(cats)); } catch(_){}
+  } catch(e) { allCats = getDefaultCats(); }
+  renderCats(allCats);
+}
+
+// Instant render from this session's cache (used on back-navigation → no flicker)
+function renderCachedCats(){
+  try{
+    const c = sessionStorage.getItem('qibah_sm_cats');
+    if(c){ const cats = JSON.parse(c); if(cats && cats.length){ allCats = cats; renderCats(cats); return true; } }
+  }catch(_){}
+  return false;
+}
+
+function getDefaultCats(){
+  return[
+    {name:'فواكه وخضروات',image_url:'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=300&q=70',bg_color:'#f0fdf4'},
+    {name:'ألبان وبيض',image_url:'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=300&q=70',bg_color:'#fffbeb'},
+    {name:'لحوم ودواجن',image_url:'https://images.unsplash.com/photo-1582034986517-30d163aa1da9?w=300&q=70',bg_color:'#faf5ff'},
+    {name:'مشروبات باردة',image_url:'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=300&q=70',bg_color:'#eff6ff'},
+    {name:'خبز ومخبوزات',image_url:'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300&q=70',bg_color:'#fff5f7'},
+    {name:'أرز ومعكرونة',image_url:'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300&q=70',bg_color:'#f0fdf4'},
+    {name:'بهارات وتوابل',image_url:'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?w=300&q=70',bg_color:'#fffbeb'},
+    {name:'حليب وعصائر',image_url:'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300&q=70',bg_color:'#f0f9ff'},
+    {name:'معلبات وجاهزة',image_url:'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&q=70',bg_color:'#f9fafb'},
+    {name:'حلويات وسناكس',image_url:'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=300&q=70',bg_color:'#fdf4ff'},
+    {name:'منتجات التنظيف',image_url:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=70',bg_color:'#fff7ed'},
+    {name:'عناية شخصية',image_url:'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=300&q=70',bg_color:'#f0fdf4'},
+  ];
+}
+
+function renderCats(list) {
+  const grid = document.getElementById('cats-grid');
+  document.getElementById('cat-count').textContent = list.length + ' فئة';
+  // Skip re-render if the grid already shows the same categories → no flicker
+  const sig = JSON.stringify(list.map(c => [c.name, c.image_url, c.bg_color]));
+  if (grid.dataset.sig === sig) return;
+  grid.dataset.sig = sig;
+  grid.innerHTML = list.map(c => `
+    <div class="cat-card" onclick="goToCategory('${c.name}')">
+      <div class="cat-img-wrap" style="background:${c.bg_color||'#f0fdf4'}">
+        ${c.image_url
+          ? `<img src="${c.image_url}" alt="${c.name}" loading="lazy"/>`
+          : `<div style="font-size:40px">🛒</div>`}
+      </div>
+      <div class="cat-name">${c.name}</div>
+    </div>`).join('');
+}
+
+function resetToMain() {
+  document.getElementById('page-heading').textContent = 'سوبرماركت · قبة';
+  document.getElementById('back-btn').style.display = 'none';
+  renderCats(allCats);
+}
+
+function filterCats(q) {
+  const filtered = q ? allCats.filter(c => c.name.includes(q)) : allCats;
+  renderCats(filtered);
+}
+
+async function goToCategory(name) {
+  try {
+    const {data} = await sb.from('supermarket_categories')
+      .select('id, name, image_url, bg_color')
+      .eq('parent_name', name)
+      .eq('is_active', true)
+      .order('sort_order');
+
+    if (data && data.length > 0) {
+      showSubCategories(name, data);
+    } else {
+      sessionStorage.setItem('qibah_cat', name);
+      window.location.href = '/pages/marketproducts.html?cat=' + encodeURIComponent(name) + '&v=14';
+    }
+  } catch(e) {
+    sessionStorage.setItem('qibah_cat', name);
+    window.location.href = '/pages/marketproducts.html?cat=' + encodeURIComponent(name) + '&v=14';
+  }
+}
+
+function showSubCategories(parentName, subs) {
+  document.getElementById('page-heading').textContent = parentName;
+  document.getElementById('back-btn').style.display = 'flex';
+  document.getElementById('cat-count').textContent = subs.length + ' فئة';
+
+  const grid = document.getElementById('cats-grid');
+  grid.dataset.sig = 'subcats:' + parentName; // so returning to main re-renders
+  grid.innerHTML = subs.map(c => `
+    <div class="cat-card" onclick="sessionStorage.setItem('qibah_cat','${c.name}');window.location.href='/pages/marketproducts.html?cat=${encodeURIComponent(c.name)}&v=14'">
+      <div class="cat-img-wrap" style="background:${c.bg_color||'#f0fdf4'}">
+        ${c.image_url
+          ? `<img src="${c.image_url}" alt="${c.name}" loading="lazy"/>`
+          : `<div style="font-size:40px">🛒</div>`}
+      </div>
+      <div class="cat-name">${c.name}</div>
+    </div>`).join('');
+}
+
+function updateCart() {
+  const cart = JSON.parse(localStorage.getItem('qibah_cart') || '[]');
+  document.getElementById('cart-count').textContent = cart.reduce((s,i) => s+i.qty, 0) || '٠';
+}
+
+async function loadDeliverySettings(){
+  if(!sb)return;
+  try{
+    const{data}=await sb.from('settings').select('key,value').in('key',['supermarket_delivery_fee','supermarket_free_delivery_min','supermarket_discount_min','supermarket_discount_fee']);
+    if(!data)return;
+    let fee=null, minFree=null, dMin=0, dFee=null;
+    data.forEach(s=>{
+      if(s.key==='supermarket_delivery_fee')fee=Number(s.value);
+      if(s.key==='supermarket_free_delivery_min')minFree=Number(s.value);
+      if(s.key==='supermarket_discount_min')dMin=Number(s.value)||0;
+      if(s.key==='supermarket_discount_fee')dFee=Number(s.value);
+    });
+    const tEl=document.getElementById('promo-title');
+    const sEl=document.getElementById('promo-sub');
+    // cheaper delivery from dMin (Admin → Settings) — shown with the free-delivery offer
+    const tier=dMin>0&&dFee!==null&&!isNaN(dFee)&&fee!==null&&dFee<fee&&!(minFree>0&&dMin>=minFree);
+    if(minFree>0&&tEl&&sEl){
+      tEl.textContent='توصيل مجاني';
+      sEl.textContent='على الطلبات فوق '+minFree+' ريال'+(tier?' · توصيل '+dFee+' ريال فوق '+dMin:'')+' · قبة';
+    }else if(tier&&tEl&&sEl){
+      tEl.textContent='توصيل '+dFee+' ريال';
+      sEl.textContent='على الطلبات فوق '+dMin+' ريال · قبة';
+    }else if(fee!==null&&tEl&&sEl){
+      tEl.textContent='رسوم التوصيل '+fee+' ريال';
+      sEl.textContent='توصيل سريع لقبة الاسياح';
+    }
+  }catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateCart();
+  if(typeof supabase !== 'undefined') {
+    sb = supabase.createClient(SB_URL, SB_KEY);
+    // Back-navigation: render this session's cached categories INSTANTLY (smooth, no skeleton).
+    // First visit: show the shimmer skeleton while we fetch.
+    const hadCache = renderCachedCats();
+    if(!hadCache){
+      const grid=document.getElementById('cats-grid');
+      if(grid){
+        let sk='';
+        for(let i=0;i<9;i++)sk+='<div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>';
+        grid.dataset.sig=''; grid.innerHTML=sk;
+      }
+    }
+    loadCatsFromDB();       // refreshes silently; renderCats is a no-op if nothing changed
+    loadDeliverySettings();
+  } else {
+    // Fallback if Supabase fails to load
+    allCats = getDefaultCats();
+    renderCats(allCats);
+  }
+});
+</script>
+</body>
+</html>
