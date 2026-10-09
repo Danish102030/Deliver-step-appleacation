@@ -33,10 +33,19 @@
     .info-item{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);flex-shrink:0}
     .info-item i{font-size:14px;color:var(--rose)}
     .info-val{font-weight:700;color:var(--text)}
-    .cat-tabs{background:#fff;border-bottom:0.5px solid var(--border);display:flex;overflow-x:auto;position:sticky;top:0;z-index:10}
+    .cat-tabs{background:#fff;border-bottom:0.5px solid var(--border);display:flex;gap:4px;overflow-x:auto;position:sticky;top:0;z-index:10;padding:10px 8px 8px;box-shadow:0 4px 10px rgba(0,0,0,.04);scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+    .cat-tabs:empty{display:none}
     .cat-tabs::-webkit-scrollbar{display:none}
-    .cat-tab{padding:10px 16px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;flex-shrink:0;transition:all 0.2s;font-family:'Tajawal',sans-serif}
-    .cat-tab.act{color:var(--rose);border-bottom-color:var(--rose)}
+    .cat-tab{width:72px;flex-shrink:0;text-align:center;cursor:pointer;font-family:'Tajawal',sans-serif;-webkit-tap-highlight-color:transparent}
+    .cat-ic{width:54px;height:54px;margin:0 auto;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1;border:2.5px solid transparent;box-shadow:0 2px 6px rgba(0,0,0,.08);transition:border-color .2s,box-shadow .2s,transform .2s}
+    .cat-nm{font-size:11.5px;font-weight:700;color:#374151;margin-top:5px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;transition:color .2s}
+    .cat-k{font-size:9.5px;color:var(--muted);font-weight:600}
+    .cat-tab.act .cat-ic{border-color:var(--rose);box-shadow:0 0 0 3px #fce7f3;transform:scale(1.04)}
+    .cat-tab.act .cat-nm{color:var(--rose)}
+    .menu-section{scroll-margin-top:118px}
+    .sec-ic{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+    .sec-k{font-size:11px;color:var(--muted);font-weight:600}
+    .ci1{background:#fde4cf}.ci2{background:#fef3c7}.ci3{background:#fee2e2}.ci4{background:#dcfce7}.ci5{background:#e0e7ff}.ci6{background:#fce7f3}.ci7{background:#cffafe}.ci8{background:#ede9fe}
     .menu-section{padding:14px 16px 4px}
     .menu-sec-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
     .menu-sec-title::after{content:'';flex:1;height:1px;background:var(--border);margin-right:8px}
@@ -399,17 +408,69 @@ function loadRestaurant(){
   if(!(r.logo_url&&_li&&_li.getAttribute('src')===r.logo_url))
     logoEl.innerHTML=r.logo_url?`<img src="${r.logo_url}" alt="${r.name}" onerror="this.parentNode.classList.add('ds-ph');this.remove()" style="width:100%;height:100%;object-fit:cover"/>`:'';
   document.title=r.name+' - قبة';
-  const categories=[...new Set(menuItems.map(i=>i.category))];
-  document.getElementById('cat-tabs').innerHTML=categories.map((c,i)=>`<div class="cat-tab ${i===0?'act':''}" onclick="setCategory('${c}',this)">${c}</div>`).join('');
+  renderCatBar();
   renderMenu();
 }
 
-function setCategory(cat,el){
-  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('act'));
-  el.classList.add('act');
-  const sec=document.getElementById('sec-'+cat.replace(/\s/g,'-'));
-  if(sec)sec.scrollIntoView({behavior:'smooth',block:'start'});
+// ── Category bar: round buttons with an icon picked from the category name (no setup needed) ──
+const DS_CAT_ICONS=[
+  [/بيتزا|بيتزه|pizza/i,'🍕',1],[/همبرجر|برجر|برغر|burger/i,'🍔',3],[/شاورما|شاورمة|shawarma|wrap|راب|تورتيلا/i,'🌯',2],
+  [/بروست|بروستد|مسحب|broast|chicken|دجاج|فراخ|مقلقل/i,'🍗',2],[/مشاوي|مشوي|شوي|كباب|تكة|grill|bbq/i,'🍢',1],
+  [/مضغوط|مندي|كبسة|برياني|رز|أرز|ارز|rice/i,'🍛',2],[/لحم|كبدة|meat|steak/i,'🥩',3],[/سمك|روبيان|fish|seafood|shrimp/i,'🐟',7],
+  [/ساندويتش|ساندوتش|سندوتش|سندويش|صامولي|صمول|sandwich|sub/i,'🥪',2],[/فطائر|فطاير|فطایر|فطيرة|مخبوزات|معجنات|كرواسان|bakery|croissant|pastr/i,'🥐',6],
+  [/سمبوسة|سمبوسه|samosa/i,'🥟',2],[/فطور|إفطار|افطار|breakfast|شكشوكة|شكشوكه|بيض|egg/i,'🍳',2],[/فول|عدس|حمص|فلافل|فلال|beans/i,'🫘',1],
+  [/معصوب|عريكة|عريكه|مدورات/i,'🍯',2],[/صاج|صاجيات/i,'🫓',1],
+  [/مقبلات|جانبي|جانبية|فرايز|بطاطس|خفايف|sides|fries|appetizer|starter/i,'🍟',4],[/سلطة|سلطات|salad/i,'🥗',4],
+  [/صوص|صوصات|sauce/i,'🥫',3],[/إضافات|اضافات|extras|add/i,'➕',5],[/بوكس|بوكسات|box|combo|وجبة|وجبات|meals|meal|صحون|أطباق|اطباق|plates|جامبو/i,'🍱',5],
+  [/حلا|حلويات|حلى|كيك|dessert|sweet|cake|كنافة|بسبوسة/i,'🍰',6],[/آيس|ايس|ice ?cream|بوظة/i,'🍦',7],
+  [/قهوة|قهوه|coffee|لاتيه|latte|كابتشينو|اسبريسو|espresso/i,'☕',1],[/ساخن|hot|شاي|tea/i,'🍵',4],
+  [/بارد|cold|عصير|عصائر|juice|انتعاش|موهيتو|مشروب|مشروبات|drinks|drink|beverage|soda/i,'🥤',7]];
+function dsCatIcon(cat){
+  const c=String(cat||'');
+  for(const [re,ic,bg] of DS_CAT_ICONS){ if(re.test(c)) return {ic,bg}; }
+  return {ic:'🍽️',bg:8};
 }
+function dsCatName(cat){ return String(cat||'').trim()||'أصناف أخرى'; }      // a dish without a category
+function dsCatCount(n){ return n===1?'صنف واحد':n===2?'صنفان':n<=10?n+' أصناف':n+' صنف'; }
+function dsSecId(i){ return 'sec-'+i; }
+let _catLock=0;
+function setCategory(i,el){
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('act'));
+  if(el){ el.classList.add('act'); _catCenter(el); }
+  const sec=document.getElementById(dsSecId(i));
+  if(!sec)return;
+  _catLock=Date.now()+900;                     // don't let the scroll highlight jump around while we glide there
+  const bar=document.getElementById('cat-tabs'), off=(bar?bar.offsetHeight:0)+6;
+  window.scrollTo({top:sec.getBoundingClientRect().top+window.pageYOffset-off,behavior:'smooth'});
+}
+function _catCenter(el){                       // keep the active button visible inside the bar (sideways only)
+  const bar=document.getElementById('cat-tabs'); if(!bar||!el)return;
+  const target=el.offsetLeft-(bar.clientWidth-el.offsetWidth)/2;
+  bar.scrollTo({left:target,behavior:'smooth'});
+}
+function _catSpy(){                            // highlight follows the section you are reading
+  if(Date.now()<_catLock)return;
+  const bar=document.getElementById('cat-tabs'); if(!bar)return;
+  const tabs=bar.querySelectorAll('.cat-tab'); if(!tabs.length)return;
+  const line=bar.getBoundingClientRect().bottom+12;
+  let cur=0;
+  tabs.forEach((t,i)=>{ const s=document.getElementById(dsSecId(i)); if(s&&s.getBoundingClientRect().top<=line)cur=i; });
+  if(window.innerHeight+window.pageYOffset>=document.documentElement.scrollHeight-4)cur=tabs.length-1;   // at the very bottom → last section (it can't reach the top)
+  const t=tabs[cur];
+  if(t&&!t.classList.contains('act')){ tabs.forEach(x=>x.classList.remove('act')); t.classList.add('act'); _catCenter(t); }
+}
+let _catRaf=0;
+window.addEventListener('scroll',()=>{ if(_catRaf)return; _catRaf=requestAnimationFrame(()=>{ _catRaf=0; _catSpy(); }); },{passive:true});
+function renderCatBar(){
+  const groups={}, order=[];
+  menuItems.forEach(it=>{ const k=it.category||''; if(!(k in groups)){groups[k]=0;order.push(k);} groups[k]++; });
+  const bar=document.getElementById('cat-tabs');
+  const html=order.map((c,i)=>{ const x=dsCatIcon(c);
+    return `<div class="cat-tab${i===0?' act':''}" onclick="setCategory(${i},this)" role="button" aria-label="${escAttr(dsCatName(c))}"><div class="cat-ic ci${x.bg}">${x.ic}</div><div class="cat-nm">${escAttr(dsCatName(c))}</div><div class="cat-k">${dsCatCount(groups[c])}</div></div>`; }).join('');
+  if(bar.innerHTML!==html)bar.innerHTML=html;
+  return order;
+}
+function escAttr(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 // Tap a product image → show it large; tap anywhere to close (same as the supermarket page).
 function zoomImg(el){
@@ -449,11 +510,11 @@ function renderMenu(){
     document.getElementById('menu-content').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)"><i class="ti ti-tools-kitchen-2" style="font-size:48px;opacity:0.3;display:block;margin-bottom:1rem"></i>القائمة قريباً!</div>';
     return;
   }
-  const groups={};
-  menuItems.forEach(item=>{if(!groups[item.category])groups[item.category]=[];groups[item.category].push(item);});
-  document.getElementById('menu-content').innerHTML=Object.entries(groups).map(([cat,items])=>`
-    <div class="menu-section" id="sec-${cat.replace(/\s/g,'-')}">
-      <div class="menu-sec-title">${cat}</div>
+  const groups={}, order=[];
+  menuItems.forEach(item=>{const k=item.category||''; if(!(k in groups)){groups[k]=[];order.push(k);} groups[k].push(item);});
+  document.getElementById('menu-content').innerHTML=order.map((cat,ci)=>[cat,groups[cat],ci]).map(([cat,items,ci])=>`
+    <div class="menu-section" id="${dsSecId(ci)}">
+      <div class="menu-sec-title"><span class="sec-ic ci${dsCatIcon(cat).bg}">${dsCatIcon(cat).ic}</span>${escAttr(dsCatName(cat))} <span class="sec-k">· ${dsCatCount(items.length)}</span></div>
       ${items.map(item=>{
         const qty=cart[item.id]?.qty||0;
         const price=item.discount_price||item.price;
