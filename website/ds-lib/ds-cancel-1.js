@@ -2,7 +2,8 @@
    Shows a "Cancel order" card with a countdown while the database says the order can still be cancelled
    (still waiting, no rider yet, inside the time allowed — 5 minutes by default, set in the admin Settings).
    The database checks everything again on "Yes, cancel", so the page can't be tricked into a late cancel.
-   Order number: ?order= in the link, else the last order on this phone. Phone: the one saved at checkout. */
+   Order number: ?num= / ?order= in the link, else the last order on this phone.
+   Phone: ?phone=, else the one saved at checkout, else the one typed on the order page. */
 (function () {
   var API = 'https://vjuhxpttssmyomqqomdx.supabase.co/rest/v1/rpc/';
   var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
@@ -12,9 +13,14 @@
   function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function qp(n) { try { return new URLSearchParams(location.search).get(n); } catch (e) { return null; } }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  var num = String(qp('order') || qp('o') || ls('qibah_last_order_num') || '').replace(/^#/, '').trim();
-  var phone = String(qp('phone') || (function () { try { return (JSON.parse(ls('ds_customer') || '{}') || {}).phone; } catch (e) { return ''; } })() || ls('qibah_last_phone') || '').trim();
-  if (!num || num === 'DS-0000' || phone.replace(/\D/g, '').length < 9) return;
+  var num = String(qp('num') || qp('order') || qp('o') || ls('qibah_last_order_num') || '').replace(/^#/, '').replace('QIB-', 'DS-').trim();
+  if (!num || /^DS-(0000|XXXX)$/.test(num)) return;
+  var phone = '';                                     // the phone that matched this order
+  function phones() {                                 // every phone this device knows, best first
+    var c = [qp('phone'), (function () { try { return (JSON.parse(ls('ds_customer') || '{}') || {}).phone; } catch (e) { return ''; } })(), ls('ds_track_phone'), ls('qibah_last_phone')];
+    var out = []; c.forEach(function (p) { p = String(p || '').trim(); if (p.replace(/\D/g, '').length >= 9 && out.indexOf(p) < 0) out.push(p); });
+    return out;
+  }
 
   function rpc(name, body) {
     return fetch(API + name, { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -49,8 +55,9 @@
   function place() {
     if (box) return box;
     var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
-    box = document.createElement('div'); box.id = 'dscx';
-    var tl = document.getElementById('timeline'), anchor = tl && tl.closest ? tl.closest('.card') : null;
+    box = document.createElement('div'); box.id = 'dscx'; box.style.width = '100%';
+    // order page: under the status card · confirmed page: under the delivery-time note
+    var tl = document.getElementById('timeline'), anchor = document.querySelector('.anim-card') || document.querySelector('.body > .notice') || (tl && tl.closest ? tl.closest('.card') : null);
     if (!anchor) anchor = document.querySelector('.card');
     if (anchor && anchor.parentNode) { box.className = 'dscx-in'; anchor.parentNode.insertBefore(box, anchor.nextSibling); }
     else document.body.appendChild(box);
@@ -95,8 +102,13 @@
   function stopTimers() { clearInterval(tick); }
 
   function load() {
-    return rpc('customer_cancel_info', { p_order_number: num, p_phone: phone }).then(function (r) {
-      if (!r || !r.found) { info = null; if (box) box.innerHTML = ''; return; }
+    var list = phone ? [phone] : phones();
+    function tryAt(i) {
+      if (i >= list.length) return Promise.resolve(null);
+      return rpc('customer_cancel_info', { p_order_number: num, p_phone: list[i] }).then(function (r) { if (r && r.found) { phone = list[i]; return r; } return tryAt(i + 1); });
+    }
+    return tryAt(0).then(function (r) {
+      if (!r) { info = null; if (box) box.innerHTML = ''; return; }
       info = r;
       if (r.can_cancel) { endAt = Date.now() + r.seconds_left * 1000; total = (r.minutes || 5) * 60; }
       render();
@@ -142,9 +154,16 @@
       + (v ? '<a class="dscx-btn dscx-wa" target="_blank" rel="noopener" href="' + esc(wa(v, 'السلام عليكم، تم إلغاء الطلب رقم #' + num + ' من العميل — الرجاء عدم تجهيزه 🙏')) + '">أبلغ ' + esc(info.vendor_name || 'المطعم') + ' بالإلغاء</a>' : '')
       + '<a class="dscx-btn dscx-rose" href="/">اطلب من جديد</a></div>';
   }
+  // the rest of the page follows: big title says cancelled, "send order on WhatsApp" buttons go away
   function heroCancelled() {
-    var t = document.getElementById('hero-title'), s = document.getElementById('hero-sub'), e = document.getElementById('eta-wrap');
-    if (t) t.textContent = 'تم إلغاء الطلب'; if (s) s.textContent = 'ألغيت الطلب بنجاح — نتمنى نخدمك قريباً'; if (e) e.style.display = 'none';
+    var t = document.querySelector('.hero-title'), s = document.querySelector('.hero-sub');
+    if (t) t.textContent = 'تم إلغاء طلبك'; if (s) s.textContent = 'ألغيت الطلب بنجاح — نتمنى نخدمك قريباً';
+    ['.wa-section', '.body > .notice', '.stars-card'].forEach(function (q) { var e = document.querySelector(q); if (e) e.style.display = 'none'; });
+    var hero = document.querySelector('.hero'), bc = document.querySelector('.badge-circle'), bi = bc && bc.querySelector('i');
+    if (hero && bc) hero.style.background = 'linear-gradient(160deg,#7f1d1d,#991b1b,#b91c1c)';   // confirmed page: green → red
+    if (bc) { bc.style.background = 'linear-gradient(135deg,#f87171,#dc2626)'; bc.style.boxShadow = '0 8px 28px rgba(220,38,38,.45)'; }
+    if (bi) bi.className = 'ti ti-x';
+    try { if (typeof window.loadOrder === 'function') window.loadOrder(num); } catch (e) {}   // order page redraws its status
   }
   function showDone() {
     var t = document.createElement('div');
@@ -153,7 +172,10 @@
   }
 
   function start() {
+    var t0 = Date.now();
     load();
+    // not found yet (order still reaching the system, or the phone is typed on the page a bit later) → try again for a few minutes
+    setInterval(function () { if (!info && Date.now() - t0 < 6 * 60000 && document.visibilityState !== 'hidden') load(); }, 15000);
     // re-check every 20s while it can still be cancelled (a rider may be assigned meanwhile)
     setInterval(function () { if (info && info.can_cancel && document.visibilityState !== 'hidden') load(); }, 20000);
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && info && (info.can_cancel || wasOpen)) load(); });
