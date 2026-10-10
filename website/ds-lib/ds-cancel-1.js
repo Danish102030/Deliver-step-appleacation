@@ -1,9 +1,11 @@
-/* Delivery Step — customer can cancel their own order (order page add-on).
-   Shows a "Cancel order" card with a countdown while the database says the order can still be cancelled
-   (still waiting, no rider yet, inside the time allowed — 5 minutes by default, set in the admin Settings).
-   The database checks everything again on "Yes, cancel", so the page can't be tricked into a late cancel.
-   Order number: ?num= / ?order= in the link, else the last order on this phone.
-   Phone: ?phone=, else the one saved at checkout, else the one typed on the order page. */
+/* Delivery Step — customer can cancel their own order.
+   Order pages (order-tracking / order-confirmed): shows a "Cancel order" card with a countdown while the database
+   says the order can still be cancelled (still waiting, no rider yet, inside the time allowed — 5 minutes by
+   default, set in the admin Settings). The database checks everything again on "Yes, cancel", so the page can't
+   be tricked into a late cancel.
+     Order number: ?num= / ?order= in the link, else the last order on this phone.
+     Phone: ?phone=, else the one saved at checkout, else the one typed on the order page.
+   Other pages (account): set window.DS_CANCEL_MANUAL = true before loading this file and use window.DSCancel. */
 (function () {
   var API = 'https://vjuhxpttssmyomqqomdx.supabase.co/rest/v1/rpc/';
   var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
@@ -13,15 +15,6 @@
   function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function qp(n) { try { return new URLSearchParams(location.search).get(n); } catch (e) { return null; } }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  var num = String(qp('num') || qp('order') || qp('o') || ls('qibah_last_order_num') || '').replace(/^#/, '').replace('QIB-', 'DS-').trim();
-  if (!num || /^DS-(0000|XXXX)$/.test(num)) return;
-  var phone = '';                                     // the phone that matched this order
-  function phones() {                                 // every phone this device knows, best first
-    var c = [qp('phone'), (function () { try { return (JSON.parse(ls('ds_customer') || '{}') || {}).phone; } catch (e) { return ''; } })(), ls('ds_track_phone'), ls('qibah_last_phone')];
-    var out = []; c.forEach(function (p) { p = String(p || '').trim(); if (p.replace(/\D/g, '').length >= 9 && out.indexOf(p) < 0) out.push(p); });
-    return out;
-  }
-
   function rpc(name, body) {
     return fetch(API + name, { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); });
@@ -49,12 +42,73 @@
     + '.dscx-ok{width:84px;height:84px;border-radius:50%;background:#fee2e2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800;margin:6px auto 12px}'
     + '.dscx-done{text-align:center}.dscx-done .dscx-btn{margin-top:10px}'
     + '@keyframes dscxUp{from{transform:translateY(40%);opacity:.3}to{transform:none;opacity:1}}@keyframes dscxF{from{opacity:0}to{opacity:1}}';
+  var cssOn = false;
+  function addCss() { if (cssOn) return; cssOn = true; var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st); }
+
+  // Bottom sheet: pick a reason, then confirm. onResult(answer) gets the database's answer (cancelled, or why not).
+  var pick = REASONS[0];
+  function openSheet(n, ph, onResult) {
+    addCss(); closeSheet();
+    var ov = document.createElement('div'); ov.className = 'dscx-ov'; ov.id = 'dscx-ov'; ov.onclick = closeSheet;
+    var sh = document.createElement('div'); sh.className = 'dscx-sh'; sh.id = 'dscx-sh'; sh.setAttribute('role', 'dialog');
+    sh.innerHTML = '<div class="dscx-grab"></div><div style="font-size:20px;font-weight:800">إلغاء الطلب #' + esc(n) + '</div>'
+      + '<div class="dscx-m" style="margin:4px 0 14px">ليش تبي تلغي؟ (يساعدنا نتحسن)</div>'
+      + REASONS.map(function (r) { return '<div class="dscx-rs' + (r === pick ? ' on' : '') + '" data-r="' + esc(r) + '"><i></i>' + esc(r) + '</div>'; }).join('')
+      + '<div class="dscx-err" id="dscx-err"></div>'
+      + '<button type="button" class="dscx-btn dscx-red" id="dscx-yes" style="margin-top:6px">نعم، ألغِ الطلب</button>'
+      + '<button type="button" class="dscx-btn dscx-gr" id="dscx-no" style="margin-top:9px">لا، أكمل الطلب</button>';
+    document.body.appendChild(ov); document.body.appendChild(sh);
+    [].forEach.call(sh.querySelectorAll('.dscx-rs'), function (el) {
+      el.onclick = function () { pick = el.getAttribute('data-r'); [].forEach.call(sh.querySelectorAll('.dscx-rs'), function (x) { x.classList.toggle('on', x === el); }); };
+    });
+    document.getElementById('dscx-no').onclick = closeSheet;
+    document.getElementById('dscx-yes').onclick = function () {
+      var yes = document.getElementById('dscx-yes'), err = document.getElementById('dscx-err');
+      yes.disabled = true; yes.textContent = 'جاري الإلغاء…'; err.textContent = '';
+      rpc('customer_cancel_order', { p_order_number: n, p_phone: ph, p_reason: pick }).then(function (r) {
+        closeSheet(); if (r && r.ok) showDone(); onResult(r || {});
+      }).catch(function () {
+        yes.disabled = false; yes.textContent = 'نعم، ألغِ الطلب'; err.textContent = 'تعذّر الاتصال — تأكد من الإنترنت وحاول مرة ثانية';
+      });
+    };
+  }
+  function closeSheet() { ['dscx-ov', 'dscx-sh'].forEach(function (id) { var e = document.getElementById(id); if (e) e.remove(); }); }
+
+  function doneHtml(inf, n, againHtml) {
+    var v = inf && inf.vendor_whatsapp;
+    return '<div class="dscx-card plain dscx-done"><div class="dscx-ok">✕</div><div style="font-size:22px;font-weight:800">تم إلغاء طلبك</div>'
+      + '<div class="dscx-m">طلب #' + esc(n) + ' · لن يتم تحصيل أي مبلغ</div>'
+      + (v ? '<a class="dscx-btn dscx-wa" target="_blank" rel="noopener" href="' + esc(wa(v, 'السلام عليكم، تم إلغاء الطلب رقم #' + n + ' من العميل — الرجاء عدم تجهيزه 🙏')) + '">أبلغ ' + esc(inf.vendor_name || 'المطعم') + ' بالإلغاء</a>' : '')
+      + (againHtml != null ? againHtml : '<a class="dscx-btn dscx-rose" href="/">اطلب من جديد</a>') + '</div>';
+  }
+  function showDone() {
+    var t = document.createElement('div');
+    t.style.cssText = 'position:fixed;left:50%;top:18px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 18px;border-radius:20px;font-weight:700;font-size:14px;z-index:10000;direction:rtl;font-family:inherit';
+    t.textContent = '✅ تم إلغاء الطلب'; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 2600);
+  }
+
+  // Shared with other pages (account page)
+  window.DSCancel = {
+    info: function (n, ph) { return rpc('customer_cancel_info', { p_order_number: n, p_phone: ph }); },
+    ask: openSheet, doneHtml: doneHtml, css: addCss, mmss: mmss, esc: esc
+  };
+  if (window.DS_CANCEL_MANUAL) return;
+
+  /* ── Order pages: one order, card placed by itself ── */
+  var num = String(qp('num') || qp('order') || qp('o') || ls('qibah_last_order_num') || '').replace(/^#/, '').replace('QIB-', 'DS-').trim();
+  if (!num || /^DS-(0000|XXXX)$/.test(num)) return;
+  var phone = '';                                     // the phone that matched this order
+  function phones() {                                 // every phone this device knows, best first
+    var c = [qp('phone'), (function () { try { return (JSON.parse(ls('ds_customer') || '{}') || {}).phone; } catch (e) { return ''; } })(), ls('ds_track_phone'), ls('qibah_last_phone')];
+    var out = []; c.forEach(function (p) { p = String(p || '').trim(); if (p.replace(/\D/g, '').length >= 9 && out.indexOf(p) < 0) out.push(p); });
+    return out;
+  }
 
   var box = null, info = null, endAt = 0, total = 300, tick = null, wasOpen = false;
 
   function place() {
     if (box) return box;
-    var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+    addCss();
     box = document.createElement('div'); box.id = 'dscx'; box.style.width = '100%';
     // order page: under the status card · confirmed page: under the delivery-time note
     var tl = document.getElementById('timeline'), anchor = document.querySelector('.anim-card') || document.querySelector('.body > .notice') || (tl && tl.closest ? tl.closest('.card') : null);
@@ -73,12 +127,12 @@
         + '<div class="dscx-tm"><b id="dscx-t"></b><span class="dscx-m" style="margin:0">متبقي</span></div>'
         + '<div class="dscx-bar"><i id="dscx-b"></i></div>'
         + '<button type="button" class="dscx-btn dscx-out" id="dscx-go">✕ إلغاء الطلب</button></div>';
-      document.getElementById('dscx-go').onclick = openSheet;
+      document.getElementById('dscx-go').onclick = function () { openSheet(num, phone, onAnswer); };
       count();
       return;
     }
     stopTimers();
-    if (w === 'cancelled' && info.cancelled_by === 'customer') { place().innerHTML = doneHtml(); heroCancelled(); return; }
+    if (w === 'cancelled' && info.cancelled_by === 'customer') { place().innerHTML = doneHtml(info, num); heroCancelled(); return; }
     var late = w === 'time' || w === 'rider' || w === 'payment' || (wasOpen && w === 'status' && info.status !== 'delivered');
     if (late) {
       place().innerHTML = '<div class="dscx-card plain"><div class="dscx-h">ما يمكن الإلغاء الآن</div>'
@@ -87,6 +141,10 @@
       return;
     }
     if (box) box.innerHTML = '';
+  }
+  function onAnswer(r) {
+    if (r.ok) { info = r; stopTimers(); place().innerHTML = doneHtml(info, num); heroCancelled(); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {} return; }
+    info = r.found ? r : info; if (info) info.can_cancel = false; render();
   }
 
   function count() {
@@ -115,45 +173,6 @@
     }).catch(function () {});
   }
 
-  // Bottom sheet: pick a reason, then confirm
-  var pick = REASONS[0];
-  function openSheet() {
-    closeSheet();
-    var ov = document.createElement('div'); ov.className = 'dscx-ov'; ov.id = 'dscx-ov'; ov.onclick = closeSheet;
-    var sh = document.createElement('div'); sh.className = 'dscx-sh'; sh.id = 'dscx-sh'; sh.setAttribute('role', 'dialog');
-    sh.innerHTML = '<div class="dscx-grab"></div><div style="font-size:20px;font-weight:800">إلغاء الطلب #' + esc(num) + '</div>'
-      + '<div class="dscx-m" style="margin:4px 0 14px">ليش تبي تلغي؟ (يساعدنا نتحسن)</div>'
-      + REASONS.map(function (r) { return '<div class="dscx-rs' + (r === pick ? ' on' : '') + '" data-r="' + esc(r) + '"><i></i>' + esc(r) + '</div>'; }).join('')
-      + '<div class="dscx-err" id="dscx-err"></div>'
-      + '<button type="button" class="dscx-btn dscx-red" id="dscx-yes" style="margin-top:6px">نعم، ألغِ الطلب</button>'
-      + '<button type="button" class="dscx-btn dscx-gr" id="dscx-no" style="margin-top:9px">لا، أكمل الطلب</button>';
-    document.body.appendChild(ov); document.body.appendChild(sh);
-    [].forEach.call(sh.querySelectorAll('.dscx-rs'), function (el) {
-      el.onclick = function () { pick = el.getAttribute('data-r'); [].forEach.call(sh.querySelectorAll('.dscx-rs'), function (x) { x.classList.toggle('on', x === el); }); };
-    });
-    document.getElementById('dscx-no').onclick = closeSheet;
-    document.getElementById('dscx-yes').onclick = doCancel;
-  }
-  function closeSheet() { ['dscx-ov', 'dscx-sh'].forEach(function (id) { var e = document.getElementById(id); if (e) e.remove(); }); }
-
-  function doCancel() {
-    var yes = document.getElementById('dscx-yes'), err = document.getElementById('dscx-err');
-    yes.disabled = true; yes.textContent = 'جاري الإلغاء…'; err.textContent = '';
-    rpc('customer_cancel_order', { p_order_number: num, p_phone: phone, p_reason: pick }).then(function (r) {
-      if (r && r.ok) { info = r; closeSheet(); stopTimers(); place().innerHTML = doneHtml(); heroCancelled(); showDone(); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {} return; }
-      closeSheet(); info = r && r.found ? r : info; if (info) { info.can_cancel = false; } render();
-    }).catch(function () {
-      yes.disabled = false; yes.textContent = 'نعم، ألغِ الطلب'; err.textContent = 'تعذّر الاتصال — تأكد من الإنترنت وحاول مرة ثانية';
-    });
-  }
-
-  function doneHtml() {
-    var v = info && info.vendor_whatsapp;
-    return '<div class="dscx-card plain dscx-done"><div class="dscx-ok">✕</div><div style="font-size:22px;font-weight:800">تم إلغاء طلبك</div>'
-      + '<div class="dscx-m">طلب #' + esc(num) + ' · لن يتم تحصيل أي مبلغ</div>'
-      + (v ? '<a class="dscx-btn dscx-wa" target="_blank" rel="noopener" href="' + esc(wa(v, 'السلام عليكم، تم إلغاء الطلب رقم #' + num + ' من العميل — الرجاء عدم تجهيزه 🙏')) + '">أبلغ ' + esc(info.vendor_name || 'المطعم') + ' بالإلغاء</a>' : '')
-      + '<a class="dscx-btn dscx-rose" href="/">اطلب من جديد</a></div>';
-  }
   // the rest of the page follows: big title says cancelled, "send order on WhatsApp" buttons go away
   function heroCancelled() {
     var t = document.querySelector('.hero-title'), s = document.querySelector('.hero-sub');
@@ -164,11 +183,6 @@
     if (bc) { bc.style.background = 'linear-gradient(135deg,#f87171,#dc2626)'; bc.style.boxShadow = '0 8px 28px rgba(220,38,38,.45)'; }
     if (bi) bi.className = 'ti ti-x';
     try { if (typeof window.loadOrder === 'function') window.loadOrder(num); } catch (e) {}   // order page redraws its status
-  }
-  function showDone() {
-    var t = document.createElement('div');
-    t.style.cssText = 'position:fixed;left:50%;top:18px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 18px;border-radius:20px;font-weight:700;font-size:14px;z-index:10000;direction:rtl;font-family:inherit';
-    t.textContent = '✅ تم إلغاء الطلب'; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 2600);
   }
 
   function start() {
