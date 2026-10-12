@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════
    خطوة التوصيل — Smart Product Search (Arabic-aware, instant, cached)
-   Self-contained. Include on any page:  <script src="/dssearch.js?v=2" defer></script>
+   VERSION 3 (one search icon) — Include on any page:  <script src="/dssearch.js?v=3" defer></script>
    Open the search overlay from anywhere: DSSearch.open()
    - Loads the product list ONCE, caches it, refreshes quietly in the background.
    - Arabic normalization (tashkeel / alef / ya / ta-marbuta / hamza / Persian letters / digits).
