@@ -250,7 +250,7 @@
     '.dss-top{background:linear-gradient(135deg,#9d174d,#be185d);padding:calc(10px + env(safe-area-inset-top)) 12px 12px;display:flex;align-items:center;gap:9px}'+
     '.dss-back{background:rgba(255,255,255,.2);border:none;color:#fff;width:38px;height:38px;border-radius:11px;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}'+
     '.dss-field{flex:1;background:#fff;border-radius:12px;display:flex;align-items:center;gap:8px;padding:0 12px;height:42px}'+
-    '.dss-field i{color:#be185d;font-size:17px;font-style:normal}'+
+    '.dss-field .dss-ic{color:#be185d;flex-shrink:0}'+
     '.dss-field input{flex:1;border:none;outline:none;font-family:inherit;font-size:16px;background:transparent;color:#1f1f1f;direction:rtl;min-width:0}'+
     '.dss-clear{background:none;border:none;color:#9ca3af;font-size:18px;cursor:pointer;display:none}'+
     '#dss-in::-webkit-search-cancel-button,#dss-in::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}'+
@@ -314,7 +314,7 @@
       '<div class="dss-top">'+
         '<button class="dss-back" id="dss-back" aria-label="رجوع">&#8594;</button>'+
         '<div class="dss-field">'+
-          '<i class="ti ti-search" aria-hidden="true">🔍</i>'+
+          '<svg class="dss-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>'+
           '<input id="dss-in" type="search" placeholder="ابحث: حليب، بيبسي أقل من 5، الأرخص…" autocomplete="off" enterkeyhint="search"/>'+
           '<button class="dss-clear" id="dss-clear" aria-label="مسح">&times;</button>'+
         '</div>'+
