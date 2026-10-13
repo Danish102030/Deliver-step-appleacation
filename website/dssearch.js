@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════
    خطوة التوصيل — Smart Product Search (Arabic-aware, instant, cached)
-   VERSION 3 (one search icon) — Include on any page:  <script src="/dssearch.js?v=3" defer></script>
+   VERSION 4 (restaurants & cafés in results on the home page) — Include on any page:  <script src="/dssearch.js?v=4" defer></script>
    Open the search overlay from anywhere: DSSearch.open()
    - Loads the product list ONCE, caches it, refreshes quietly in the background.
    - Arabic normalization (tashkeel / alef / ya / ta-marbuta / hamza / Persian letters / digits).
@@ -303,7 +303,16 @@
     '.dss-go{display:block;width:100%;border:none;border-radius:14px;padding:13px;font-family:inherit;font-weight:800;font-size:15px;margin-top:16px;cursor:pointer;background:#be185d;color:#fff}'+
     '.dss-clr{display:block;width:100%;border:none;background:none;color:#6b7280;font-family:inherit;font-size:13px;margin-top:8px;cursor:pointer}'+
     '.dss-toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));right:50%;transform:translateX(50%) translateY(20px);background:#1f1f1f;color:#fff;font-family:"Tajawal",sans-serif;font-size:13px;padding:11px 20px;border-radius:22px;white-space:nowrap;opacity:0;transition:all .3s;z-index:100002;pointer-events:none}'+
-    '.dss-toast.on{opacity:1;transform:translateX(50%) translateY(0)}';
+    '.dss-toast.on{opacity:1;transform:translateX(50%) translateY(0)}'+
+    '.dss-vh{font-size:13px;font-weight:800;color:#1f1f1f;padding:4px 4px 8px;display:flex;align-items:center;gap:6px}.dss-vh b{color:#9ca3af;font-size:11.5px}'+
+    '.dss-vrow{display:flex;gap:9px;overflow-x:auto;padding:0 2px 10px;margin:0 -2px 6px;scrollbar-width:none;border-bottom:1px solid #f0e4e9}.dss-vrow::-webkit-scrollbar{display:none}'+
+    '.dss-v{flex:0 0 128px;background:#fff;border:.5px solid #f0e4e9;border-radius:14px;overflow:hidden;cursor:pointer;position:relative}'+
+    '.dss-v:active{transform:scale(.97)}'+
+    '.dss-vi{height:74px;background:linear-gradient(135deg,#9d174d,#be185d);display:flex;align-items:center;justify-content:center;font-size:30px;position:relative}'+
+    '.dss-vi img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}'+
+    '.dss-vn{font-size:12.5px;font-weight:800;color:#1f1f1f;padding:7px 8px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'+
+    '.dss-vs{font-size:10.5px;font-weight:700;color:#15803d;padding:2px 8px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dss-vs.off{color:#b91c1c}.dss-vs.soon{color:#b45309}'+
+    '.dss-nop{background:#fff;border:1px dashed #f0e4e9;border-radius:12px;padding:10px 12px;color:#9ca3af;font-size:12.5px;text-align:center;margin-top:4px}';
     document.head.appendChild(s);
   }
 
@@ -327,7 +336,7 @@
     document.body.appendChild(sh);
     var toastEl=document.createElement('div'); toastEl.className='dss-toast'; toastEl.id='dss-toast';
     document.body.appendChild(toastEl);
-    el.ov=ov; el.in=document.getElementById('dss-in'); el.body=document.getElementById('dss-body'); el.bars=document.getElementById('dss-bars');
+    el.ov=ov; el.in=document.getElementById('dss-in'); if(hasVen()) el.in.placeholder='ابحث عن مطعم، قهوة أو منتج…'; el.body=document.getElementById('dss-body'); el.bars=document.getElementById('dss-bars');
     el.clear=document.getElementById('dss-clear'); el.toast=toastEl; el.sh=sh;
     document.getElementById('dss-back').onclick=function(){ close(); };
     el.clear.onclick=function(){ el.in.value=''; el.clear.style.display='none'; F={cat:'',price:'',sort:''}; doSearch(); el.in.focus(); };
@@ -344,9 +353,35 @@
   }
 
   var POPULAR=['حليب','خبز','بيض','أرز','ماء','دجاج','بيبسي','شاي','قهوة','سكر'];
+  // ── Restaurants & cafés in the results (home page only: it sets window.DSVendors) ──
+  var VSYN={burger:'برجر برقر برغر burger',shawarma:'شاورما شاورمه شورما shawarma',coffee:'كوفي قهوه كافيه كافي coffee cafe لاتيه كابتشينو اسبريسو موكا',pizza:'بيتزا pizza',
+    broasted:'بروستد بروست broasted',saudi:'مندي كبسه مضغوط بخاري مشويات شعبي',dessert:'حلويات حلا كيك',juice:'عصير عصيرات',bakery:'مخبوزات معجنات فطاير',icecream:'ايس كريم ايسكريم',
+    'buffet-breakfast':'فطور افطار فول تميس فلافل شكشوكه بوفيه','buffet-lunch':'غدا غداء بوفيه','buffet-dinner':'عشا عشاء بوفيه','buffet-mixed':'بوفيه'};
+  var VICON={burger:'🍔',shawarma:'🥙',coffee:'☕',pizza:'🍕',broasted:'🍗',saudi:'🍚',dessert:'🍰',juice:'🥤','buffet-breakfast':'🍳'};
+  function hasVen(){ return typeof window.DSVendors==='function'; }
+  function vendors(text){
+    if(!hasVen()) return [];
+    var list=[]; try{ list=window.DSVendors()||[]; }catch(e){ return []; }
+    var words=norm(text).split(' ').filter(function(w){ return w.length>=2; }); if(!words.length) return [];
+    var out=[];
+    list.forEach(function(v){ if(!v||v.is_active===false) return;
+      var hay=norm((v.name||'')+' '+(v.name_ar||'')+' '+(VSYN[v.category]||''));
+      if(words.every(function(w){ return hay.indexOf(w)>=0; })){
+        var st=null; try{ st=window.DSVendorStatus?window.DSVendorStatus(v):null; }catch(e){}
+        out.push({v:v,st:st,nameHit:norm(v.name||'').indexOf(words[0])>=0}); } });
+    out.sort(function(a,b){ return ((a.st&&a.st.rank)||0)-((b.st&&b.st.rank)||0)||(b.nameHit?1:0)-(a.nameHit?1:0); });
+    return out.slice(0,12);
+  }
+  function vendorsHTML(V){
+    if(!V.length) return '';
+    return '<div class="dss-vh">🍽️ مطاعم وكافيهات <b>'+V.length+'</b></div><div class="dss-vrow">'+V.map(function(x){ var v=x.v, st=x.st;
+      return '<div class="dss-v" data-v="'+esc(v.id)+'"><div class="dss-vi">'+(VICON[v.category]||'🍽️')+(v.banner_url?'<img src="'+esc(v.banner_url)+'" alt="" loading="lazy" onerror="this.remove()"/>':'')+'</div>'+
+        '<div class="dss-vn">'+esc(v.name)+'</div><div class="dss-vs '+(st?esc(st.cls||''):'')+'">'+(st?esc(st.pill):'')+'</div></div>'; }).join('')+'</div>';
+  }
   function chipsHTML(list){ return '<div class="dss-chips">'+list.map(function(w){return '<button class="dss-chip" data-w="'+esc(w)+'">'+esc(w)+'</button>';}).join('')+'</div>'; }
   function empty(){
     el.bars.innerHTML='';
+    if(hasVen()){ el.body.innerHTML='<div class="dss-hint"><span class="big">🔎</span>ابحث عن مطعم، كوفي، أو أي منتج من السوبرماركت'+chipsHTML(['برجر','شاورما','قهوة','بيتزا','فطور','حليب','بيبسي','خبز'])+'</div>'; return; }
     el.body.innerHTML='<div class="dss-hint"><span class="big">🛒</span>ابحث في أكثر من '+(INDEX.length>500?Math.floor(INDEX.length/100)*100:'١٠٠٠')+' منتج من السوبرماركت<br/>اكتب اسم المنتج أو جرّب: <b style="font-size:13.5px;color:#be185d">حليب أقل من 10</b>'+chipsHTML(POPULAR)+'</div>';
   }
 
@@ -366,15 +401,16 @@
     if(!q.trim()){ empty(); return; }
     if(!INDEX.length){
       el.bars.innerHTML='';
-      el.body.innerHTML='<div class="dss-hint"><span class="big">⏳</span>جاري تحميل المنتجات...<br/>لحظة من فضلك</div>';
+      el.body.innerHTML=vendorsHTML(vendors(q))+'<div class="dss-hint"><span class="big">⏳</span>جاري تحميل المنتجات...<br/>لحظة من فضلك</div>';
       loadIndex();
       return;
     }
-    var r=LAST=run(q), R=r.R, list=r.list;
-    logLater(q,list.length,r.cat);
+    var r=LAST=run(q), R=r.R, list=r.list, V=(R.min==null&&R.max==null&&!F.cat&&!F.price)?vendors(R.text||q):[];
+    logLater(q,list.length+V.length,r.cat);
+    if(!list.length&&V.length){ renderBars(r,true); el.body.innerHTML=vendorsHTML(V)+'<div class="dss-nop">لا توجد منتجات سوبرماركت بهذا الاسم</div>'; el.body.scrollTop=0; return; }
     if(!list.length){ renderBars(r,!(F.cat||F.price||F.sort)); renderNone(q,r); return; }
     renderBars(r);
-    var html='<div class="dss-count">'+list.length+' نتيجة</div>';
+    var html=vendorsHTML(V)+'<div class="dss-count">'+(V.length?'🛒 من السوبرماركت · ':'')+list.length+' نتيجة</div>';
     var show=list.slice(0,SHOWN), words=R.text||'';
     for(var i=0;i<show.length;i++){
       var p=show[i], qn=qtyOf(p.id), oos=(p.in_stock===false), hot=pop(p)>=5;
@@ -427,6 +463,7 @@
   }
   function setQuery(w){ el.in.value=w; el.clear.style.display='block'; F.cat=''; SHOWN=40; doSearch(); }
   function onBody(ev){
+    var vv=ev.target.closest('[data-v]'); if(vv){ ev.stopPropagation(); logNow(); window.location.href='/pages/menu.html?id='+encodeURIComponent(vv.getAttribute('data-v')); return; }
     var b=ev.target.closest('[data-a],[data-w],[data-more]'); if(!b) return;
     ev.stopPropagation();
     if(b.hasAttribute('data-a')){ var id=b.getAttribute('data-id'), delta=parseInt(b.getAttribute('data-a'),10);
