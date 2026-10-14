@@ -606,7 +606,7 @@ function updateFreeDelivery(total){
 /* ---- "Search the whole supermarket" → loads the big search only when tapped ---- */
 function dsOpenAll(){
   if(window.DSSearch) return DSSearch.open(searchQuery);
-  const s=document.createElement('script'); s.src='/dssearch.js?v=3';
+  const s=document.createElement('script'); s.src='/dssearch.js?v=4';
   s.onload=()=>{ if(window.DSSearch) DSSearch.open(searchQuery); };
   document.body.appendChild(s);
 }
