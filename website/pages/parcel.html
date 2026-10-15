@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-1.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-1.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,viewport-fit=cover"/>
+<meta name="theme-color" content="#be185d"/>
+<title>إرسال طرد · خطوة التوصيل</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+<!-- Leaflet + OpenStreetMap (free, no token / no quota — reliable map tiles) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
+<style>
+:root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f2937;--muted:#6b7280;--border:#eef0f3;--bg:#f5f6f8;--green:#16a34a;--blue:#2563eb}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;direction:rtl;padding-top:env(safe-area-inset-top)}
+.top{background:var(--rose);color:#fff;padding:13px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.top .bk{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.2);border:none;color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;cursor:pointer}
+.top b{font-size:15px;font-weight:800;flex:1;text-align:center}
+.wrap{padding:14px}
+.pill{display:inline-block;background:#eef2ff;color:var(--blue);font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px}
+.block{background:#fff;border:1px solid var(--border);border-radius:15px;padding:13px;margin-top:12px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.block.pick{border-inline-start:4px solid var(--green)}
+.block.drop{border-inline-start:4px solid var(--rose)}
+.bl-h{font-size:13px;font-weight:800;display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.bl-h .n{width:20px;height:20px;border-radius:50%;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:none}
+.pick .n{background:var(--green)}.drop .n{background:var(--rose)}
+.loc{display:flex;align-items:center;gap:8px;background:#f0fdf4;border-radius:10px;padding:10px 12px;font-size:12.5px;font-weight:700;color:#166534}
+.hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6}
+.inp{width:100%;border:1.5px solid var(--border);border-radius:11px;padding:11px 12px;font-family:'Tajawal';font-size:14px;margin-top:8px;background:#fff;color:var(--text);outline:none}
+.inp:focus{border-color:var(--rose)}
+.dropbtn{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;margin-top:9px;border:1.8px dashed #f3b6d0;background:var(--rose-soft);border-radius:12px;padding:14px 14px;font-family:'Tajawal';font-size:13.5px;font-weight:800;color:var(--rose);cursor:pointer}
+.dropbtn.set{border-style:solid;border-color:#bbf7d0;background:#f0fdf4;color:#166534}
+.dropbtn .ar{font-size:18px}
+.dropmeta{font-size:11.5px;color:var(--muted);margin-top:7px;display:none;line-height:1.7}
+.dropmeta a{color:var(--blue);font-weight:800;text-decoration:underline}
+.dropmeta .edit{color:var(--rose);font-weight:800;cursor:pointer}
+/* fullscreen map picker */
+.mapmodal{position:fixed;inset:0;z-index:1000;background:#fff;display:none;flex-direction:column}
+.mapmodal.open{display:flex}
+.mm-top{background:var(--rose);color:#fff;padding:13px 14px;display:flex;align-items:center;gap:10px;flex:none;padding-top:calc(13px + env(safe-area-inset-top))}
+.mm-top .x{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;cursor:pointer}
+.mm-top b{font-size:15px;font-weight:800;flex:1}
+.mm-search{position:relative;padding:10px 12px;flex:none;border-bottom:1px solid var(--border)}
+.mm-search input{width:100%;border:1.5px solid var(--border);border-radius:11px;padding:11px 40px 11px 12px;font-family:'Tajawal';font-size:14px;outline:none}
+.mm-search input:focus{border-color:var(--rose)}
+.mm-search .sicon{position:absolute;top:50%;inset-inline-start:24px;transform:translateY(-50%);color:var(--muted);font-size:16px;pointer-events:none}
+.mm-res{position:absolute;top:100%;inset-inline:12px;background:#fff;border:1px solid var(--border);border-radius:0 0 12px 12px;box-shadow:0 8px 20px rgba(0,0,0,.12);max-height:220px;overflow:auto;z-index:5}
+.mm-res .r{padding:11px 13px;font-size:13px;font-weight:700;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:7px;align-items:flex-start}
+.mm-res .r:active{background:var(--rose-soft)}
+.mm-maparea{position:relative;flex:1;min-height:0;background:#e9eef2}
+#dropmap{position:absolute;inset:0;width:100%;height:100%}
+.centerpin{position:absolute;top:50%;left:50%;transform:translate(-50%,-100%);font-size:42px;pointer-events:none;z-index:600;filter:drop-shadow(0 5px 6px rgba(0,0,0,.45));transition:transform .12s}
+.centerpin.drag{transform:translate(-50%,-118%)}
+.pinshadow{position:absolute;top:50%;left:50%;width:14px;height:6px;border-radius:50%;background:rgba(0,0,0,.28);transform:translate(-50%,6px);pointer-events:none;z-index:599}
+.myloc{position:absolute;bottom:14px;inset-inline-end:14px;background:#fff;border:none;border-radius:50%;width:46px;height:46px;box-shadow:0 3px 10px rgba(0,0,0,.25);cursor:pointer;z-index:600;font-size:20px;display:flex;align-items:center;justify-content:center}
+.mm-hint{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(17,24,39,.85);color:#fff;font-size:11.5px;font-weight:700;padding:7px 14px;border-radius:20px;z-index:600;white-space:nowrap;text-align:center;max-width:92%}
+.mm-fail{display:none;position:absolute;inset:0;background:#f8fafc;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--muted);font-size:13px;font-weight:700;line-height:1.8;z-index:610}
+.mm-confirm{flex:none;padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border)}
+.mm-confirm button{width:100%;border:none;border-radius:13px;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:#fff;font-family:'Tajawal';font-size:15px;font-weight:800;padding:15px;box-shadow:0 6px 18px rgba(190,24,93,.3)}
+.up{border:2px dashed #e5e7eb;background:#fafafa;border-radius:12px;padding:15px;text-align:center;color:var(--muted);margin-top:9px;cursor:pointer;display:block}
+.up .ic{font-size:28px}.up .t{font-size:12.5px;font-weight:800;margin-top:4px;color:#374151}
+.thumbs{display:flex;gap:12px;margin-top:11px;flex-wrap:wrap}
+.thumb{width:66px;height:66px;position:relative;flex:none}
+.thumb img{width:100%;height:100%;object-fit:cover;border-radius:12px;border:1px solid var(--border);display:block}
+.thumb .x{position:absolute;top:-7px;left:-7px;width:23px;height:23px;border-radius:50%;background:#dc2626;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.35)}
+.pay{display:flex;gap:9px;margin-top:9px}
+.payopt{flex:1;border:1.5px solid var(--border);border-radius:11px;padding:11px 6px;text-align:center;font-size:12.5px;font-weight:800;color:var(--muted);cursor:pointer}
+.payopt.on{border-color:var(--rose);background:var(--rose-soft);color:var(--rose)}
+.feebar{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#fff1f6,#eef2ff);border-radius:13px;padding:13px 15px;margin-top:13px}
+.feebar .lb{font-size:12.5px;color:var(--muted);font-weight:700}
+.feebar .v{font-size:18px;color:var(--rose);font-weight:900}
+.warn{font-size:11px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:9px 12px;margin-top:11px;font-weight:700;line-height:1.7}
+.submit{width:100%;margin-top:13px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:#fff;font-family:'Tajawal';font-size:15px;font-weight:800;padding:15px;box-shadow:0 6px 18px rgba(190,24,93,.35);cursor:pointer}
+.up-loading{display:none;text-align:center;color:var(--muted);font-size:12px;padding:8px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;font-size:12.5px;font-weight:700;padding:10px 18px;border-radius:22px;z-index:2000;opacity:0;transition:opacity .25s;pointer-events:none;text-align:center;max-width:90%}
+.toast.show{opacity:.96}
+.leaflet-control-attribution{font-size:9px!important}
+</style>
+</head>
+<body>
+<div class="top"><button class="bk" onclick="goBack()">›</button><b>إرسال طرد 📦</b><div style="width:32px"></div></div>
+
+<div class="wrap">
+  <span class="pill">📦 أرسل أي غرض من بيت إلى بيت</span>
+
+  <div class="block pick">
+    <div class="bl-h"><span class="n">1</span> 📤 الاستلام — من أين نأخذ الغرض؟</div>
+    <div class="loc">📍 موقعك الحالي (يُحدَّد تلقائياً في صفحة إتمام الطلب)</div>
+    <div class="hint">المندوب يستلم الغرض من مكانك الحالي — نفس طريقة تحديد موقع طلباتك المعتادة.</div>
+  </div>
+
+  <div class="block drop">
+    <div class="bl-h"><span class="n">2</span> 📥 التسليم — إلى من؟</div>
+    <input class="inp" id="p-rname" style="margin-top:0" placeholder="اسم المستلم — مثال: أبو محمد"/>
+    <input class="inp" id="p-rphone" type="tel" inputmode="numeric" placeholder="جوال المستلم — 05xxxxxxxx" dir="ltr"/>
+    <input class="inp" id="p-rarea" placeholder="وصف مختصر / علامة مميزة (اختياري)"/>
+    <button type="button" class="dropbtn" id="dropbtn" onclick="openMapPicker()">
+      <span id="dropbtn-txt">🗺️ حدّد موقع المستلم على الخريطة</span><span class="ar">›</span>
+    </button>
+    <div class="dropmeta" id="dropmeta"></div>
+  </div>
+
+  <div class="block">
+    <div class="bl-h">📝 ما هو الغرض؟</div>
+    <input class="inp" id="p-item" style="margin-top:0" placeholder="مثال: مفاتيح · ظرف أوراق · هدية صغيرة"/>
+    <label class="up" for="p-file"><div class="ic">📷</div><div class="t">أضف صورة الغرض (اختياري)</div></label>
+    <input id="p-file" type="file" accept="image/*" style="display:none" onchange="onFile(this)"/>
+    <div class="up-loading" id="up-loading">جارٍ رفع الصورة…</div>
+    <div class="thumbs" id="thumbs"></div>
+  </div>
+
+  <div class="block">
+    <div class="bl-h">💳 من يدفع رسوم التوصيل؟</div>
+    <div class="pay">
+      <div class="payopt on" id="pay-sender" onclick="setPay('sender')">أنا (المُرسِل)</div>
+      <div class="payopt" id="pay-recipient" onclick="setPay('recipient')">المستلم عند الاستلام</div>
+    </div>
+  </div>
+
+  <div class="feebar"><span class="lb">رسوم التوصيل (ثابت)</span><span class="v" id="fee-val">…</span></div>
+  <div class="warn">⚠️ ممنوع إرسال: نقود · مجوهرات · أشياء ممنوعة نظاماً أو قابلة للكسر أو خطرة.</div>
+  <button class="submit" id="go-btn" onclick="proceed()">متابعة لإتمام الطلب ›</button>
+</div>
+
+<div class="mapmodal" id="mapmodal">
+  <div class="mm-top"><button class="x" onclick="closeMapPicker()">✕</button><b>موقع المستلم 📍</b></div>
+  <div class="mm-search">
+    <input id="mapsearch" placeholder="ابحث: اسم الحي أو مكان قريب…" onkeydown="if(event.key==='Enter'){event.preventDefault();doSearch();}"/>
+    <span class="sicon">🔍</span>
+    <div class="mm-res" id="mm-res" style="display:none"></div>
+  </div>
+  <div class="mm-maparea" id="mm-maparea">
+    <div id="dropmap"></div>
+    <div class="pinshadow" id="pinshadow"></div>
+    <div class="centerpin" id="centerpin">📍</div>
+    <div class="mm-hint">حرّك الخريطة ليستقر الدبوس على موقع المستلم بالضبط</div>
+    <button class="myloc" type="button" onclick="centerOnMe(false)" title="موقعي">🎯</button>
+    <div class="mm-fail" id="mm-fail">تعذّر تحميل الخريطة.<br>أغلِق هذه النافذة واكتب وصف موقع التسليم في الحقل، وسنتواصل مع المستلم لتحديد المكان.</div>
+  </div>
+  <div class="mm-confirm"><button type="button" onclick="confirmDrop()">✓ تأكيد موقع التسليم</button></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
+const HOME=[26.3500,43.6800]; // Al-Asyah / Qibah default [lat,lng] (Leaflet order)
+var sb=null; try{ sb=supabase.createClient(SB_URL,SB_KEY); }catch(e){}
+var _fee=7.5, _img='', _pay='sender';
+var _map=null, _dropLat=null, _dropLng=null;
+
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
+function goBack(){ if(document.getElementById('mapmodal').classList.contains('open')){ closeMapPicker(); return; } try{ if(history.length>1){ history.back(); return; } }catch(e){} window.location.href='/index.html'; }
+function money(n){ n=Number(n); return (n%1?n.toFixed(2):n)+' ﷼'; }
+function renderFee(){ document.getElementById('fee-val').textContent = (_fee>0)?money(_fee):'مجاني'; }
+renderFee();
+
+(async function(){ try{
+  var r=await sb.from('settings').select('key,value').eq('key','parcel_delivery_fee').limit(1);
+  var v=r.data&&r.data[0]&&Number(r.data[0].value);
+  if(v>=0 && !isNaN(v)) _fee=v;
+}catch(e){} renderFee(); })();
+
+function setPay(who){ _pay=who;
+  document.getElementById('pay-sender').classList.toggle('on',who==='sender');
+  document.getElementById('pay-recipient').classList.toggle('on',who==='recipient');
+}
+
+/* ── Full-screen map picker (Leaflet + OpenStreetMap — free, no token) ── */
+function showMapFail(){ var f=document.getElementById('mm-fail'); if(f)f.style.display='flex'; }
+function openMapPicker(){
+  document.getElementById('mapmodal').classList.add('open');
+  // create the map only once its container is really laid out (avoids a 0-size / blank map)
+  var tries=0;
+  (function waitSize(){
+    var el=document.getElementById('dropmap');
+    if(el && el.clientHeight>40){
+      if(!_map){ initMap(); } else { try{_map.invalidateSize();}catch(e){} }
+      setTimeout(function(){ if(_map){ try{_map.invalidateSize();}catch(e){} if(!_dropLat) centerOnMe(true); } }, 250);
+      setTimeout(function(){ if(_map){ try{_map.invalidateSize();}catch(e){} } }, 700);
+    } else if(tries++ < 40){ requestAnimationFrame(waitSize); }
+    else if(!_map){ initMap(); }
+  })();
+}
+function closeMapPicker(){ document.getElementById('mapmodal').classList.remove('open'); }
+function initMap(){
+  try{
+    if(typeof L==='undefined'){ throw new Error('no leaflet'); }
+    _map=L.map('dropmap',{center:(_dropLat?[_dropLat,_dropLng]:HOME),zoom:14,zoomControl:true,attributionControl:true});
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(_map);
+    var pin=document.getElementById('centerpin');
+    _map.on('movestart',function(){ if(pin)pin.classList.add('drag'); });
+    _map.on('moveend',function(){ if(pin)pin.classList.remove('drag'); });
+    setTimeout(function(){ try{_map.invalidateSize();}catch(e){} },300);
+  }catch(e){ showMapFail(); }
+}
+function centerOnMe(silent){
+  if(!navigator.geolocation){ if(!silent)toast('خدمة الموقع غير متاحة'); return; }
+  navigator.geolocation.getCurrentPosition(function(pos){
+    if(_map)_map.setView([pos.coords.latitude,pos.coords.longitude],16);
+  },function(){ if(!silent)toast('فعّل خدمة الموقع في جهازك أولاً'); },{enableHighAccuracy:true,timeout:8000,maximumAge:60000});
+}
+async function doSearch(){
+  var q=(document.getElementById('mapsearch').value||'').trim(); if(!q)return;
+  var res=document.getElementById('mm-res');
+  try{
+    var url='https://nominatim.openstreetmap.org/search?format=json&limit=6&accept-language=ar&countrycodes=sa&q='+encodeURIComponent(q);
+    var r=await fetch(url,{headers:{'Accept':'application/json'}}); var d=await r.json();
+    if(!d||!d.length){ res.style.display='none'; toast('لا نتائج — حرّك الخريطة يدوياً'); return; }
+    res.innerHTML=d.map(function(f){ var nm=String(f.display_name||'').replace(/'/g,'’').replace(/</g,'&lt;'); return '<div class="r" onclick="pickResult('+f.lat+','+f.lon+')">📍 <span>'+nm+'</span></div>'; }).join('');
+    res.style.display='block';
+  }catch(e){ res.style.display='none'; toast('تعذّر البحث — حرّك الخريطة يدوياً'); }
+}
+function pickResult(lat,lng){ document.getElementById('mm-res').style.display='none'; var s=document.getElementById('mapsearch'); if(s)s.blur(); if(_map)_map.setView([lat,lng],16); }
+function confirmDrop(){
+  if(!_map){ toast('الخريطة غير جاهزة'); return; }
+  var c=_map.getCenter(); _dropLat=c.lat; _dropLng=c.lng;
+  var btn=document.getElementById('dropbtn'); btn.classList.add('set');
+  document.getElementById('dropbtn-txt').textContent='✓ تم تحديد موقع التسليم';
+  var meta=document.getElementById('dropmeta'); meta.style.display='block';
+  meta.innerHTML='📍 <a href="https://maps.google.com/?q='+_dropLat+','+_dropLng+'" target="_blank" rel="noopener">معاينة الموقع</a> · <span class="edit" onclick="openMapPicker()">تعديل</span>';
+  closeMapPicker();
+  toast('✓ تم تحديد موقع المستلم');
+}
+
+async function onFile(input){
+  var f=input.files&&input.files[0]; input.value='';
+  if(!f) return;
+  if(_img){ toast('صورة واحدة تكفي'); return; }
+  if(!sb){ toast('تعذّر الرفع، حاول لاحقاً'); return; }
+  document.getElementById('up-loading').style.display='block';
+  try{
+    var ext=(f.name.split('.').pop()||'jpg').toLowerCase();
+    var name='pcl-'+Date.now()+'-'+Math.floor(Math.random()*9999)+'.'+ext;
+    var up=await sb.storage.from('door-photos').upload(name,f,{cacheControl:'3600',upsert:false});
+    if(up.error){ throw up.error; }
+    var pu=sb.storage.from('door-photos').getPublicUrl(name);
+    var url=pu.data&&pu.data.publicUrl;
+    if(url){ _img=url; renderThumbs(); } else toast('تعذّر الحصول على رابط الصورة');
+  }catch(e){ toast('فشل رفع الصورة، حاول مجدداً'); }
+  document.getElementById('up-loading').style.display='none';
+}
+function renderThumbs(){
+  var el=document.getElementById('thumbs');
+  el.innerHTML=_img?('<div class="thumb"><img src="'+_img+'" alt=""><div class="x" onclick="rmImg()">×</div></div>'):'';
+}
+function rmImg(){ _img=''; renderThumbs(); }
+
+function _digits(s){ return String(s||'').replace(/[^0-9]/g,''); }
+
+function proceed(){
+  var rname=(document.getElementById('p-rname').value||'').trim();
+  var rphone=_digits(document.getElementById('p-rphone').value);
+  var rarea=(document.getElementById('p-rarea').value||'').trim();
+  var item=(document.getElementById('p-item').value||'').trim();
+  if(!rname){ toast('اكتب اسم المستلم'); return; }
+  if(rphone.length<9){ toast('اكتب جوال المستلم بشكل صحيح'); return; }
+  if(!_dropLat && !rarea){ toast('حدّد موقع التسليم على الخريطة أو اكتب وصفه'); return; }
+  if(!item && !_img){ toast('اكتب ما هو الغرض أو أضف صورته'); return; }
+
+  var dropMaps=(_dropLat&&_dropLng)?('https://maps.google.com/?q='+_dropLat+','+_dropLng):'';
+  var itemName='📦 إرسال طرد'+(item?(' — '+item):'');
+  var cartItem={ id:'PCL-'+Date.now(), name:itemName, price:0, qty:1,
+    vendor:'إرسال طرد', vendor_wa:'', vendor_fee:_fee,
+    image:_img||'', restaurant:'إرسال طرد', restaurant_wa:'' };
+  try{
+    localStorage.setItem('qibah_cart', JSON.stringify([cartItem]));
+    localStorage.setItem('qibah_restaurant', JSON.stringify({id:'parcel',name:'إرسال طرد',whatsapp:'',delivery_fee:_fee}));
+    localStorage.setItem('qibah_delivery_fee', String(_fee));
+    localStorage.removeItem('qibah_delivery_disc');
+    localStorage.setItem('qibah_parcel', JSON.stringify({ rname:rname, rphone:rphone, rarea:rarea, item:item, pay:_pay, img:_img,
+      drop_lat:_dropLat, drop_lng:_dropLng, drop_maps:dropMaps }));
+    localStorage.setItem('qibah_is_parcel', '1');
+  }catch(e){}
+  window.location.href='/pages/checkout.html';
+}
+</script>
+</body>
+</html>
