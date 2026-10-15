@@ -22,3 +22,7 @@ Ideas the owner approved in principle but asked to keep for a future session.
 - Owner chose to skip it for now (2026-10-15): the database setting `geo_block` is `{"on":false}`, so nothing is blocked even if these page files are uploaded.
 - To use it later: upload `ds-lib/ds-geo-1.js` + the pages + admin.html, then tick the switch in the admin.
 - Decided NOT to limit the App Store / Google Play to Saudi Arabia (expats with foreign store accounts couldn't download the app).
+
+## 5. Nightly clean-up of visit records (small, not urgent)
+- page_views / visit_live / visit_days grow by a few thousand rows a day. A nightly job should delete page_views older than 180 days, visit_live older than 1 day, visit_days older than ~400 days.
+- Not added yet: statements with DELETE need the owner's confirmation in the database tool (it timed out). Add `public.clean_visit_logs()` + a pg_cron job when the owner can approve.

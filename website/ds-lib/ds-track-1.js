@@ -1,7 +1,8 @@
-/* خطوة التوصيل — count each phone ONCE per day and how far it got (opened → shop → cart → checkout).
-   Feeds Admin → Marketing → Visitors. Nothing is shown to the customer. Sends no name and no location;
-   the phone number is linked only when the customer is already logged in / ordered on this phone.
-   At most one tiny call when the phone reaches a NEW step today (usually 1–3 calls a day). */
+/* خطوة التوصيل — Admin → Marketing → Visitors. Nothing is shown to the customer; no name and no location are sent.
+   1) Each phone ONCE per day + how far it got (opened → shop → cart → checkout): one tiny call only when a NEW step is reached.
+      The phone number is linked only when the customer is already logged in / ordered on this phone.
+   2) Which page is opened (and which restaurant menu / supermarket category) → "most visited pages".
+   3) "Still here" once a minute while the app is open on screen → "Live now". */
 (function(){
   'use strict';
   var SB='https://vjuhxpttssmyomqqomdx.supabase.co', KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
@@ -42,5 +43,29 @@
         .catch(function(){});
     }catch(e){}
   }
-  if(document.readyState==='complete') setTimeout(run,1200); else window.addEventListener('load',function(){ setTimeout(run,1200); });
+  // ── page opened + live ──
+  var DEV=null, APP=null, PAGE=null, REF=null, hb=null;
+  function page(open){
+    try{
+      if(!PAGE){
+        var ua=navigator.userAgent||''; if(/bot|crawl|spider|slurp|facebookexternalhit|preview|lighthouse/i.test(ua)) return;
+        DEV=localStorage.getItem('ds_dev'); if(!DEV) return;
+        APP=window.DS_APP_VERSION?'ios':(window.Capacitor||/; wv\)/.test(ua))?'android':'web';
+        var m=/\/pages\/([a-z0-9_-]+)\.html$/i.exec(location.pathname);
+        PAGE=m?m[1].toLowerCase():(/^\/(index\.html)?$/.test(location.pathname)?'home':'other');
+        var q=new URLSearchParams(location.search);
+        if(PAGE==='menu') REF=q.get('id');
+        else if(PAGE==='marketproducts'){ REF=q.get('cat'); try{ REF=sessionStorage.getItem('qibah_cat')||REF; }catch(e){} }
+      }
+      fetch(SB+'/rest/v1/rpc/track_page',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+KEY},
+        body:JSON.stringify({p_dev:DEV,p_page:PAGE,p_ref:REF?String(REF).slice(0,80):null,p_app:APP,p_open:!!open})}).catch(function(){});
+    }catch(e){}
+  }
+  function startLive(){
+    page(true);
+    clearInterval(hb); hb=setInterval(function(){ if(document.visibilityState==='visible') page(false); },60000);
+    document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible') page(false); });
+  }
+  function boot(){ run(); setTimeout(startLive,300); }   // run() first: it creates the phone id on a first visit
+  if(document.readyState==='complete') setTimeout(boot,1200); else window.addEventListener('load',function(){ setTimeout(boot,1200); });
 })();
