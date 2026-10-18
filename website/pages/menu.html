@@ -309,6 +309,7 @@ document.addEventListener('DOMContentLoaded',async()=>{   // start as soon as th
   // Instant paint from the saved copy → no blank, and no flash when re-opening this menu
   try{
     const c=JSON.parse(sessionStorage.getItem('qibah_menu_'+id)||'null');
+    if(c&&c.r&&c.r.category==='ds_store'){location.replace('/pages/dsstore.html');return;}
     if(c&&c.items&&c.items.length){currentRestaurant=c.r;menuItems=c.items;loadRestaurant();_fromCache=true;_cachedSig=_menuSig();}
   }catch(e){}
   try{
@@ -318,6 +319,7 @@ document.addEventListener('DOMContentLoaded',async()=>{   // start as soon as th
       sb.from('menu_items').select('*').eq('restaurant_id',id).eq('is_active',true).order('sort_order')
     ]);
     if(!restRes.data){if(!_fromCache)window.location.href='/pages/restaurants.html';return;}
+    if(restRes.data.category==='ds_store'){location.replace('/pages/dsstore.html');return;}   // the owner's store has its own page
     currentRestaurant=restRes.data;
     menuItems=itemsRes.data||[];
     if(_fromCache){

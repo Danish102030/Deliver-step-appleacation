@@ -260,6 +260,17 @@ body{background:#f7f4f6}
 .sh-a{font-size:12.5px;color:var(--rose);font-weight:800;cursor:pointer;display:flex;align-items:center;gap:2px;white-space:nowrap;padding-bottom:2px}
 .sec-head{padding:22px 16px 12px}.sec-title{font-size:17px;font-weight:900;color:var(--ink)}
 /* parcel (home to home) — compact card with an animated route: pickup → rider → delivered */
+.mb{margin:14px 16px 0;border-radius:22px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;background:linear-gradient(120deg,#f5f3ff 0%,#ffffff 70%);border:1px solid #ede9fe;box-shadow:0 6px 18px rgba(76,29,149,.08);position:relative;overflow:hidden;transition:transform .15s}
+.mb:active{transform:scale(.98)}
+.mb-ic{width:58px;height:58px;border-radius:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:30px;background:linear-gradient(135deg,#7c3aed,#4c1d95);box-shadow:0 6px 14px rgba(124,58,237,.3);position:relative}
+.mb-ic b{position:absolute;bottom:-4px;left:-4px;font-size:16px;background:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.mb-tx{flex:1;min-width:0}
+.mb-h{font-size:15.5px;font-weight:900;color:#1e1b4b;display:flex;align-items:center;gap:6px}
+.mb-new{font-size:9.5px;font-weight:800;background:#fde68a;color:#78350f;border-radius:8px;padding:2px 7px}
+.mb-s{font-size:11.5px;color:#6b7280;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mb-ch{display:flex;gap:5px;margin-top:7px}
+.mb-ch span{font-size:10px;font-weight:900;color:#fff;border-radius:7px;padding:2px 8px;font-family:system-ui,sans-serif}
+.mb-go{flex-shrink:0;width:38px;height:38px;border-radius:12px;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900}
 .pk{margin:18px 16px 0;border-radius:22px;padding:14px 16px 12px;position:relative;overflow:hidden;cursor:pointer;color:#fff;background:linear-gradient(120deg,#2a0a1c 0%,#5b0d33 50%,#9d174d 100%);box-shadow:0 10px 24px rgba(74,13,43,.25)}
 .pk::before{content:'';position:absolute;inset:0;background:radial-gradient(70% 90% at 0% 0%,rgba(245,181,68,.2),rgba(245,181,68,0) 60%);pointer-events:none}
 .pk:active{transform:scale(.985)}
@@ -541,6 +552,17 @@ img{-webkit-user-drag:none}
   </div>
 </div>
 
+<!-- ── متجر خطوة التوصيل — the owner's own shop (shown only when it is live: Admin → My store) ── -->
+<div class="mb" id="mb-card" style="display:none" onclick="ripple(event,this);window.location.href='/pages/dsstore.html'" role="button" aria-label="متجر خطوة التوصيل — جوالات وشحن">
+  <div class="mb-ic">📱<b>⚡</b></div>
+  <div class="mb-tx">
+    <div class="mb-h">جوالات وشحن <span class="mb-new">جديد</span></div>
+    <div class="mb-s">بطاقات شحن · شواحن · سماعات · كفرات</div>
+    <div class="mb-ch"><span style="background:#4f008c">stc</span><span style="background:#0369a1">mobily</span><span style="background:#111">zain</span></div>
+  </div>
+  <div class="mb-go">←</div>
+</div>
+
 <!-- ── إرسال طرد — من بيت إلى بيت (v2, compact + animated route) ── -->
 <div class="pk" onclick="ripple(event,this);window.location.href='/pages/parcel.html'" role="button" aria-label="أرسل طرد من بيت إلى بيت">
   <div class="pk-top">
@@ -729,7 +751,7 @@ img{-webkit-user-drag:none}
 
 <script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
 <script src="/ds-order-sync.js?v=3" defer></script>
-<script src="/dssearch.js?v=4" defer></script>
+<script src="/dssearch.js?v=5" defer></script>
 <script>
 const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
@@ -849,7 +871,7 @@ function _go(v){ return `window.location.href='/pages/menu.html?id=${encodeURICo
 
 async function loadRestaurants(){
   // 1) instant paint from the saved copy
-  try{ const c=JSON.parse(localStorage.getItem('ds_home_v2')||'null'); if(c&&c.rests&&c.rests.length){ HOME.rests=c.rests; HOME.top=c.top||[]; HOME.set=c.set||{}; renderHome(); } }catch(e){}
+  try{ const c=JSON.parse(localStorage.getItem('ds_home_v2')||'null'); if(c&&c.rests&&c.rests.length){ HOME.rests=c.rests; HOME.top=c.top||[]; HOME.set=c.set||{}; HOME.store=c.store||null; renderHome(); } }catch(e){}
   // 2) fresh data (3 small requests, side by side)
   const cols='id,name,category,banner_url,logo_url,delivery_fee,delivery_discount_min,delivery_discount_fee,delivery_time,rating,is_open,is_24h,open_time,close_time,sort_order,is_active';
   const [r,t,s]=await Promise.all([
@@ -858,13 +880,15 @@ async function loadRestaurants(){
     sb.from('settings').select('key,value').in('key',['home_offers','supermarket_delivery_fee','supermarket_discount_min','supermarket_discount_fee','supermarket_free_delivery_min']).then(x=>x,()=>({error:1}))
   ]);
   if(!r||r.error||!r.data){ if(!HOME.rests.length) document.getElementById('rest-list').innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);font-size:13px">تعذر التحميل — تأكد من الإنترنت<br><button onclick="loadRestaurants()" style="margin-top:10px;border:none;background:var(--rose);color:#fff;font-family:inherit;font-weight:800;font-size:13px;border-radius:12px;padding:9px 18px;cursor:pointer">إعادة المحاولة</button></div>'; return; }
-  HOME.rests=r.data.filter(v=>v.is_active!==false);
+  HOME.store=r.data.find(v=>v.category==='ds_store'&&v.is_active!==false)||null;   // the owner's own store (its own page + home card)
+  HOME.rests=r.data.filter(v=>v.is_active!==false&&v.category!=='ds_store');
   HOME.top=(t&&!t.error&&Array.isArray(t.data))?t.data:(window.DS_TOP_PREVIEW||[]);
   const set={}; ((s&&s.data)||[]).forEach(x=>{ set[x.key]=x.value; }); HOME.set=set;
-  try{ localStorage.setItem('ds_home_v2',JSON.stringify({t:Date.now(),rests:HOME.rests,top:HOME.top,set:HOME.set})); }catch(e){}
+  try{ localStorage.setItem('ds_home_v2',JSON.stringify({t:Date.now(),rests:HOME.rests,top:HOME.top,set:HOME.set,store:HOME.store})); }catch(e){}
   renderHome();
 }
-function renderHome(){ renderOffers(); renderTop(); renderOpen(); }
+function renderHome(){ HOME.rests=(HOME.rests||[]).filter(v=>v.category!=='ds_store'); renderStoreCard(); renderOffers(); renderTop(); renderOpen(); }
+function renderStoreCard(){ const el=document.getElementById('mb-card'); if(el) el.style.display=HOME.store?'':'none'; }
 
 function renderOffers(){
   const set=HOME.set||{}, cards=[];
@@ -931,7 +955,7 @@ function renderOpen(){
 function renderRestaurants(){ renderHome(); }
 
 /* Search bar: "ابحث عن «برجر»" → the word slides up and changes (like Keeta / HungerStation) */
-window.DSVendors=function(){ return HOME.rests; };          // the search also finds restaurants & cafés
+window.DSVendors=function(){ return HOME.store?HOME.rests.concat([HOME.store]):HOME.rests; };          // the search also finds restaurants & cafés
 window.DSVendorStatus=function(v){ return vStatus(v); };
 const HS_BASE=['برجر','حليب','قهوة','شاورما','بيبسي','بيتزا','خبز','فطور','آيس كريم','دجاج','كوفي لاتيه','أرز'];
 let _hsI=0, _hsT=null;

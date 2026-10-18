@@ -226,7 +226,7 @@ async function loadRestaurants(){
       if(!allRestaurants.length){listEl.innerHTML='<div class="empty"><i class="ti ti-database-off"></i>خطأ '+res.status+': '+text+'</div>';document.getElementById('featured-scroll').innerHTML='';}
       return;
     }
-    const all=JSON.parse(text)||[];
+    const all=(JSON.parse(text)||[]).filter(r=>r.category!=='ds_store');   // the owner's store has its own page
     let list=all.filter(r=>(!COFFEE_CATS.includes(r.category)&&!BUFFET_CATS.includes(r.category))||_alsoIn(r,'restaurants'));
     if(!list.length&&all.length) list=all;
     allRestaurants=list;

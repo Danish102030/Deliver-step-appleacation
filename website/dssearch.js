@@ -354,10 +354,10 @@
 
   var POPULAR=['حليب','خبز','بيض','أرز','ماء','دجاج','بيبسي','شاي','قهوة','سكر'];
   // ── Restaurants & cafés in the results (home page only: it sets window.DSVendors) ──
-  var VSYN={burger:'برجر برقر برغر burger',shawarma:'شاورما شاورمه شورما shawarma',coffee:'كوفي قهوه كافيه كافي coffee cafe لاتيه كابتشينو اسبريسو موكا',pizza:'بيتزا pizza',
+  var VSYN={ds_store:'متجر خطوه التوصيل شحن رصيد سوا stc موبايلي mobily زين zain بطاقه كرت شاحن شواحن كيبل كيابل سماعه سماعات كفر كفرات حمايه شاشه جوال جوالات اكسسوارات باور بانك',burger:'برجر برقر برغر burger',shawarma:'شاورما شاورمه شورما shawarma',coffee:'كوفي قهوه كافيه كافي coffee cafe لاتيه كابتشينو اسبريسو موكا',pizza:'بيتزا pizza',
     broasted:'بروستد بروست broasted',saudi:'مندي كبسه مضغوط بخاري مشويات شعبي',dessert:'حلويات حلا كيك',juice:'عصير عصيرات',bakery:'مخبوزات معجنات فطاير',icecream:'ايس كريم ايسكريم',
     'buffet-breakfast':'فطور افطار فول تميس فلافل شكشوكه بوفيه','buffet-lunch':'غدا غداء بوفيه','buffet-dinner':'عشا عشاء بوفيه','buffet-mixed':'بوفيه'};
-  var VICON={burger:'🍔',shawarma:'🥙',coffee:'☕',pizza:'🍕',broasted:'🍗',saudi:'🍚',dessert:'🍰',juice:'🥤','buffet-breakfast':'🍳'};
+  var VICON={ds_store:'📱',burger:'🍔',shawarma:'🥙',coffee:'☕',pizza:'🍕',broasted:'🍗',saudi:'🍚',dessert:'🍰',juice:'🥤','buffet-breakfast':'🍳'};
   function hasVen(){ return typeof window.DSVendors==='function'; }
   function vendors(text){
     if(!hasVen()) return [];
@@ -463,7 +463,8 @@
   }
   function setQuery(w){ el.in.value=w; el.clear.style.display='block'; F.cat=''; SHOWN=40; doSearch(); }
   function onBody(ev){
-    var vv=ev.target.closest('[data-v]'); if(vv){ ev.stopPropagation(); logNow(); window.location.href='/pages/menu.html?id='+encodeURIComponent(vv.getAttribute('data-v')); return; }
+    var vv=ev.target.closest('[data-v]'); if(vv){ ev.stopPropagation(); logNow(); var vid=vv.getAttribute('data-v'), isStore=false; try{ (window.DSVendors()||[]).forEach(function(x){ if(x&&String(x.id)===vid&&x.category==='ds_store') isStore=true; }); }catch(e){}
+      window.location.href=isStore?'/pages/dsstore.html':'/pages/menu.html?id='+encodeURIComponent(vid); return; }
     var b=ev.target.closest('[data-a],[data-w],[data-more]'); if(!b) return;
     ev.stopPropagation();
     if(b.hasAttribute('data-a')){ var id=b.getAttribute('data-id'), delta=parseInt(b.getAttribute('data-a'),10);
