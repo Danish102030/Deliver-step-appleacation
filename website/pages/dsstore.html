@@ -62,7 +62,13 @@
     .am button.out small{color:#b91c1c}
     .go{margin-top:12px;width:100%;height:50px;border-radius:15px;background:var(--p);color:#fff;font-size:15.5px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 18px rgba(124,58,237,.3)}
     .go:disabled{background:#c4b5fd;box-shadow:none;cursor:default}
-    .rc-n{font-size:11.5px;color:var(--muted);text-align:center;margin-top:8px}
+    .rc-n{font-size:11.5px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.6}
+    .md{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .md button{border:2px solid #f1f5f9;background:#f8fafc;border-radius:14px;padding:9px 6px;text-align:center;line-height:1.35}
+    .md button b{display:block;font-size:13.5px;font-weight:900}
+    .md button small{display:block;font-size:11px;color:var(--muted);font-weight:700}
+    .md button.on{border-color:var(--p);background:var(--pl);color:var(--pd)}
+    .md button.on small{color:var(--pd)}
     /* offers */
     .of{border-radius:22px;padding:14px;color:#fff;background:linear-gradient(120deg,#0f766e,#0e7490);display:flex;align-items:center;gap:12px;margin-bottom:10px}
     .of .im{width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;flex-shrink:0}
@@ -128,6 +134,7 @@
     .mods button{min-height:46px;border-radius:13px;border:2px solid #f1f5f9;background:#f8fafc;font-weight:800;font-size:13.5px;padding:4px 6px}
     .mods button small{display:block;font-size:11px;color:var(--muted)}
     .mods button.on{border-color:var(--p);background:var(--pl);color:var(--pd)}
+    .mods .md-x{grid-column:1/-1}
     .toast{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%) translateY(-140px);background:#0f172a;color:#fff;border-radius:14px;padding:10px 16px;font-size:13.5px;font-weight:800;z-index:400;transition:transform .3s;max-width:calc(100% - 32px);text-align:center}
     .toast.on{transform:translateX(-50%) translateY(0)}
   </style>
@@ -186,7 +193,9 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 const CK='ds_store_cache_v1';
 const CAR={stc:{n:'stc',c:'#4f008c'},mobily:{n:'mobily',c:'#0369a1'},zain:{n:'zain',c:'#111111'}};
 let S=null, DEPS=[], ITEMS=[], MODS={}, BEST=[];
-let dep='all', q='', car=null, amt=null, sheetItem=null, sheetOpt=null;
+let dep='all', q='', car=null, amt=null, sheetItem=null, sheetOpt=null, sheetType=false, mode='deliver';
+// recharge card PHOTO sent on WhatsApp (Admin → My store → Store settings): no rider, small service fee, bank transfer first
+let DIG={on:false,fee:1,stcpay:''};
 const $=id=>document.getElementById(id);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=n=>{ n=Math.round(Number(n||0)*100)/100; return String(n); };
@@ -215,12 +224,15 @@ function vStatus(v){
 
 /* ── load: saved copy first (instant), then fresh from the database ── */
 async function load(){
-  try{ const c=JSON.parse(sessionStorage.getItem(CK)||'null'); if(c&&c.S&&c.ITEMS){ ({S,DEPS,ITEMS,MODS,BEST}=c); render(); } }catch(e){}
+  try{ const c=JSON.parse(sessionStorage.getItem(CK)||'null'); if(c&&c.S&&c.ITEMS){ ({S,DEPS,ITEMS,MODS,BEST}=c); if(c.DIG) DIG=c.DIG; render(); } }catch(e){}
   try{
-    const [r,d]=await Promise.all([
+    const [r,d,g0]=await Promise.all([
       sb.from('restaurants').select('*').eq('category','ds_store').order('created_at').limit(1),
-      sb.from('ds_store_departments').select('id,name,icon,color,kind,sort_order').eq('is_active',true).order('sort_order')
+      sb.from('ds_store_departments').select('id,name,icon,color,kind,sort_order').eq('is_active',true).order('sort_order'),
+      sb.from('settings').select('value').eq('key','ds_store_digital').limit(1).then(x=>x,()=>({data:null}))
     ]);
+    try{ let v=g0&&g0.data&&g0.data[0]&&g0.data[0].value; if(typeof v==='string') v=JSON.parse(v);
+      DIG={on:!!(v&&v.on), fee:(v&&Number(v.fee)>=0)?Number(v.fee):1, stcpay:String((v&&v.stcpay)||'')}; }catch(e){ DIG={on:false,fee:1,stcpay:''}; }
     const s=r.data&&r.data[0];
     const preview=/[?&]preview=1/.test(location.search);   // the owner checks the store before showing it (Admin → My store → Open store page)
     if(!s||(s.is_active===false&&!preview)){ S=null; try{sessionStorage.removeItem(CK);}catch(e){} return gone(); }
@@ -239,7 +251,7 @@ async function load(){
       }
     }
     S=s; DEPS=d.data||[]; ITEMS=items; MODS=mods; BEST=Array.isArray(best.data)?best.data:[];
-    try{ sessionStorage.setItem(CK,JSON.stringify({S,DEPS,ITEMS,MODS,BEST})); }catch(e){}
+    try{ sessionStorage.setItem(CK,JSON.stringify({S,DEPS,ITEMS,MODS,BEST,DIG})); }catch(e){}
     render();
   }catch(e){ if(!S) $('main').innerHTML='<div class="gone"><div style="font-size:46px">📶</div><b>تعذر التحميل</b><p>تأكد من الإنترنت وحاول مرة ثانية</p><a href="" onclick="location.reload();return false">إعادة المحاولة</a></div>'; }
 }
@@ -264,7 +276,7 @@ function render(){
   const offers=ITEMS.filter(i=>price(i)<Number(i.price)&&!cardInfo(i)).slice(0,3);
   let h='';
   if(used.length) h+='<div class="sec"><div class="deps" id="deps"></div></div>';
-  if(rcDep&&cards.length) h+='<div class="sec" id="rc-sec"><div class="rc"><div class="rc-h">⚡ اشحن رصيدك <small>يوصلك الكرت مع المندوب</small></div><div class="cr" id="cr"></div><div class="am" id="am"></div><button class="go" id="rc-go" disabled onclick="addCard()">اختر المبلغ</button><div class="rc-n">السعر = قيمة البطاقة · بدون أي زيادة</div></div></div>';
+  if(rcDep&&cards.length) h+='<div class="sec" id="rc-sec"><div class="rc"><div class="rc-h">⚡ اشحن رصيدك <small>يوصلك الكرت مع المندوب</small></div><div class="cr" id="cr"></div><div class="am" id="am"></div><div class="md" id="md" style="display:none"></div><button class="go" id="rc-go" disabled onclick="addCard()">اختر المبلغ</button><div class="rc-n" id="rc-n">السعر = قيمة البطاقة · بدون أي زيادة</div></div></div>';
   if(offers.length) h+='<div class="sec" id="of-sec"><div class="sh"><h2>🔥 عروض</h2></div><div id="offers"></div></div>';
   h+='<div class="sec" id="best-sec" style="display:none"><div class="sh"><h2>⭐ الأكثر طلباً</h2></div><div class="hs" id="best"></div></div>';
   h+='<div class="sec" id="all"><div class="sh"><h2 id="all-h">كل المنتجات</h2></div><div class="chips" id="chips"></div><div class="grid" id="grid"></div></div>';
@@ -290,12 +302,26 @@ function drawRc(){
   $('am').innerHTML=list.map(i=>{ const v=cardInfo(i).v, ok=i.in_stock!==false;
     return '<button class="'+(amt===i.id?'on ':'')+(ok?'':'out')+'" '+(ok?'onclick="pickAmt(\''+i.id+'\')"':'disabled')+'><b>'+v+'</b><small>'+(ok?(price(i)!==v?fmt(price(i))+' ر.س':'ريال'):'نفذت')+'</small></button>'; }).join('');
   const sel=ITEMS.find(i=>i.id===amt);
+  const md=$('md'); if(!DIG.on) mode='deliver';
+  md.style.display=DIG.on?'':'none';
+  if(DIG.on) md.innerHTML=modeButtons(sel,'pickMode');
   const go=$('rc-go'); go.disabled=!sel;
-  go.innerHTML=sel?'＋ أضف بطاقة <span class="en">'+CAR[car].n+'</span> '+cardInfo(sel).v+' ريال':'اختر المبلغ';
+  go.innerHTML=!sel?'اختر المبلغ':mode==='photo'?'📲 اطلب صورة بطاقة <span class="en">'+CAR[car].n+'</span> '+cardInfo(sel).v+' · '+fmt(price(sel)+DIG.fee)+' ر.س':'＋ أضف بطاقة <span class="en">'+CAR[car].n+'</span> '+cardInfo(sel).v+' ريال';
+  $('rc-n').textContent=mode==='photo'?'📲 الدفع تحويل بنكي قبل الإرسال · نرسل صورة الكرت على واتساب بعد التأكد من التحويل':DIG.on?'🛵 السعر = قيمة البطاقة · يوصلك الكرت مع المندوب (التوصيل يُحسب في السلة)':'السعر = قيمة البطاقة · بدون أي زيادة';
 }
+// 🛵 delivered card  /  📲 card photo on WhatsApp (+ service fee, no delivery fee)
+function modeButtons(sel,fn){
+  const cur=fn==='pickMode'?mode:(sheetOpt&&sheetOpt.type);
+  return '<button type="button" class="'+(cur==='deliver'?'on':'')+'" onclick="'+fn+'(\'deliver\')"><b>🛵 توصيل الكرت</b><small>'+(sel?fmt(price(sel))+' ر.س':'')+' + التوصيل</small></button>'+
+         '<button type="button" class="'+(cur==='photo'?'on':'')+'" onclick="'+fn+'(\'photo\')"><b>📲 صورة على واتساب</b><small>'+(sel?fmt(price(sel)+DIG.fee)+' ر.س':'+'+fmt(DIG.fee)+' ر.س')+' · بدون توصيل</small></button>';
+}
+function pickMode(m){ mode=m; drawRc(); }
 function pickCar(k){ car=k; amt=null; drawRc(); }
 function pickAmt(id){ amt=id; drawRc(); }
-function addCard(){ if(amt){ add(amt); amt=null; drawRc(); } }
+function addCard(){ if(!amt) return; if(DIG.on&&mode==='photo') addPhoto(amt); else put0(amt); amt=null; drawRc(); }
+function put0(id){ const i=ITEMS.find(x=>x.id===id); if(!canAdd(i)) return; put(i, id, i.name, price(i)); }
+function addPhoto(id){ const i=ITEMS.find(x=>x.id===id); if(!canAdd(i)) return;
+  put(i, id+'|photo', i.name+' (صورة واتساب)', price(i)+DIG.fee, {ds_digital:true}); }
 function drawOffers(list){
   const el=$('offers'); if(!el) return;
   el.innerHTML=list.map(i=>'<div class="of"><div class="im">'+(i.image_url?'<img src="'+esc(i.image_url)+'" alt="" loading="lazy" onerror="this.remove()"/>':esc((depOf(i)||{}).icon||'🎁'))+'</div>'+
@@ -310,12 +336,12 @@ function img(i){
 }
 function qtyOf(id){ return cartGet().filter(x=>x.vendor===S.name&&(x.id===id||String(x.id).indexOf(id+'|')===0)).reduce((s,x)=>s+Number(x.qty||0),0); }
 function card(i){
-  const out=i.in_stock===false, n=qtyOf(i.id), hasMod=!!MODS[i.id], p=price(i);
+  const out=i.in_stock===false, n=qtyOf(i.id), hasMod=!!MODS[i.id]||(DIG.on&&!!cardInfo(i)), p=price(i);
   const btn=out?'<span class="soon">نفذت الكمية</span>':(n&&!hasMod)?'<div class="qty"><button onclick="chg(\''+i.id+'\',-1)" aria-label="أنقص">−</button><b>'+n+'</b><button onclick="chg(\''+i.id+'\',1)" aria-label="زد">+</button></div>':'<button class="plus" onclick="add(\''+i.id+'\')" aria-label="أضف">'+(n?'<span style="font-size:14px">'+n+'+</span>':'+')+'</button>';
   const hot=BEST.indexOf(i.id)>-1&&BEST.indexOf(i.id)<4;
   return '<div class="pc'+(out?' out':'')+'">'+(p<Number(i.price)?'<span class="tag dis">خصم</span>':hot?'<span class="tag hot">🔥 الأكثر طلباً</span>':'')+img(i)+'<div class="nm">'+esc(i.name)+'</div>'+
-    (hasMod?'<div class="ds">اختر '+esc(MODS[i.id].name||'الموديل')+'</div>':i.description?'<div class="ds">'+esc(i.description)+'</div>':'')+
-    '<div class="ft"><div class="p">'+(p<Number(i.price)?'<s>'+fmt(i.price)+'</s>':'')+(hasMod&&MODS[i.id].opts.some(o=>Number(o.extra_price)>0)?'<small>من </small>':'')+fmt(p)+' <small>ر.س</small></div>'+btn+'</div></div>';
+    (MODS[i.id]?'<div class="ds">اختر '+esc(MODS[i.id].name||'الموديل')+'</div>':(DIG.on&&cardInfo(i))?'<div class="ds">🛵 توصيل أو 📲 صورة على واتساب</div>':i.description?'<div class="ds">'+esc(i.description)+'</div>':'')+
+    '<div class="ft"><div class="p">'+(p<Number(i.price)?'<s>'+fmt(i.price)+'</s>':'')+(MODS[i.id]&&MODS[i.id].opts.some(o=>Number(o.extra_price)>0)?'<small>من </small>':'')+fmt(p)+' <small>ر.س</small></div>'+btn+'</div></div>';
 }
 function drawList(){
   if(!$('grid')) return;
@@ -350,9 +376,10 @@ function cartSet(c){
   try{
     if(vs.length===1&&vs[0]===S.name){
       localStorage.setItem('qibah_restaurant',JSON.stringify({id:S.id,name:S.name,name_ar:S.name_ar||'',whatsapp:S.whatsapp||'',delivery_fee:Number(S.delivery_fee)||0}));
-      localStorage.setItem('qibah_delivery_fee',String(Number(S.delivery_fee)||0));
+      const photoOnly=c.length&&c.every(x=>x.ds_digital);   // only card photos → no rider, no delivery fee
+      localStorage.setItem('qibah_delivery_fee',String(photoOnly?0:(Number(S.delivery_fee)||0)));
       const dm=Number(S.delivery_discount_min)||0, df=Number(S.delivery_discount_fee)||0;
-      if(dm>0&&df<(Number(S.delivery_fee)||0)) localStorage.setItem('qibah_delivery_disc',JSON.stringify({min:dm,fee:df})); else localStorage.removeItem('qibah_delivery_disc');
+      if(!photoOnly&&dm>0&&df<(Number(S.delivery_fee)||0)) localStorage.setItem('qibah_delivery_disc',JSON.stringify({min:dm,fee:df})); else localStorage.removeItem('qibah_delivery_disc');
     }else if(vs.length>=2){
       localStorage.removeItem('qibah_restaurant'); localStorage.removeItem('qibah_delivery_fee'); localStorage.removeItem('qibah_delivery_disc');
     }else if(!c.length){
@@ -360,19 +387,24 @@ function cartSet(c){
     }
   }catch(e){}
 }
-function add(id){
-  const i=ITEMS.find(x=>x.id===id); if(!i||!S) return;
-  if(i.in_stock===false){ toast('نفذت الكمية'); return; }
-  if(!vStatus(S).open){ toast('🌙 المتجر '+vStatus(S).txt); return; }
+function canAdd(i){
+  if(!i||!S) return false;
+  if(i.in_stock===false){ toast('نفذت الكمية'); return false; }
+  if(!vStatus(S).open){ toast('🌙 المتجر '+vStatus(S).txt); return false; }
   const others=[...new Set(cartGet().map(vendorOf).filter(v=>v!==S.name))];
-  if(others.length>=2){ toast('🛍️ يمكنك الطلب من متجرين فقط في نفس السلة'); return; }
+  if(others.length>=2){ toast('🛍️ يمكنك الطلب من متجرين فقط في نفس السلة'); return false; }
+  return true;
+}
+function add(id){
+  const i=ITEMS.find(x=>x.id===id); if(!canAdd(i)) return;
   if(MODS[id]){ openSheet(i); return; }
+  if(DIG.on&&cardInfo(i)){ openTypeSheet(i); return; }
   put(i, id, i.name, price(i));
 }
-function put(i, cid, name, p){
+function put(i, cid, name, p, extra){
   const c=cartGet(); const ex=c.find(x=>x.id===cid&&vendorOf(x)===S.name);
   if(ex) ex.qty=Number(ex.qty||0)+1;
-  else c.push({id:cid,name:name,price:p,qty:1,image:i.image_url||'',modifiers:[],restaurant:S.name,restaurant_wa:S.whatsapp||'',vendor:S.name,vendor_wa:S.whatsapp||'',vendor_fee:Number(S.delivery_fee)||0});
+  else c.push(Object.assign({id:cid,name:name,price:p,qty:1,image:i.image_url||'',modifiers:[],restaurant:S.name,restaurant_wa:S.whatsapp||'',vendor:S.name,vendor_wa:S.whatsapp||'',vendor_fee:Number(S.delivery_fee)||0},extra||{}));
   cartSet(c); toast('✓ أضفنا '+name); refreshCart();
 }
 function chg(id,d){
@@ -388,15 +420,25 @@ function refreshCart(){
   $('cb').classList.toggle('on',n>0); $('cb-n').textContent=n; $('cb-t').textContent=fmt(t)+' ر.س';
   $('bd').textContent=n; $('bd').style.display=n?'flex':'none';
   const onlyCards=mine.length&&mine.every(x=>{ const i=ITEMS.find(y=>y.id===String(x.id).split('|')[0]); return i&&cardInfo(i); });
-  $('cb-s').textContent=onlyCards&&ITEMS.some(i=>!cardInfo(i)&&i.in_stock!==false)?'🔌 تحتاج شاحن أو كيبل؟':'التوصيل يُحسب في الخطوة الجاية';
+  const allPhoto=mine.length&&mine.every(x=>x.ds_digital);
+  $('cb-s').textContent=allPhoto&&mine.length===c.length?'📲 بدون توصيل · الدفع تحويل بنكي':onlyCards&&ITEMS.some(i=>!cardInfo(i)&&i.in_stock!==false)?'🔌 تحتاج شاحن أو كيبل؟':'التوصيل يُحسب في الخطوة الجاية';
   if($('grid')) drawList();
 }
 function goCart(){ location.href='/pages/cart.html'; }
 function goBack(){ if(history.length>1&&document.referrer&&document.referrer.indexOf(location.host)>-1) history.back(); else location.href='/'; }
 
 /* ── phone-model sheet ── */
+function openTypeSheet(i){
+  sheetItem=i; sheetOpt=null; sheetType=true;
+  $('sh-t').textContent=i.name; $('sh-p').textContent='كيف تبغى البطاقة؟';
+  $('mods').innerHTML=modeButtons(i,'pickType');
+  $('sh-go').disabled=true; $('sh-go').textContent='اختر طريقة الاستلام';
+  $('ov').classList.add('on'); $('sheet').classList.add('on');
+}
+function pickType(t){ sheetOpt={type:t}; $('mods').innerHTML=modeButtons(sheetItem,'pickType'); $('sh-go').disabled=false;
+  $('sh-go').innerHTML=t==='photo'?'📲 اطلب الصورة · '+fmt(price(sheetItem)+DIG.fee)+' ر.س':'＋ أضف للسلة · '+fmt(price(sheetItem))+' ر.س'; }
 function openSheet(i){
-  sheetItem=i; sheetOpt=null; const m=MODS[i.id];
+  sheetType=false; sheetItem=i; sheetOpt=null; const m=MODS[i.id];
   $('sh-t').textContent=i.name+' — '+fmt(price(i))+' ر.س';
   $('sh-p').textContent='اختر '+(m.name||'الموديل')+' — مطلوب';
   $('mods').innerHTML=m.opts.map((o,k)=>'<button class="en" data-k="'+k+'" onclick="pickOpt('+k+')">'+esc(o.name)+(Number(o.extra_price)>0?'<small>+'+fmt(o.extra_price)+' ر.س</small>':'')+'</button>').join('');
@@ -406,6 +448,7 @@ function openSheet(i){
 function pickOpt(k){ sheetOpt=MODS[sheetItem.id].opts[k]; document.querySelectorAll('#mods button').forEach(b=>b.classList.toggle('on',Number(b.dataset.k)===k));
   $('sh-go').disabled=false; $('sh-go').innerHTML='＋ أضف للسلة · <span class="en">'+esc(sheetOpt.name)+'</span>'; }
 function addFromSheet(){ if(!sheetItem||!sheetOpt) return; const i=sheetItem;
+  if(sheetType){ closeSheet(); if(sheetOpt.type==='photo') addPhoto(i.id); else put0(i.id); return; }
   put(i, i.id+'|'+sheetOpt.id, i.name+' ('+sheetOpt.name+')', price(i)+(Number(sheetOpt.extra_price)||0)); closeSheet(); }
 function closeSheet(){ $('ov').classList.remove('on'); $('sheet').classList.remove('on'); }
 

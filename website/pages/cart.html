@@ -205,7 +205,9 @@ async function loadCart() {
   // Restaurant order: use saved restaurant fee
   // Supermarket order (no restaurant): ALWAYS use latest settings, ignore stale localStorage
   let del;
-  if(twoVendors){
+  if(cart.every(i => i && i.ds_digital)){
+    del = 0;   // Delivery Step Store: only recharge-card photos (sent on WhatsApp) → no rider, no delivery fee
+  }else if(twoVendors){
     del = _twoVendorFee;
   }else if(isRest && savedFee !== null){
     del = Number(savedFee);
