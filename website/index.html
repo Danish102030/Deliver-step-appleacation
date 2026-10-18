@@ -264,6 +264,8 @@ body{background:#f7f4f6}
 .mb:active{transform:scale(.98)}
 .mb-ic{width:58px;height:58px;border-radius:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:30px;background:linear-gradient(135deg,#7c3aed,#4c1d95);box-shadow:0 6px 14px rgba(124,58,237,.3);position:relative}
 .mb-ic b{position:absolute;bottom:-4px;left:-4px;font-size:16px;background:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.mb-im{width:76px;height:76px;border-radius:20px;overflow:hidden;flex-shrink:0;background:#ede9fe;box-shadow:0 8px 18px rgba(124,58,237,.28)}
+.mb-im img{width:100%;height:100%;object-fit:cover;display:block}
 .mb-tx{flex:1;min-width:0}
 .mb-h{font-size:15.5px;font-weight:900;color:#1e1b4b;display:flex;align-items:center;gap:6px}
 .mb-new{font-size:9.5px;font-weight:800;background:#fde68a;color:#78350f;border-radius:8px;padding:2px 7px}
@@ -554,7 +556,7 @@ img{-webkit-user-drag:none}
 
 <!-- ── متجر خطوة التوصيل — the owner's own shop (shown only when it is live: Admin → My store) ── -->
 <div class="mb" id="mb-card" style="display:none" onclick="ripple(event,this);window.location.href='/pages/dsstore.html'" role="button" aria-label="متجر خطوة التوصيل — جوالات وشحن">
-  <div class="mb-ic">📱<b>⚡</b></div>
+  <div class="mb-im"><img id="mb-img" src="/ds-lib/ds-store-card-1.svg" alt="" width="76" height="76" decoding="async" onerror="this.onerror=null;this.src='/ds-lib/ds-store-card-1.svg'"/></div>
   <div class="mb-tx">
     <div class="mb-h">جوالات وشحن <span class="mb-new">جديد</span></div>
     <div class="mb-s">بطاقات شحن · شواحن · سماعات · كفرات</div>
@@ -888,7 +890,9 @@ async function loadRestaurants(){
   renderHome();
 }
 function renderHome(){ HOME.rests=(HOME.rests||[]).filter(v=>v.category!=='ds_store'); renderStoreCard(); renderOffers(); renderTop(); renderOpen(); }
-function renderStoreCard(){ const el=document.getElementById('mb-card'); if(el) el.style.display=HOME.store?'':'none'; }
+function renderStoreCard(){ const el=document.getElementById('mb-card'); if(!el) return; el.style.display=HOME.store?'':'none';
+  const im=document.getElementById('mb-img'), want=(HOME.store&&HOME.store.banner_url)||'/ds-lib/ds-store-card-1.svg';   // owner's own picture (Admin → My store → Store settings) or the built-in one
+  if(im&&im.getAttribute('src')!==want) im.setAttribute('src',want); }
 
 function renderOffers(){
   const set=HOME.set||{}, cards=[];
