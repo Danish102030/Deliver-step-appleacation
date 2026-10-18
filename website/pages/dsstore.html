@@ -222,7 +222,8 @@ async function load(){
       sb.from('ds_store_departments').select('id,name,icon,color,kind,sort_order').eq('is_active',true).order('sort_order')
     ]);
     const s=r.data&&r.data[0];
-    if(!s||s.is_active===false){ S=null; try{sessionStorage.removeItem(CK);}catch(e){} return gone(); }
+    const preview=/[?&]preview=1/.test(location.search);   // the owner checks the store before showing it (Admin → My store → Open store page)
+    if(!s||(s.is_active===false&&!preview)){ S=null; try{sessionStorage.removeItem(CK);}catch(e){} return gone(); }
     const [it,best]=await Promise.all([
       sb.from('menu_items').select('id,name,description,price,discount_price,image_url,in_stock,category,sort_order').eq('restaurant_id',s.id).eq('is_active',true).order('sort_order').limit(1000),
       sb.rpc('ds_store_best',{p_limit:8}).then(x=>x,()=>({data:[]}))
@@ -255,6 +256,8 @@ function render(){
   if(S.logo_url) $('logo').innerHTML='<img src="'+esc(S.logo_url)+'" alt="" onerror="this.parentNode.textContent=\'📱\'"/>';
   const st=vStatus(S); $('s-open').textContent=(st.open?'🟢 ':'🔴 ')+st.txt;
   $('closed').style.display=st.open?'none':'block'; $('closed').textContent='🌙 المتجر '+st.txt+' — تقدر تتصفح، والطلب يكون وقت الدوام';
+  if(S.is_active===false){ const pv=$('closed'); pv.style.display='block'; pv.style.background='#eff6ff'; pv.style.borderColor='#bfdbfe'; pv.style.color='#1e40af';
+    pv.textContent='👀 معاينة — المتجر مخفي عن العملاء حالياً'+(st.open?'':' · '+st.txt); }
   const used=DEPS.filter(d=>ITEMS.some(i=>i.category===d.name));
   const rcDep=used.find(d=>d.kind==='recharge');
   const cards=ITEMS.filter(i=>cardInfo(i));

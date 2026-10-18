@@ -147,7 +147,7 @@ drop trigger if exists trg_ds_store_on_order_change on public.orders;
 create trigger trg_ds_store_on_order_change after update of order_status, deleted_at on public.orders
   for each row execute function public._ds_store_on_order_change();
 
--- Admin: create the store (once) + the starting departments. Returns the store id.
+-- Admin: create the store (once, HIDDEN and closed) + the starting departments. Returns the store id.
 create or replace function public.ds_store_setup(p_name text default 'متجر خطوة التوصيل', p_fee numeric default 7, p_whatsapp text default '')
 returns uuid language plpgsql volatile security definer set search_path to '' as $$
 declare v uuid;
@@ -156,7 +156,7 @@ begin
   v := public.ds_store_vendor_id();
   if v is null then
     insert into public.restaurants(name, category, whatsapp, delivery_fee, delivery_time, rating, is_open, is_active, sort_order, open_time, close_time, is_24h, min_order, description)
-    values (coalesce(nullif(btrim(p_name), ''), 'متجر خطوة التوصيل'), 'ds_store', coalesce(btrim(p_whatsapp), ''), greatest(coalesce(p_fee, 7), 0), '20-30', 5, false, true, 9999, '08:00', '02:00', false, 0,
+    values (coalesce(nullif(btrim(p_name), ''), 'متجر خطوة التوصيل'), 'ds_store', coalesce(btrim(p_whatsapp), ''), greatest(coalesce(p_fee, 7), 0), '20-30', 5, false, false, 9999, '08:00', '02:00', false, 0,
             'شحن رصيد وإكسسوارات جوال')
     returning id into v;
   end if;
