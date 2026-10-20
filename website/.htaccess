@@ -1,0 +1,68 @@
+# Delivery Step — public_html/.htaccess (main folder only)
+# Web pages (.html): a phone may reuse a page it opened in the last 2 minutes, so moving between
+# pages is instant; after you upload a new page, every phone gets it within 2 minutes.
+# "private" = the CDN keeps no copy of pages. Pictures, fonts and scripts are not affected.
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "private, max-age=120, stale-while-revalidate=300"
+  </FilesMatch>
+</IfModule>
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Clean addresses — deliverystep.app/restaurants instead of /pages/restaurants.html
+#   • /restaurants, /menu?id=…, /cart … open the page in /pages/ (the address stays clean)
+#   • /admin, /welcome, /store … open the page in the main folder
+#   • /shop = the Delivery Step Store (pages/dsstore.html)
+#   • old links (/pages/x.html, /x.html — WhatsApp, Google, old app copies) move to the clean
+#     address (the ?id=… part is kept). Server files (.php, pictures, scripts) are not touched.
+# ─────────────────────────────────────────────────────────────────────────────
+Options -Indexes
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 1) old addresses → clean (only what the visitor typed / clicked; never our own inside step)
+  RewriteCond %{THE_REQUEST} \s/+pages/dsstore\.html[\s?]
+  RewriteRule ^ /shop [R=302,L]
+  RewriteCond %{THE_REQUEST} \s/+pages/[a-z0-9_-]+\.html[\s?] [NC]
+  RewriteCond %{DOCUMENT_ROOT}/$1.html !-f
+  RewriteRule ^pages/([a-z0-9_-]+)\.html$ /$1 [R=302,L,NC]
+  RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
+  RewriteRule ^index\.html$ / [R=302,L,NC]
+  RewriteCond %{REQUEST_URI} !^/(google[0-9a-z]+|yandex_[0-9a-z]+|pinterest-[0-9a-z]+)\.html$ [NC]
+  RewriteCond %{THE_REQUEST} \s/+[a-z0-9_-]+\.html[\s?] [NC]
+  RewriteRule ^([a-z0-9_-]+)\.html$ /$1 [R=302,L,NC]
+
+  # 2) clean address → the real file (inside step, the visitor still sees the clean address)
+  RewriteRule ^shop/?$ /pages/dsstore.html [L,NC]
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^([a-z0-9_-]+)/?$ /$1.html [L]
+  RewriteCond %{DOCUMENT_ROOT}/pages/$1.html -f
+  RewriteRule ^([a-z0-9_-]+)/?$ /pages/$1.html [L]
+</IfModule>
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Security
+#   • browsers always use the secure 🔒 connection for this site (after the first visit)
+#   • other websites can't show our pages inside theirs (stops fake look-alike pages)
+#   • files are only used as what they really are · links to other sites don't leak full addresses
+#   • only our own pages may ask for the camera (barcode scanner) and location (delivery pin)
+# ─────────────────────────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(self), geolocation=(self), microphone=(), payment=(self), usb=()"
+  Header always unset X-Powered-By
+</IfModule>
+
+# Private files can never be opened from the internet (hidden files, backups, databases, logs, zips)
+<FilesMatch "(^\.(?!well-known)|\.(sql|bak|old|orig|save|swp|log|env|ini|sh|zip|tar|gz|tgz|7z|rar)$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>

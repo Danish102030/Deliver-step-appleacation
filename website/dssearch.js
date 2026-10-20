@@ -464,7 +464,7 @@
   function setQuery(w){ el.in.value=w; el.clear.style.display='block'; F.cat=''; SHOWN=40; doSearch(); }
   function onBody(ev){
     var vv=ev.target.closest('[data-v]'); if(vv){ ev.stopPropagation(); logNow(); var vid=vv.getAttribute('data-v'), isStore=false; try{ (window.DSVendors()||[]).forEach(function(x){ if(x&&String(x.id)===vid&&x.category==='ds_store') isStore=true; }); }catch(e){}
-      window.location.href=isStore?'/pages/dsstore.html':'/pages/menu.html?id='+encodeURIComponent(vid); return; }
+      window.location.href=isStore?'/shop':'/menu?id='+encodeURIComponent(vid); return; }
     var b=ev.target.closest('[data-a],[data-w],[data-more]'); if(!b) return;
     ev.stopPropagation();
     if(b.hasAttribute('data-a')){ var id=b.getAttribute('data-id'), delta=parseInt(b.getAttribute('data-a'),10);

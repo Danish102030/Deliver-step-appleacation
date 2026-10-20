@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8"/>
-  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-1.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-1.js" defer></script>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,viewport-fit=cover"/>
 <meta name="theme-color" content="#be185d"/>
 <title>الصيدليات · خطوة التوصيل</title>
@@ -92,7 +92,7 @@ var sb=null; try{ sb=supabase.createClient(SB_URL,SB_KEY); }catch(e){}
 var _fee=5.5, _defFee=5.5, _pharm=null, _images=[];
 
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
-function onBack(){ if(document.getElementById('order-view').style.display!=='none'){ showList(); } else { window.location.href='/index.html'; } }
+function onBack(){ if(document.getElementById('order-view').style.display!=='none'){ showList(); } else { window.location.href='/'; } }
 function showList(){ document.getElementById('order-view').style.display='none'; document.getElementById('list-view').style.display='block'; document.getElementById('top-title').textContent='الصيدليات 💊'; }
 
 // delivery fee (same setting the checkout uses)
@@ -179,7 +179,7 @@ function proceed(){
     localStorage.setItem('qibah_pharmacy_note', note);
     localStorage.setItem('qibah_is_pharmacy', '1');
   }catch(e){}
-  window.location.href='/pages/checkout.html';
+  window.location.href='/checkout';
 }
 
 window.addEventListener('load',loadPharmacies);

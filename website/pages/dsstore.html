@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8"/>
-  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-1.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-1.js" defer></script>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
   <meta name="theme-color" content="#5b21b6"/>
   <title>متجر خطوة التوصيل — شحن رصيد وإكسسوارات جوال</title>
@@ -175,12 +175,12 @@
 <div class="glass-nav-wrap">
   <nav class="glass-nav">
     <div class="gnav-item" onclick="location.href='/'"><i class="ti ti-home gnav-icon" aria-hidden="true"></i><span class="gnav-label">الرئيسية</span><div class="gnav-dot"></div></div>
-    <div class="gnav-item" onclick="location.href='/pages/supermarket.html?v=14'"><i class="ti ti-building-store gnav-icon" aria-hidden="true"></i><span class="gnav-label">سوبرماركت</span><div class="gnav-dot"></div></div>
+    <div class="gnav-item" onclick="location.href='/supermarket?v=14'"><i class="ti ti-building-store gnav-icon" aria-hidden="true"></i><span class="gnav-label">سوبرماركت</span><div class="gnav-dot"></div></div>
     <div class="gnav-item"><i class="ti ti-receipt gnav-icon" aria-hidden="true"></i><span class="gnav-label">طلباتي</span><div class="gnav-dot"></div></div>
-    <div class="gnav-item" onclick="location.href='/pages/account.html'"><i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i><span class="gnav-label">حسابي</span><div class="gnav-dot"></div></div>
+    <div class="gnav-item" onclick="location.href='/account'"><i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i><span class="gnav-label">حسابي</span><div class="gnav-dot"></div></div>
   </nav>
 </div>
-<script src="/ds-lib/ds-nav-1.js"></script>
+<script src="/ds-lib/ds-nav-2.js"></script>
 
 <script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
 <script>
@@ -424,7 +424,7 @@ function refreshCart(){
   $('cb-s').textContent=allPhoto&&mine.length===c.length?'📲 بدون توصيل · الدفع تحويل بنكي':onlyCards&&ITEMS.some(i=>!cardInfo(i)&&i.in_stock!==false)?'🔌 تحتاج شاحن أو كيبل؟':'التوصيل يُحسب في الخطوة الجاية';
   if($('grid')) drawList();
 }
-function goCart(){ location.href='/pages/cart.html'; }
+function goCart(){ location.href='/cart'; }
 function goBack(){ if(history.length>1&&document.referrer&&document.referrer.indexOf(location.host)>-1) history.back(); else location.href='/'; }
 
 /* ── phone-model sheet ── */
@@ -456,6 +456,6 @@ let _tt; function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add
 window.addEventListener('pageshow',e=>{ if(e.persisted&&S) refreshCart(); });
 load();
 </script>
-<script src="/ds-lib/ds-cart-remind-1.js" defer></script>
+<script src="/ds-lib/ds-cart-remind-2.js" defer></script>
 </body>
 </html>

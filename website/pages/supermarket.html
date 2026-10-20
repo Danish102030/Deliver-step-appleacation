@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8"/>
-  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-1.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-1.js" defer></script>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
   <meta name="theme-color" content="#be185d"/>
   <title>سوبرماركت - خطوة التوصيل</title>
@@ -75,7 +75,7 @@ img{-webkit-user-drag:none}
   <button class="btn-back" onclick="window.location.href='/?v=14'" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
   <button class="btn-back" id="back-btn" style="display:none" onclick="resetToMain()" aria-label="رجوع للفئات"><i class="ti ti-arrow-right"></i></button>
   <div class="topbar-title" id="page-heading">سوبرماركت · قبة</div>
-  <button class="cart-btn" onclick="window.location.href='/pages/cart.html?v=14'" aria-label="السلة">
+  <button class="cart-btn" onclick="window.location.href='/cart?v=14'" aria-label="السلة">
     <i class="ti ti-shopping-cart" style="font-size:18px"></i>
     <div class="cart-dot" id="cart-count">٠</div>
   </button>
@@ -93,7 +93,7 @@ img{-webkit-user-drag:none}
     <div class="promo-title" id="promo-title">توصيل مجاني</div>
     <div class="promo-sub" id="promo-sub">على الطلبات فوق ٢٠٠ ريال · قبة</div>
   </div>
-  <button class="promo-cta" onclick="window.location.href='/pages/catalog.html'">تسوق الآن</button>
+  <button class="promo-cta" onclick="window.location.href='/catalog'">تسوق الآن</button>
 </div>
 
 <div class="sec-head">
@@ -118,7 +118,7 @@ img{-webkit-user-drag:none}
     <div style="font-size:13px;font-weight:700;color:var(--text)">عروض اليوم</div>
     <div style="font-size:11px;color:var(--muted);margin-top:2px">خصم حتى ٤٠٪ على منتجات مختارة</div>
   </div>
-  <button class="offer-btn" onclick="window.location.href='/pages/catalog.html'">شاهد العروض</button>
+  <button class="offer-btn" onclick="window.location.href='/catalog'">شاهد العروض</button>
 </div>
 
 <div class="glass-nav-wrap">
@@ -128,7 +128,7 @@ img{-webkit-user-drag:none}
       <span class="gnav-label">الرئيسية</span>
       <div class="gnav-dot"></div>
     </div>
-    <div class="gnav-item" onclick="window.location.href='/pages/restaurants.html'">
+    <div class="gnav-item" onclick="window.location.href='/restaurants'">
       <i class="ti ti-tools-kitchen-2 gnav-icon" aria-hidden="true"></i>
       <span class="gnav-label">المطاعم</span>
       <div class="gnav-dot"></div>
@@ -138,14 +138,14 @@ img{-webkit-user-drag:none}
       <span class="gnav-label act">سوبرماركت</span>
       <div class="gnav-dot act"></div>
     </div>
-    <div class="gnav-item" onclick="window.location.href='/pages/account.html'">
+    <div class="gnav-item" onclick="window.location.href='/account'">
       <i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i>
       <span class="gnav-label">حسابي</span>
       <div class="gnav-dot"></div>
     </div>
   </nav>
 </div>
-<script src="/ds-lib/ds-nav-1.js"></script><!-- same bottom menu on every page (الرئيسية · سوبرماركت · طلباتي · حسابي) -->
+<script src="/ds-lib/ds-nav-2.js"></script><!-- same bottom menu on every page (الرئيسية · سوبرماركت · طلباتي · حسابي) -->
 
 
 <script src="/dssearch.js?v=4" defer></script>
@@ -248,11 +248,11 @@ async function goToCategory(name) {
       showSubCategories(name, data);
     } else {
       sessionStorage.setItem('qibah_cat', name);
-      window.location.href = '/pages/marketproducts.html?cat=' + encodeURIComponent(name) + '&v=14';
+      window.location.href = '/marketproducts?cat=' + encodeURIComponent(name) + '&v=14';
     }
   } catch(e) {
     sessionStorage.setItem('qibah_cat', name);
-    window.location.href = '/pages/marketproducts.html?cat=' + encodeURIComponent(name) + '&v=14';
+    window.location.href = '/marketproducts?cat=' + encodeURIComponent(name) + '&v=14';
   }
 }
 
@@ -264,7 +264,7 @@ function showSubCategories(parentName, subs) {
   const grid = document.getElementById('cats-grid');
   grid.dataset.sig = 'subcats:' + parentName; // so returning to main re-renders
   grid.innerHTML = subs.map(c => `
-    <div class="cat-card" onclick="sessionStorage.setItem('qibah_cat','${c.name}');window.location.href='/pages/marketproducts.html?cat=${encodeURIComponent(c.name)}&v=14'">
+    <div class="cat-card" onclick="sessionStorage.setItem('qibah_cat','${c.name}');window.location.href='/marketproducts?cat=${encodeURIComponent(c.name)}&v=14'">
       <div class="cat-img-wrap" style="background:${c.bg_color||'#f0fdf4'}">
         ${c.image_url
           ? `<img src="${c.image_url}" alt="${c.name}" loading="lazy"/>`
@@ -332,6 +332,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
-<script src="/ds-lib/ds-cart-remind-1.js" defer></script>
+<script src="/ds-lib/ds-cart-remind-2.js" defer></script>
 </body>
 </html>

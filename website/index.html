@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8"/>
-  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-1.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-1.js" defer></script>
-  <script>try{if(!localStorage.getItem('ds_seen_intro'))location.replace('/welcome.html');}catch(e){}</script>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
+  <script>try{if(!localStorage.getItem('ds_seen_intro'))location.replace('/welcome');}catch(e){}</script>
   <script>try{var _ss=sessionStorage;var _seen=_ss.getItem('ds_splash_shown')==='1';var _fromWel=(document.referrer||'').indexOf('welcome')>-1;if(_seen||_fromWel){document.documentElement.className+=' dsos-skip';}_ss.setItem('ds_splash_shown','1');}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <meta name="theme-color" content="#be185d"/>
@@ -14,9 +14,9 @@
   <link rel="preconnect" href="https://vjuhxpttssmyomqqomdx.supabase.co"/>
   <link rel="dns-prefetch" href="https://cdn.shopify.com"/>
   <!-- Preload the category pages so tapping a home button opens instantly (from cache) -->
-  <link rel="prefetch" href="/pages/restaurants.html"/>
-  <link rel="prefetch" href="/pages/coffee.html"/>
-  <link rel="prefetch" href="/pages/supermarket.html?v=14"/>
+  <link rel="prefetch" href="/restaurants"/>
+  <link rel="prefetch" href="/coffee"/>
+  <link rel="prefetch" href="/supermarket?v=14"/>
   <link rel="stylesheet" href="/ds-lib/tajawal-5.3.0-all.css" onerror="this.onerror=null;this.href='https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&amp;display=swap'"/>
   <link rel="stylesheet" href="/ds-lib/ds-icons-2.47.0-1.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" media="print" onload="this.media='all'"/>
@@ -471,7 +471,7 @@ img{-webkit-user-drag:none}
       <div class="hd-greet" id="hd-greet">أهلاً بك 👋</div>
       <div class="hd-loc"><i class="ti ti-map-pin" aria-hidden="true"></i>قبة الاسياح <small>· التوصيل ٢٠–٣٥ دقيقة</small></div>
     </div>
-    <button class="cart-btn" onclick="window.location.href='/pages/cart.html?v=14'" aria-label="السلة">
+    <button class="cart-btn" onclick="window.location.href='/cart?v=14'" aria-label="السلة">
       <i class="ti ti-shopping-cart" aria-hidden="true"></i>
       <span class="cart-badge" id="cart-badge">0</span>
     </button>
@@ -481,7 +481,7 @@ img{-webkit-user-drag:none}
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
       <span class="hs-ph">ابحث عن <span class="hs-w"><b id="hs-w">برجر</b></span></span>
     </div>
-    <button class="cart-btn hd-mc" onclick="event.stopPropagation();window.location.href='/pages/cart.html?v=14'" aria-label="السلة" tabindex="-1">
+    <button class="cart-btn hd-mc" onclick="event.stopPropagation();window.location.href='/cart?v=14'" aria-label="السلة" tabindex="-1">
       <i class="ti ti-shopping-cart" aria-hidden="true"></i>
       <span class="cart-badge" id="cart-badge2">0</span>
     </button>
@@ -528,15 +528,15 @@ img{-webkit-user-drag:none}
 <!-- CATEGORIES -->
 <div class="sec-head"><div class="sec-title">ماذا تريد أن تطلب؟</div></div>
 <div class="cat-grid">
-  <div class="cat-card" onclick="ripple(event,this);window.location.href='/pages/restaurants.html'">
+  <div class="cat-card" onclick="ripple(event,this);window.location.href='/restaurants'">
     <div class="cat-img" style="background:#fff1f2"><span class="ico">🍔</span></div>
     <div class="cat-name">المطاعم</div>
   </div>
-  <div class="cat-card" onclick="ripple(event,this);window.location.href='/pages/coffee.html'">
+  <div class="cat-card" onclick="ripple(event,this);window.location.href='/coffee'">
     <div class="cat-img" style="background:#fffbeb"><span class="ico">☕</span></div>
     <div class="cat-name">كوفي وحلويات</div>
   </div>
-  <div class="cat-card" onclick="ripple(event,this);window.location.href='/pages/supermarket.html?v=14'">
+  <div class="cat-card" onclick="ripple(event,this);window.location.href='/supermarket?v=14'">
     <div class="cat-img" style="background:#f0fdf4"><span class="ico">🛒</span></div>
     <div class="cat-name">سوبرماركت</div>
   </div>
@@ -544,18 +544,18 @@ img{-webkit-user-drag:none}
     <div class="cat-img" style="background:#fff1f6"><span class="ico">🔧</span></div>
     <div class="cat-name">خدمات منزلية</div>
   </div>
-  <div class="cat-card" onclick="ripple(event,this);window.location.href='/pages/buffet.html'">
+  <div class="cat-card" onclick="ripple(event,this);window.location.href='/buffet'">
     <div class="cat-img" style="background:#f0fdfa"><span class="ico">🥘</span></div>
     <div class="cat-name">بوفيهات إفطار</div>
   </div>
-  <div class="cat-card" onclick="ripple(event,this);window.location.href='/pages/pharmacy.html'">
+  <div class="cat-card" onclick="ripple(event,this);window.location.href='/pharmacy'">
     <div class="cat-img" style="background:#dcfce7"><span class="ico">💊</span></div>
     <div class="cat-name">صيدلية</div>
   </div>
 </div>
 
 <!-- ── متجر خطوة التوصيل — the owner's own shop (shown only when it is live: Admin → My store) ── -->
-<div class="mb" id="mb-card" style="display:none" onclick="ripple(event,this);window.location.href='/pages/dsstore.html'" role="button" aria-label="متجر خطوة التوصيل — جوالات وشحن">
+<div class="mb" id="mb-card" style="display:none" onclick="ripple(event,this);window.location.href='/shop'" role="button" aria-label="متجر خطوة التوصيل — جوالات وشحن">
   <div class="mb-im"><img id="mb-img" src="/ds-lib/ds-store-card-1.svg" alt="" width="76" height="76" decoding="async" onerror="this.onerror=null;this.src='/ds-lib/ds-store-card-1.svg'"/></div>
   <div class="mb-tx">
     <div class="mb-h">جوالات وشحن <span class="mb-new">جديد</span></div>
@@ -566,7 +566,7 @@ img{-webkit-user-drag:none}
 </div>
 
 <!-- ── إرسال طرد — من بيت إلى بيت (v2, compact + animated route) ── -->
-<div class="pk" onclick="ripple(event,this);window.location.href='/pages/parcel.html'" role="button" aria-label="أرسل طرد من بيت إلى بيت">
+<div class="pk" onclick="ripple(event,this);window.location.href='/parcel'" role="button" aria-label="أرسل طرد من بيت إلى بيت">
   <div class="pk-top">
     <div class="pk-tx"><span class="pk-new">✨ جديد</span><div class="pk-h">أرسل طرد من بيت إلى بيت</div></div>
     <span class="pk-go">أرسِل ←</span>
@@ -586,7 +586,7 @@ img{-webkit-user-drag:none}
 <div class="of-row" id="offers-row"><div class="skel" style="flex:0 0 276px;height:132px;border-radius:20px"></div><div class="skel" style="flex:0 0 276px;height:132px;border-radius:20px"></div></div>
 
 <!-- MOST ORDERED THIS WEEK (v2): real ranking from this week's orders -->
-<div class="sh"><div><div class="sh-t">🏆 الأكثر طلباً هذا الأسبوع</div><div class="sh-s">حسب طلبات أهل قبة</div></div><div class="sh-a" onclick="window.location.href='/pages/restaurants.html'">عرض الكل <i class="ti ti-chevron-left" aria-hidden="true"></i></div></div>
+<div class="sh"><div><div class="sh-t">🏆 الأكثر طلباً هذا الأسبوع</div><div class="sh-s">حسب طلبات أهل قبة</div></div><div class="sh-a" onclick="window.location.href='/restaurants'">عرض الكل <i class="ti ti-chevron-left" aria-hidden="true"></i></div></div>
 <div class="tp-row" id="top-row"><div class="skel" style="flex:0 0 256px;height:200px;border-radius:20px"></div><div class="skel" style="flex:0 0 256px;height:200px;border-radius:20px"></div></div>
 
 <!-- ALL SHOPS, OPEN FIRST (v2) -->
@@ -596,10 +596,10 @@ img{-webkit-user-drag:none}
   <div class="skel" style="height:112px;border-radius:20px"></div>
   <div class="skel" style="height:112px;border-radius:20px"></div>
 </div>
-<button class="all-btn" id="all-btn" onclick="window.location.href='/pages/restaurants.html'">عرض كل المطاعم <i class="ti ti-chevron-left" aria-hidden="true"></i></button>
+<button class="all-btn" id="all-btn" onclick="window.location.href='/restaurants'">عرض كل المطاعم <i class="ti ti-chevron-left" aria-hidden="true"></i></button>
 
-<!-- INVITE (same page as before: /pages/invite.html) -->
-<div class="inv" onclick="window.location.href='/pages/invite.html?v=15'">
+<!-- INVITE (same page as before: /invite) -->
+<div class="inv" onclick="window.location.href='/invite?v=15'">
   <div class="inv-e">🎁</div>
   <div><div class="inv-t">ادعُ أصدقاءك</div><div class="inv-s">كل صديق يطلب = توصيلة مجانية لك</div></div>
   <div class="inv-b">شارك</div>
@@ -621,7 +621,7 @@ img{-webkit-user-drag:none}
   <div class="bf-line">الجوال / واتساب: <a href="tel:+966560957163" dir="ltr">+966 56 095 7163</a></div>
   <div class="bf-line">البريد الإلكتروني: <a href="mailto:info@deliverystep.app" dir="ltr">info@deliverystep.app</a></div>
   <div class="bf-en-block" dir="ltr" lang="en">Delivery Step Est. · Commercial Registration (CR) No. 1165100337<br/>Al Azhar District, Al Shuala, Qubbah, Al Qassim, Saudi Arabia<br/><span style="white-space:nowrap">+966 56 095 7163</span> · <span style="white-space:nowrap">info@deliverystep.app</span></div>
-  <div class="bf-links"><a href="/privacy-policy.html">سياسة الخصوصية</a> · <span dir="ltr">© 2026 Delivery Step</span></div>
+  <div class="bf-links"><a href="/privacy-policy">سياسة الخصوصية</a> · <span dir="ltr">© 2026 Delivery Step</span></div>
 </footer>
 
 <!-- BOTTOM MENU (v2): الرئيسية · سوبرماركت · طلباتي · حسابي  + live order bar above it -->
@@ -637,7 +637,7 @@ img{-webkit-user-drag:none}
       <span class="gnav-label act">الرئيسية</span>
       <div class="gnav-dot act"></div>
     </div>
-    <div class="gnav-item" onclick="window.location.href='/pages/supermarket.html?v=14'">
+    <div class="gnav-item" onclick="window.location.href='/supermarket?v=14'">
       <i class="ti ti-building-store gnav-icon" aria-hidden="true"></i>
       <span class="gnav-label">سوبرماركت</span>
       <div class="gnav-dot"></div>
@@ -647,7 +647,7 @@ img{-webkit-user-drag:none}
       <span class="gnav-label">طلباتي</span>
       <div class="gnav-dot"></div>
     </div>
-    <div class="gnav-item" onclick="window.location.href='/pages/account.html'">
+    <div class="gnav-item" onclick="window.location.href='/account'">
       <i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i>
       <span class="gnav-label">حسابي</span>
       <div class="gnav-dot"></div>
@@ -782,9 +782,9 @@ async function loadBanners(){
 
 function getDefaultSlides(){
   return[
-    {title:'أفضل المطاعم تصلك بسرعة',subtitle:'٢٠-٣٥ دقيقة لباب بيتك',tag:'🌹 خطوة التوصيل · قبة الاسياح',button_text:'اطلب الآن',button_link:'/pages/restaurants.html',bg_color:'#9d174d',image_url:null},
-    {title:'أفضل الكافيهات في قبة',subtitle:'قهوتك المفضلة · ١٥-٣٠ دقيقة',tag:'☕ كوفي وحلويات',button_text:'تصفح الكافيهات',button_link:'/pages/coffee.html',bg_color:'#b45309',image_url:null},
-    {title:'توصيل البقالة لباب بيتك',subtitle:'أكثر من ١٨٠٠ منتج',tag:'🛒 سوبرماركت',button_text:'تسوّق الآن',button_link:'/pages/supermarket.html?v=14',bg_color:'#15803d',image_url:null},
+    {title:'أفضل المطاعم تصلك بسرعة',subtitle:'٢٠-٣٥ دقيقة لباب بيتك',tag:'🌹 خطوة التوصيل · قبة الاسياح',button_text:'اطلب الآن',button_link:'/restaurants',bg_color:'#9d174d',image_url:null},
+    {title:'أفضل الكافيهات في قبة',subtitle:'قهوتك المفضلة · ١٥-٣٠ دقيقة',tag:'☕ كوفي وحلويات',button_text:'تصفح الكافيهات',button_link:'/coffee',bg_color:'#b45309',image_url:null},
+    {title:'توصيل البقالة لباب بيتك',subtitle:'أكثر من ١٨٠٠ منتج',tag:'🛒 سوبرماركت',button_text:'تسوّق الآن',button_link:'/supermarket?v=14',bg_color:'#15803d',image_url:null},
   ];
 }
 
@@ -869,7 +869,7 @@ function _feeChip(v){
   return `<span class="mc"><i class="ti ti-motorbike"></i>${_num(v.delivery_fee)} ر.س</span>`;
 }
 function _photo(v){ return v.banner_url?`<img src="${_esc(v.banner_url)}" alt="" loading="lazy" decoding="async" onerror="dsPh(this,'ds-ph-pink')"/>`:'<div class="ds-ph-pink"></div>'; }
-function _go(v){ return `window.location.href='/pages/menu.html?id=${encodeURIComponent(v.id)}'`; }
+function _go(v){ return `window.location.href='/menu?id=${encodeURIComponent(v.id)}'`; }
 
 async function loadRestaurants(){
   // 1) instant paint from the saved copy
@@ -900,13 +900,13 @@ function renderOffers(){
   let adm=[]; try{ adm=typeof set.home_offers==='string'?JSON.parse(set.home_offers||'[]'):(set.home_offers||[]); }catch(e){}
   (Array.isArray(adm)?adm:[]).filter(o=>o&&o.active!==false&&o.title).forEach(o=>{
     const g=o.color==='green'?'g-green':o.color==='amber'?'g-amber':'g-rose';
-    cards.push(`<div class="of big ${g}" onclick="window.location.href='${_esc(_safeLink(o.link||'/pages/restaurants.html'))}'"><span class="of-k">🎁 عرض خاص</span><div class="of-n">${_esc(o.title)}</div>${o.code?`<span class="of-code">${_esc(o.code)}</span>`:''}<div class="of-c">${_esc(o.sub||'')}${o.expires?' · ⏰ '+_esc(o.expires):''}</div><div class="of-e">${_esc(o.emoji||'🎉')}</div></div>`);
+    cards.push(`<div class="of big ${g}" onclick="window.location.href='${_esc(_safeLink(o.link||'/restaurants'))}'"><span class="of-k">🎁 عرض خاص</span><div class="of-n">${_esc(o.title)}</div>${o.code?`<span class="of-code">${_esc(o.code)}</span>`:''}<div class="of-c">${_esc(o.sub||'')}${o.expires?' · ⏰ '+_esc(o.expires):''}</div><div class="of-e">${_esc(o.emoji||'🎉')}</div></div>`);
   });
   // b) supermarket delivery (from Admin → Settings)
   const smFee=_num(set.supermarket_delivery_fee), dMin=_num(set.supermarket_discount_min), dFee=_num(set.supermarket_discount_fee), free=_num(set.supermarket_free_delivery_min);
   if(free>0||(dMin>0&&dFee<smFee)){
     const line=(dMin>0&&dFee<smFee?`توصيل ${dFee} ر.س فوق ${dMin}`:'')+(free>0?(dMin>0&&dFee<smFee?' · ':'')+`مجاني فوق ${free} ر.س`:'');
-    cards.push(`<div class="of big g-sm" onclick="window.location.href='/pages/supermarket.html?v=14'"><span class="of-k">🛒 السوبرماركت</span><div class="of-n">${free>0?'توصيل مجاني<br>فوق '+free+' ريال':'توصيل أرخص'}</div><div class="of-c">${line}</div><div class="of-e">🛒</div></div>`);
+    cards.push(`<div class="of big g-sm" onclick="window.location.href='/supermarket?v=14'"><span class="of-k">🛒 السوبرماركت</span><div class="of-n">${free>0?'توصيل مجاني<br>فوق '+free+' ريال':'توصيل أرخص'}</div><div class="of-c">${line}</div><div class="of-e">🛒</div></div>`);
   }
   // c) real delivery deals from the shops (open ones first)
   HOME.rests.filter(_deal).map(v=>({v,s:vStatus(v)})).sort((a,b)=>a.s.rank-b.s.rank).slice(0,10).forEach(({v,s})=>{
@@ -952,7 +952,7 @@ function renderOpen(){
       <div class="vr-c">${catIcons[v.category]||'🍽️'} ${CAT_AR[v.category]||'مطعم'}${_deal(v)?' · وفّر على التوصيل فوق '+_num(v.delivery_discount_min)+' ر.س':''}</div>
       <div class="vr-m"><span class="mc star"><i class="ti ti-star-filled"></i>${_esc(v.rating||'5.0')}</span><span class="dotsep"></span><span class="mc"><i class="ti ti-clock"></i>${_esc(v.delivery_time||'20-35')} د</span><span class="dotsep"></span>${_feeChip(v)}</div></div></div>`).join('');
   const more=list.length-6, btn=document.getElementById('all-btn');
-  const coffee=HOME.filter==='coffee', link=coffee?'/pages/coffee.html':'/pages/restaurants.html';
+  const coffee=HOME.filter==='coffee', link=coffee?'/coffee':'/restaurants';
   btn.innerHTML=(more>0?`عرض الكل (${list.length})`:(coffee?'كل الكافيهات':'كل المطاعم'))+' <i class="ti ti-chevron-left" aria-hidden="true"></i>';
   btn.onclick=()=>{ window.location.href=link; };
 }
@@ -1008,7 +1008,7 @@ function _myPhone(){ try{ return String((JSON.parse(localStorage.getItem('ds_cus
 function _isActive(o){ return o&&!ORD_DONE.includes(o.order_status)&&(Date.now()-new Date(o.created_at).getTime())<6*3600e3; }
 function _ago(t){ const m=Math.max(0,Math.round((Date.now()-new Date(t).getTime())/60000)); if(m<1)return 'الآن'; if(m<60)return 'قبل '+m+' د'; const h=Math.round(m/60); if(h<24)return 'قبل '+h+' س';
   try{ return new Date(t).toLocaleDateString('ar-SA-u-ca-gregory-nu-latn',{day:'numeric',month:'long'}); }catch(e){ return new Date(t).toISOString().slice(0,10); } }
-function _trackUrl(o){ return '/pages/order-tracking.html?num='+encodeURIComponent(o.order_number||''); }
+function _trackUrl(o){ return '/order-tracking?num='+encodeURIComponent(o.order_number||''); }
 async function loadMyOrders(force){
   const ph=_myPhone(); if(!ph||!sb){ ORD.list=[]; renderOrderBar(); return; }
   if(!force){ try{ const c=JSON.parse(sessionStorage.getItem('ds_myorders')||'null'); if(c&&c.p===ph&&Date.now()-c.t<60000){ ORD.list=c.l; renderOrderBar(); return; } }catch(e){} }
@@ -1041,10 +1041,10 @@ function openOrders(fromBar){
 function closeOrders(){ document.getElementById('os-bg').classList.remove('on'); document.getElementById('os').classList.remove('on'); document.body.style.overflow=''; }
 function renderOrders(){
   const bd=document.getElementById('os-bd'), ph=_myPhone();
-  if(!ph){ bd.innerHTML='<div class="os-empty"><span class="big">👋</span>سجّل برقم جوالك عشان تشوف طلباتك وتتبعها<a class="os-cta" href="/pages/account.html">تسجيل الدخول</a></div>'; return; }
+  if(!ph){ bd.innerHTML='<div class="os-empty"><span class="big">👋</span>سجّل برقم جوالك عشان تشوف طلباتك وتتبعها<a class="os-cta" href="/account">تسجيل الدخول</a></div>'; return; }
   if(ORD.list===null){ bd.innerHTML='<div class="skel" style="height:150px;border-radius:20px;margin-top:6px"></div><div class="skel" style="height:66px;border-radius:16px;margin-top:10px"></div>'; return; }
   const act=ORD.list.filter(_isActive), past=ORD.list.filter(o=>!_isActive(o)).slice(0,6);
-  if(!ORD.list.length){ bd.innerHTML='<div class="os-empty"><span class="big">🧾</span>ما عندك طلبات للحين<br>اطلب من مطاعم قبة والسوبرماركت لباب بيتك<a class="os-cta" href="/pages/restaurants.html">اطلب الآن</a></div>'; return; }
+  if(!ORD.list.length){ bd.innerHTML='<div class="os-empty"><span class="big">🧾</span>ما عندك طلبات للحين<br>اطلب من مطاعم قبة والسوبرماركت لباب بيتك<a class="os-cta" href="/restaurants">اطلب الآن</a></div>'; return; }
   let h='';
   if(act.length){ h+='<div class="os-lb">🟢 طلبات جارية</div>'+act.map(o=>{ const st=ORD_STEP[o.order_status]||1;
     return `<div class="oa" onclick="window.location.href='${_trackUrl(o)}'"><div class="oa-top"><div class="oa-n">${_esc(o.vendor_name)}</div><span class="oa-s">${_esc(ORD_LABEL[o.order_status]||'قيد التنفيذ')}</span></div>
@@ -1056,7 +1056,7 @@ function renderOrders(){
     return `<div class="oh" onclick="window.location.href='${_trackUrl(o)}'"><div class="oh-ic">${/سوبرماركت/.test(o.vendor_name)?'🛒':'🍽️'}</div>
       <div class="oh-b"><div class="oh-n">${_esc(o.vendor_name)}</div><div class="oh-m">${_ago(o.created_at)}${o.n?' · '+o.n+' منتج':''}</div></div>
       <div class="oh-r"><div class="oh-p">${o.total!=null?_num(o.total)+' ر.س':''}</div><div class="oh-st${x?' x':''}${ORD_DONE.includes(o.order_status)?'':' old'}">${ORD_DONE.includes(o.order_status)?_esc(ORD_LABEL[o.order_status]||o.order_status):'منتهي'}</div></div></div>`; }).join(''); }
-  h+='<a class="os-all" href="/pages/account.html">كل الطلبات وبطاقة الولاء ←</a>';
+  h+='<a class="os-all" href="/account">كل الطلبات وبطاقة الولاء ←</a>';
   bd.innerHTML=h;
 }
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&sb) loadMyOrders(); });
@@ -1411,6 +1411,6 @@ function closeAdsBanner(){
   }catch(e){}
 })();
 </script>
-<script src="/ds-lib/ds-cart-remind-1.js" defer></script>
+<script src="/ds-lib/ds-cart-remind-2.js" defer></script>
 </body>
 </html>

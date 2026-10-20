@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8"/>
-  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-1.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-1.js" defer></script>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <meta name="theme-color" content="#be185d"/>
   <title>إتمام الطلب - خطوة التوصيل</title>
@@ -393,7 +393,7 @@ function _dsRenderBlock(){
   if(!b){ if(box)box.remove(); if(pb)pb.classList.remove('blocked'); return null; }
   if(!box){ box=document.createElement('div'); box.id='ds-rule'; const pw=document.querySelector('#main-checkout .progress-wrap'); if(pw&&pw.parentNode)pw.parentNode.insertBefore(box,pw.nextSibling); }
   const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const act=b.kind==='min'?'<a href="/pages/supermarket.html?v=14">أكمل التسوق</a>'
+  const act=b.kind==='min'?'<a href="/supermarket?v=14">أكمل التسوق</a>'
     :b.kind==='max'?'<a href="https://wa.me/'+_DS_WA+'?text='+encodeURIComponent('مرحباً، أريد طلب سوبرماركت كبير')+'" target="_blank" rel="noopener">تواصل معنا واتساب</a>':'';
   box.className='ds-rule '+b.kind;
   box.innerHTML='<div>'+(b.kind==='pause'?'⏸️ ':b.kind==='min'?'🛒 ':'📦 ')+esc(b.text)+'</div>'+act;
@@ -1212,7 +1212,7 @@ async function placeOrder(){
 
   btn.innerHTML='<i class="ti ti-circle-check" style="font-size:18px"></i> تم تأكيد الطلب!';
   // Go to confirmation page - WhatsApp links open there
-  setTimeout(()=>window.location.href='/pages/order-confirmed.html',1500);
+  setTimeout(()=>window.location.href='/order-confirmed',1500);
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
@@ -1269,6 +1269,6 @@ async function consumeReferral(){
   try{ localStorage.removeItem('ds_ref_freedel'); localStorage.removeItem('ds_ref_mode'); localStorage.removeItem('qibah_ref'); }catch(e){}
 }
 </script>
-<script src="/ds-lib/ds-cart-remind-1.js" defer></script>
+<script src="/ds-lib/ds-cart-remind-2.js" defer></script>
 </body>
 </html>
