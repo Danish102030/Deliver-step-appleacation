@@ -909,8 +909,9 @@ async function _dsPlaceViaRelay(ov, items, ref){
 async function _dsFindExisting(op){
   // Only an order placed in the LAST 15 MINUTES counts — never an old order of the same customer
   try{ var since=new Date(Date.now()-15*60000).toISOString();
-    var r=await sb.from('orders').select('id,order_number').eq('order_number',op.order_number).eq('customer_phone',op.customer_phone).gte('created_at',since).limit(1);
-    if(r.data && r.data[0]) return r.data[0]; }catch(e){}
+    // safe server check (orders can't be read from phones): same number + same phone, last 15 minutes
+    var r=await sb.rpc('ds_find_recent_order',{p_order_number:op.order_number,p_phone:op.customer_phone});
+    if(r && !r.error && r.data && r.data.id) return r.data; }catch(e){}
   return null;
 }
 async function _dsInsertOrderOnce(ov, op){
