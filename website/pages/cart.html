@@ -154,7 +154,7 @@ function _dsRuleCard(b){
   if(!b)return '';
   const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const icon=b.kind==='pause'?'⏸️ ':b.kind==='min'?'🛒 ':'📦 ';
-  const act=b.kind==='min'?'<a href="/supermarket?v=14">أكمل التسوق</a>'
+  const act=b.kind==='min'?'<a href="/supermarket">أكمل التسوق</a>'
     :b.kind==='max'?'<a href="https://wa.me/'+_DS_WA+'?text='+encodeURIComponent('مرحباً، أريد طلب سوبرماركت كبير')+'" target="_blank" rel="noopener">تواصل معنا واتساب</a>':'';
   return '<div class="ds-rule '+b.kind+'" id="ds-rule"><div>'+icon+esc(b.text)+'</div>'+act+'</div>';
 }
@@ -167,7 +167,7 @@ function _dsApplyButton(b){
 function goCheckout(){
   const b=_orderBlock(JSON.parse(localStorage.getItem('qibah_cart')||'[]'));
   if(b){ showToast(b.text); _dsApplyButton(b); return; }
-  window.location.href='/checkout?v=14';   // ?v= → never an old saved copy
+  window.location.href='/checkout';   // ?v= → never an old saved copy
 }
 function _cartBlockedTap(){
   const b=_orderBlock(JSON.parse(localStorage.getItem('qibah_cart')||'[]'));
@@ -189,7 +189,7 @@ async function loadCart() {
         <i class="ti ti-shopping-cart" aria-hidden="true"></i>
         <div class="empty-title">سلتك فارغة!</div>
         <div class="empty-sub">أضف منتجات من المطاعم والمحلات</div>
-        <button onclick="window.location.href='/?v=14'" style="background:var(--rose);color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif">
+        <button onclick="window.location.href='/'" style="background:var(--rose);color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif">
           تصفح المطاعم
         </button>
       </div>`;

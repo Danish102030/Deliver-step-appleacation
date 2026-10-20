@@ -72,10 +72,10 @@ img{-webkit-user-drag:none}
 <body>
 
 <div class="topbar">
-  <button class="btn-back" onclick="window.location.href='/?v=14'" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+  <button class="btn-back" onclick="window.location.href='/'" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
   <button class="btn-back" id="back-btn" style="display:none" onclick="resetToMain()" aria-label="رجوع للفئات"><i class="ti ti-arrow-right"></i></button>
   <div class="topbar-title" id="page-heading">سوبرماركت · قبة</div>
-  <button class="cart-btn" onclick="window.location.href='/cart?v=14'" aria-label="السلة">
+  <button class="cart-btn" onclick="window.location.href='/cart'" aria-label="السلة">
     <i class="ti ti-shopping-cart" style="font-size:18px"></i>
     <div class="cart-dot" id="cart-count">٠</div>
   </button>
@@ -123,7 +123,7 @@ img{-webkit-user-drag:none}
 
 <div class="glass-nav-wrap">
   <nav class="glass-nav">
-    <div class="gnav-item" onclick="window.location.href='/?v=14'">
+    <div class="gnav-item" onclick="window.location.href='/'">
       <i class="ti ti-home gnav-icon" aria-hidden="true"></i>
       <span class="gnav-label">الرئيسية</span>
       <div class="gnav-dot"></div>
@@ -236,10 +236,14 @@ function filterCats(q) {
   renderCats(filtered);
 }
 
+// Clean category address (Ninja style): /category/fruits-vegetables — old ?cat= address if a category has no slug yet
+function catUrl(name, slug){ return slug ? '/category/' + slug : '/marketproducts?cat=' + encodeURIComponent(name); }
+function goCat(name, slug){ try{ sessionStorage.setItem('qibah_cat', name); sessionStorage.setItem('qibah_cat_slug', slug||''); }catch(_){} window.location.href = catUrl(name, slug); }
 async function goToCategory(name) {
+  const _main = (allCats||[]).find(c => c.name === name) || {};
   try {
     const {data} = await sb.from('supermarket_categories')
-      .select('id, name, image_url, bg_color')
+      .select('id, name, image_url, bg_color, slug')
       .eq('parent_name', name)
       .eq('is_active', true)
       .order('sort_order');
@@ -247,12 +251,10 @@ async function goToCategory(name) {
     if (data && data.length > 0) {
       showSubCategories(name, data);
     } else {
-      sessionStorage.setItem('qibah_cat', name);
-      window.location.href = '/marketproducts?cat=' + encodeURIComponent(name) + '&v=14';
+      goCat(name, _main.slug);
     }
   } catch(e) {
-    sessionStorage.setItem('qibah_cat', name);
-    window.location.href = '/marketproducts?cat=' + encodeURIComponent(name) + '&v=14';
+    goCat(name, _main.slug);
   }
 }
 
@@ -264,7 +266,7 @@ function showSubCategories(parentName, subs) {
   const grid = document.getElementById('cats-grid');
   grid.dataset.sig = 'subcats:' + parentName; // so returning to main re-renders
   grid.innerHTML = subs.map(c => `
-    <div class="cat-card" onclick="sessionStorage.setItem('qibah_cat','${c.name}');window.location.href='/marketproducts?cat=${encodeURIComponent(c.name)}&v=14'">
+    <div class="cat-card" data-name="${c.name}" data-slug="${c.slug||''}" onclick="goCat(this.dataset.name,this.dataset.slug)">
       <div class="cat-img-wrap" style="background:${c.bg_color||'#f0fdf4'}">
         ${c.image_url
           ? `<img src="${c.image_url}" alt="${c.name}" loading="lazy"/>`

@@ -10,7 +10,7 @@
   var nav=document.querySelector('.glass-nav'); if(!nav) return;
   var URL_='https://vjuhxpttssmyomqqomdx.supabase.co';
   var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
-  /* page name from the address — clean (/menu, /shop) or old (/pages/menu.html) */ function pgKey(){ var p=location.pathname.toLowerCase().replace(/\/+$/,''); if(!p||p==='/index.html'||p==='/index') return 'home'; var m=/^\/(?:pages\/)?([a-z0-9_-]+?)(?:\.html)?$/.exec(p); var k=m?m[1]:'other'; return k==='shop'?'dsstore':k; }
+  /* page name from the address — clean (/menu, /shop) or old (/pages/menu.html) */ function pgKey(){ var p=location.pathname.toLowerCase().replace(/\/+$/,''); if(!p||p==='/index.html'||p==='/index') return 'home'; if(/^\/category\/[a-z0-9-]+$/.test(p)) return 'marketproducts'; var m=/^\/(?:pages\/)?([a-z0-9_-]+?)(?:\.html)?$/.exec(p); var k=m?m[1]:'other'; return k==='shop'?'dsstore':k; }
   var pk=pgKey();
   var here=(pk==='supermarket'||pk==='marketproducts')?'sm':pk==='account'?'acc':'home';
   var isAcc=here==='acc';
@@ -21,7 +21,7 @@
                   :'<i class="ti '+icon+' gnav-icon'+(on?' act':'')+'" aria-hidden="true"></i>')+
       '<span class="gnav-label'+(on?' act':'')+'">'+label+'</span><div class="gnav-dot'+(on?' act':'')+'"></div></div>';
   }
-  nav.innerHTML=item('home','ti-home','الرئيسية','/')+item('sm','ti-building-store','سوبرماركت','/supermarket?v=14')+
+  nav.innerHTML=item('home','ti-home','الرئيسية','/')+item('sm','ti-building-store','سوبرماركت','/supermarket')+
                 item('ord','ti-receipt','طلباتي','')+item('acc','ti-user-circle','حسابي','/account');
   nav.addEventListener('click',function(e){
     var it=e.target.closest('.gnav-item'); if(!it) return;

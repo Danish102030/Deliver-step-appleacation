@@ -185,7 +185,7 @@ svg{display:block;flex-shrink:0}
       <div class="how-row"><span class="num">2</span>أكمل طلبك الأول</div>
       <div class="how-row"><span class="num g">3</span>التوصيل علينا — مجاناً</div>
     </div>
-    <a class="btn" id="f-start" href="/?v=14">ابدأ أول طلب</a>
+    <a class="btn" id="f-start" href="/">ابدأ أول طلب</a>
     <a class="btn dark" id="f-store" href="#" target="_blank" rel="noopener" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg><span id="f-store-t">حمّل التطبيق</span></a>
     <p class="fine">الهدية لأول طلب من رقم جوال جديد فقط</p>
   </div>
@@ -356,7 +356,7 @@ function route(){
 window.addEventListener('hashchange',route);
 $('back').onclick=function(){
   if(VIEW==='friends'||VIEW==='history'){ if(history.length>1)history.back(); else location.hash=''; return; }
-  location.href='/?v=14';
+  location.href='/';
 };
 
 /* ── a friend arriving through someone's link ── */

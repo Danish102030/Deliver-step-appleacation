@@ -393,7 +393,7 @@ function _dsRenderBlock(){
   if(!b){ if(box)box.remove(); if(pb)pb.classList.remove('blocked'); return null; }
   if(!box){ box=document.createElement('div'); box.id='ds-rule'; const pw=document.querySelector('#main-checkout .progress-wrap'); if(pw&&pw.parentNode)pw.parentNode.insertBefore(box,pw.nextSibling); }
   const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const act=b.kind==='min'?'<a href="/supermarket?v=14">أكمل التسوق</a>'
+  const act=b.kind==='min'?'<a href="/supermarket">أكمل التسوق</a>'
     :b.kind==='max'?'<a href="https://wa.me/'+_DS_WA+'?text='+encodeURIComponent('مرحباً، أريد طلب سوبرماركت كبير')+'" target="_blank" rel="noopener">تواصل معنا واتساب</a>':'';
   box.className='ds-rule '+b.kind;
   box.innerHTML='<div>'+(b.kind==='pause'?'⏸️ ':b.kind==='min'?'🛒 ':'📦 ')+esc(b.text)+'</div>'+act;

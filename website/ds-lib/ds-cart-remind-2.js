@@ -43,7 +43,7 @@
     + '.dscr-x{background:none;border:none;color:#9ca3af;font-size:16px;cursor:pointer;padding:4px;flex-shrink:0}'
     + '.dscr-note{margin:12px 16px 0;background:#fdf2f8;border:1px solid #fbcfe8;border-radius:14px;padding:10px 12px;font-size:13px;font-weight:700;color:#9d174d;direction:rtl;font-family:Tajawal,sans-serif}'
     + '@keyframes dscrIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}';
-  /* page name from the address — clean (/menu, /shop) or old (/pages/menu.html) */ function pgKey(){ var p=location.pathname.toLowerCase().replace(/\/+$/,''); if(!p||p==='/index.html'||p==='/index') return 'home'; var m=/^\/(?:pages\/)?([a-z0-9_-]+?)(?:\.html)?$/.exec(p); var k=m?m[1]:'other'; return k==='shop'?'dsstore':k; }
+  /* page name from the address — clean (/menu, /shop) or old (/pages/menu.html) */ function pgKey(){ var p=location.pathname.toLowerCase().replace(/\/+$/,''); if(!p||p==='/index.html'||p==='/index') return 'home'; if(/^\/category\/[a-z0-9-]+$/.test(p)) return 'marketproducts'; var m=/^\/(?:pages\/)?([a-z0-9_-]+?)(?:\.html)?$/.exec(p); var k=m?m[1]:'other'; return k==='shop'?'dsstore':k; }
   onReady(function () {
     var pk = pgKey(), isHome = pk === 'home', isCart = pk === 'cart';
     if (!isHome && !isCart) return;

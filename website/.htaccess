@@ -12,7 +12,7 @@
 # Clean addresses — deliverystep.app/restaurants instead of /pages/restaurants.html
 #   • /restaurants, /menu?id=…, /cart … open the page in /pages/ (the address stays clean)
 #   • /admin, /welcome, /store … open the page in the main folder
-#   • /shop = the Delivery Step Store (pages/dsstore.html)
+#   • /shop = the Delivery Step Store (pages/dsstore.html) · /category/fruits-vegetables = a supermarket category
 #   • old links (/pages/x.html, /x.html — WhatsApp, Google, old app copies) move to the clean
 #     address (the ?id=… part is kept). Server files (.php, pictures, scripts) are not touched.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -34,6 +34,7 @@ Options -Indexes
 
   # 2) clean address → the real file (inside step, the visitor still sees the clean address)
   RewriteRule ^shop/?$ /pages/dsstore.html [L,NC]
+  RewriteRule ^category/[a-z0-9-]+/?$ /pages/marketproducts.html [L,NC]
   RewriteCond %{DOCUMENT_ROOT}/$1.html -f
   RewriteRule ^([a-z0-9_-]+)/?$ /$1.html [L]
   RewriteCond %{DOCUMENT_ROOT}/pages/$1.html -f

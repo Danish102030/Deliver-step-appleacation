@@ -6,7 +6,7 @@
 (function(){
   'use strict';
   var SB='https://vjuhxpttssmyomqqomdx.supabase.co', KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
-  /* page name from the address — clean (/menu, /shop) or old (/pages/menu.html) */ function pgKey(){ var p=location.pathname.toLowerCase().replace(/\/+$/,''); if(!p||p==='/index.html'||p==='/index') return 'home'; var m=/^\/(?:pages\/)?([a-z0-9_-]+?)(?:\.html)?$/.exec(p); var k=m?m[1]:'other'; return k==='shop'?'dsstore':k; }
+  /* page name from the address — clean (/menu, /shop) or old (/pages/menu.html) */ function pgKey(){ var p=location.pathname.toLowerCase().replace(/\/+$/,''); if(!p||p==='/index.html'||p==='/index') return 'home'; if(/^\/category\/[a-z0-9-]+$/.test(p)) return 'marketproducts'; var m=/^\/(?:pages\/)?([a-z0-9_-]+?)(?:\.html)?$/.exec(p); var k=m?m[1]:'other'; return k==='shop'?'dsstore':k; }
   function run(){
     try{
       var ua=navigator.userAgent||'', ls=window.localStorage;

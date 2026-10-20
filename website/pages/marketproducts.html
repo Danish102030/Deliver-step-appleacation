@@ -131,7 +131,7 @@
 <div class="topbar">
   <button class="btn-back" onclick="history.back()" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
   <div class="topbar-title" id="page-title">جاري التحميل...</div>
-  <button class="cart-btn" onclick="window.location.href='/cart?v=14'" aria-label="السلة">
+  <button class="cart-btn" onclick="window.location.href='/cart'" aria-label="السلة">
     <i class="ti ti-shopping-cart" style="font-size:18px"></i>
     <div class="cart-dot" id="cart-count">٠</div>
   </button>
@@ -167,7 +167,7 @@
 </div>
 
 <!-- CART BAR + FREE-DELIVERY PROGRESS -->
-<div class="cart-bar" id="cart-bar" onclick="window.location.href='/cart?v=14'">
+<div class="cart-bar" id="cart-bar" onclick="window.location.href='/cart'">
   <div class="fd-row" id="fd-row">
     <div class="fd-text" id="fd-text"></div>
     <div class="fd-track"><div class="fd-fill" id="fd-fill"></div></div>
@@ -184,7 +184,7 @@
 <!-- GLASS NAV -->
 <div class="glass-nav-wrap">
   <nav class="glass-nav">
-    <div class="gnav-item" onclick="window.location.href='/?v=14'">
+    <div class="gnav-item" onclick="window.location.href='/'">
       <i class="ti ti-home gnav-icon" aria-hidden="true"></i>
       <span class="gnav-label">الرئيسية</span>
       <div class="gnav-dot"></div>
@@ -194,7 +194,7 @@
       <span class="gnav-label">المطاعم</span>
       <div class="gnav-dot"></div>
     </div>
-    <div class="gnav-item" onclick="window.location.href='/supermarket?v=14'">
+    <div class="gnav-item" onclick="window.location.href='/supermarket'">
       <i class="ti ti-building-store gnav-icon act" aria-hidden="true"></i>
       <span class="gnav-label act">سوبرماركت</span>
       <div class="gnav-dot act"></div>
@@ -252,8 +252,24 @@ window.addEventListener('load', async () => {
   const params = new URLSearchParams(window.location.search);
   const raw = params.get('cat') || '';
   const stored = sessionStorage.getItem('qibah_cat') || '';
-  try { categoryName = stored || decodeURIComponent(raw).trim(); }
-  catch(e) { categoryName = stored || raw.trim(); }
+  const slugM = /^\/category\/([a-z0-9-]+)\/?$/i.exec(location.pathname);
+  if (slugM) {
+    // clean address /category/fruits-vegetables → the category's name (instant when we came from the supermarket page)
+    const slug = slugM[1].toLowerCase();
+    if (stored && (sessionStorage.getItem('qibah_cat_slug') || '') === slug) categoryName = stored;
+    else {
+      try { const r = await sb.from('supermarket_categories').select('name').eq('slug', slug).limit(1); categoryName = (r.data && r.data[0] && r.data[0].name) || ''; } catch(e) { categoryName = ''; }
+      if (!categoryName) { location.replace('/supermarket'); return; }
+    }
+  } else {
+    // the address decides (a shared link must open ITS category); the saved name only when the address has none
+    try { categoryName = raw ? decodeURIComponent(raw).trim() : stored; }
+    catch(e) { categoryName = raw ? raw.trim() : stored; }
+    // old address (…?cat=name) → show the clean one in the address bar (no reload)
+    sb.from('supermarket_categories').select('slug').eq('name', categoryName).not('slug', 'is', null).limit(1)
+      .then(r => { const s = r && r.data && r.data[0] && r.data[0].slug; if (s && history.replaceState) history.replaceState(history.state, '', '/category/' + s); }).catch(() => {});
+  }
+  try { sessionStorage.setItem('qibah_cat', categoryName); } catch(e) {}
 
   document.getElementById('page-title').textContent = categoryName || 'المنتجات';
   document.title = categoryName + ' - قبة';
