@@ -208,6 +208,7 @@ function getDefaultCats(){
 }
 
 function renderCats(list) {
+  if (SUB) return;   // a section's sub-categories are on screen — keep them
   const grid = document.getElementById('cats-grid');
   document.getElementById('cat-count').textContent = list.length + ' فئة';
   // Skip re-render if the grid already shows the same categories → no flicker
@@ -225,7 +226,16 @@ function renderCats(list) {
     </div>`).join('');
 }
 
+// Sections with sub-categories open on this page; each one is a step in the phone's history,
+// so the back button / back swipe returns to the main list instead of leaving the supermarket.
+let SUB = null;
+window.addEventListener('popstate', e => { const s = e.state && e.state.dsSub; if (s) goToCategory(s, true); else if (SUB) showMain(); });
 function resetToMain() {
+  if (SUB && history.state && history.state.dsSub) { history.back(); return; }
+  showMain();
+}
+function showMain() {
+  SUB = null;
   document.getElementById('page-heading').textContent = 'سوبرماركت · قبة';
   document.getElementById('back-btn').style.display = 'none';
   renderCats(allCats);
@@ -239,7 +249,7 @@ function filterCats(q) {
 // Clean category address (Ninja style): /category/fruits-vegetables — old ?cat= address if a category has no slug yet
 function catUrl(name, slug){ return slug ? '/category/' + slug : '/marketproducts?cat=' + encodeURIComponent(name); }
 function goCat(name, slug){ try{ sessionStorage.setItem('qibah_cat', name); sessionStorage.setItem('qibah_cat_slug', slug||''); }catch(_){} window.location.href = catUrl(name, slug); }
-async function goToCategory(name) {
+async function goToCategory(name, fromHistory) {
   const _main = (allCats||[]).find(c => c.name === name) || {};
   try {
     const {data} = await sb.from('supermarket_categories')
@@ -249,7 +259,7 @@ async function goToCategory(name) {
       .order('sort_order');
 
     if (data && data.length > 0) {
-      showSubCategories(name, data);
+      showSubCategories(name, data, fromHistory);
     } else {
       goCat(name, _main.slug);
     }
@@ -258,7 +268,9 @@ async function goToCategory(name) {
   }
 }
 
-function showSubCategories(parentName, subs) {
+function showSubCategories(parentName, subs, fromHistory) {
+  if (!fromHistory) { try { history.pushState({ dsSub: parentName }, ''); } catch(_) {} }
+  SUB = parentName;
   document.getElementById('page-heading').textContent = parentName;
   document.getElementById('back-btn').style.display = 'flex';
   document.getElementById('cat-count').textContent = subs.length + ' فئة';
@@ -316,6 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sb = supabase.createClient(SB_URL, SB_KEY);
     // Back-navigation: render this session's cached categories INSTANTLY (smooth, no skeleton).
     // First visit: show the shimmer skeleton while we fetch.
+    if (history.state && history.state.dsSub) { SUB = history.state.dsSub; goToCategory(SUB, true); }   // came back to a section
     const hadCache = renderCachedCats();
     if(!hadCache){
       const grid=document.getElementById('cats-grid');

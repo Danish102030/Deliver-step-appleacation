@@ -129,7 +129,7 @@
 <body>
 
 <div class="topbar">
-  <button class="btn-back" onclick="history.back()" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+  <button class="btn-back" onclick="dsBack()" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
   <div class="topbar-title" id="page-title">جاري التحميل...</div>
   <button class="cart-btn" onclick="window.location.href='/cart'" aria-label="السلة">
     <i class="ti ti-shopping-cart" style="font-size:18px"></i>
@@ -304,6 +304,8 @@ async function fetchPage(reset) {
 }
 
 // Arabic search that forgives spelling: أ/إ/آ=ا · ة=ه · ى/ی=ي · tashkeel ignored · Arabic digits = 0-9
+// Back: to the page the customer came from on this site; opened from a shared link → the supermarket (not out of the app)
+function dsBack(){ var ok=false; try{ ok=!!document.referrer&&new URL(document.referrer).origin===location.origin; }catch(_){} if(ok&&history.length>1) history.back(); else location.href='/supermarket'; }
 function dsNorm(t){ return String(t||'').replace(/[\u064B-\u0652\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/[ىی]/g,'ي').replace(/ک/g,'ك')
   .replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/ء/g,'').replace(/[٠-٩]/g,d=>String(d.charCodeAt(0)-1632)).replace(/[۰-۹]/g,d=>String(d.charCodeAt(0)-1776))
   .replace(/[^\u0600-\u06FF0-9a-zA-Z.\s]/g,' ').replace(/\s+/g,' ').trim().toLowerCase(); }
