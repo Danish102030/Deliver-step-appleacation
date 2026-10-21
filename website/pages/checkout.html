@@ -82,7 +82,9 @@
     .notice{background:var(--rose-soft);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--rose-dark);line-height:1.7}
     .toast{position:fixed;bottom:24px;right:50%;transform:translateX(50%);background:#1f1f1f;color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999;font-family:'Tajawal',sans-serif}
     .toast.show{opacity:1}
-  </style>
+      /* WhatsApp consent (opt-in) note under WhatsApp buttons — Meta / WhatsApp Business policy */
+    .ds-wac{display:block;margin:6px 0 0;padding:0 4px;font-size:12.5px;line-height:1.7;font-weight:500;color:#8a8f98;text-align:center;direction:rtl;white-space:normal;overflow-wrap:anywhere;max-width:100%;box-sizing:border-box}.ds-wac-en{display:block;font-size:11px;line-height:1.5;color:#a3a8b0;direction:ltr;margin-top:2px}
+</style>
 <style>
 /* Native-app feel: text is NOT selectable / copyable; form fields (name, phone, search, notes) stay usable */
 *{-webkit-touch-callout:none}
@@ -324,6 +326,7 @@ img{-webkit-user-drag:none}
       <i class="ti ti-shopping-cart-check" style="font-size:20px" aria-hidden="true"></i>
       تأكيد الطلب · <span id="place-total">٠ ريال</span>
     </button>
+    <div class="ds-wac" style="margin:8px 0 0">بإتمام الطلب، توافق على استلام تحديثات طلبك عبر واتساب. للإيقاف أرسل: إيقاف</div>
     <div style="height:10px"></div>
   </div>
 </div>
@@ -394,7 +397,7 @@ function _dsRenderBlock(){
   if(!box){ box=document.createElement('div'); box.id='ds-rule'; const pw=document.querySelector('#main-checkout .progress-wrap'); if(pw&&pw.parentNode)pw.parentNode.insertBefore(box,pw.nextSibling); }
   const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const act=b.kind==='min'?'<a href="/supermarket">أكمل التسوق</a>'
-    :b.kind==='max'?'<a href="https://wa.me/'+_DS_WA+'?text='+encodeURIComponent('مرحباً، أريد طلب سوبرماركت كبير')+'" target="_blank" rel="noopener">تواصل معنا واتساب</a>':'';
+    :b.kind==='max'?'<a href="https://wa.me/'+_DS_WA+'?text='+encodeURIComponent('مرحباً، أريد طلب سوبرماركت كبير')+'" target="_blank" rel="noopener">تواصل معنا واتساب</a>'+'<div class="ds-wac" style="margin:0;text-align:right">بالتواصل معنا عبر واتساب، توافق على استلام رسائل تخص طلباتك. للإيقاف أرسل: إيقاف<span class="ds-wac-en" dir="ltr" lang="en">By contacting us on WhatsApp, you agree to receive messages about your orders. To stop, send: STOP</span></div>':'';
   box.className='ds-rule '+b.kind;
   box.innerHTML='<div>'+(b.kind==='pause'?'⏸️ ':b.kind==='min'?'🛒 ':'📦 ')+esc(b.text)+'</div>'+act;
   if(pb)pb.classList.add('blocked');

@@ -137,7 +137,9 @@
     .mods .md-x{grid-column:1/-1}
     .toast{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%) translateY(-140px);background:#0f172a;color:#fff;border-radius:14px;padding:10px 16px;font-size:13.5px;font-weight:800;z-index:400;transition:transform .3s;max-width:calc(100% - 32px);text-align:center}
     .toast.on{transform:translateX(-50%) translateY(0)}
-  </style>
+      /* WhatsApp consent (opt-in) note under WhatsApp buttons — Meta / WhatsApp Business policy */
+    .ds-wac{display:block;margin:6px 0 0;padding:0 4px;font-size:12.5px;line-height:1.7;font-weight:500;color:#8a8f98;text-align:center;direction:rtl;white-space:normal;overflow-wrap:anywhere;max-width:100%;box-sizing:border-box}.ds-wac-en{display:block;font-size:11px;line-height:1.5;color:#a3a8b0;direction:ltr;margin-top:2px}
+</style>
 </head>
 <body>
 
@@ -358,7 +360,7 @@ function drawList(){
   list=list.slice().sort((a,b)=>(a.in_stock===false)-(b.in_stock===false));
   $('all-h').textContent=q?('نتائج "'+q+'"'):dep==='all'?'كل المنتجات':dep==='__other'?'أخرى':dep;
   const wa=String(S.whatsapp||'').replace(/\D/g,'');
-  $('grid').innerHTML=list.length?list.map(card).join(''):'<div class="empty">ما لقينا "'+esc(q)+'"'+(wa?'<br><a href="https://wa.me/'+wa+'?text='+encodeURIComponent('مرحباً، أبغى من متجر خطوة التوصيل: '+q)+'" target="_blank" rel="noopener">اطلبه منّا على واتساب ونوفّره لك</a>':'')+'</div>';
+  $('grid').innerHTML=list.length?list.map(card).join(''):'<div class="empty">ما لقينا "'+esc(q)+'"'+(wa?'<br><a href="https://wa.me/'+wa+'?text='+encodeURIComponent('مرحباً، أبغى من متجر خطوة التوصيل: '+q)+'" target="_blank" rel="noopener">اطلبه منّا على واتساب ونوفّره لك</a><div class="ds-wac" style="margin-top:8px">بالتواصل معنا عبر واتساب، توافق على استلام رسائل تخص طلباتك. للإيقاف أرسل: إيقاف<span class="ds-wac-en" dir="ltr" lang="en">By contacting us on WhatsApp, you agree to receive messages about your orders. To stop, send: STOP</span></div>':'')+'</div>';
   const bs=$('best-sec'), bl=BEST.map(id=>ITEMS.find(i=>i.id===id)).filter(i=>i&&i.in_stock!==false);
   if(bs){ bs.style.display=(!q&&dep==='all'&&bl.length>=2)?'':'none'; if(bl.length>=2) $('best').innerHTML=bl.map(card).join(''); }
   ['rc-sec','of-sec'].forEach(id=>{ const e=$(id); if(e) e.style.display=q?'none':(id==='rc-sec'?((dep==='all'||(depOf({category:dep})||{}).kind==='recharge')?'':'none'):(dep==='all'?'':'none')); });

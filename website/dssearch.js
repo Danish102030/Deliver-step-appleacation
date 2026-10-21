@@ -271,6 +271,7 @@
     '.dss-dym{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:10px 12px;margin:4px 0 10px;font-size:13.5px;font-weight:700;cursor:pointer}'+
     '.dss-dym u{color:#be185d}'+
     '.dss-ask{background:#fff;border:1px solid #f0e4e9;border-radius:16px;padding:14px;margin:6px 4px 0;text-align:center}'+
+    '.ds-wac{display:block;margin:6px 0 0;padding:0 4px;font-size:12.5px;line-height:1.7;font-weight:500;color:#8a8f98;text-align:center;direction:rtl;white-space:normal;overflow-wrap:anywhere;max-width:100%;box-sizing:border-box}.ds-wac-en{display:block;font-size:11px;line-height:1.5;color:#a3a8b0;direction:ltr;margin-top:2px}'+
     '.dss-ask a{display:block;background:#16a34a;color:#fff;text-decoration:none;border-radius:12px;padding:12px;font-weight:800;margin-top:10px}'+
     '.dss-count{font-size:11.5px;color:#6b7280;font-weight:600;padding:4px 4px 8px}'+
     '.dss-item{background:#fff;border-radius:14px;border:.5px solid #f0e4e9;display:flex;align-items:center;gap:10px;padding:8px;margin-bottom:8px}'+
@@ -453,7 +454,7 @@
     if(alts.length) h+='<br/>جرّب كلمة أقصر:<div class="dss-chips">'+alts.map(function(a){ return '<button class="dss-chip" data-w="'+esc(a[0])+'">'+esc(a[0])+' ('+a[1]+')</button>'; }).join('')+'</div>';
     h+='</div>';
     h+='<div class="dss-ask"><div style="font-weight:800">تبي نوفر لك هذا المنتج؟</div><div style="color:#6b7280;font-size:12.5px;margin-top:3px">أرسل لنا اسمه وبنحاول نضيفه قريباً</div>'+
-      '<a target="_blank" rel="noopener" href="https://api.whatsapp.com/send?phone='+HELP_WA+'&text='+encodeURIComponent('السلام عليكم، أبحث عن منتج في السوبرماركت: '+q+' — هل يمكن توفيره؟')+'">اطلب المنتج عبر واتساب</a></div>';
+      '<a target="_blank" rel="noopener" href="https://api.whatsapp.com/send?phone='+HELP_WA+'&text='+encodeURIComponent('السلام عليكم، أبحث عن منتج في السوبرماركت: '+q+' — هل يمكن توفيره؟')+'">اطلب المنتج عبر واتساب</a><div class="ds-wac" style="margin-top:8px">بالتواصل معنا عبر واتساب، توافق على استلام رسائل تخص طلباتك. للإيقاف أرسل: إيقاف<span class="ds-wac-en" dir="ltr" lang="en">By contacting us on WhatsApp, you agree to receive messages about your orders. To stop, send: STOP</span></div></div>';
     h+='<div class="dss-hint" style="padding:16px 0 0">عمليات بحث شائعة'+chipsHTML(POPULAR.slice(0,6))+'</div>';
     el.body.innerHTML=h;
   }

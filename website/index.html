@@ -201,7 +201,9 @@
     .srv-confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:flex-end;justify-content:center}
     .srv-confirm-overlay.on{display:flex}
     .srv-confirm-box{background:#fff;border-radius:26px 26px 0 0;padding:28px 20px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:480px;text-align:center}
-  </style>
+      /* WhatsApp consent (opt-in) note under WhatsApp buttons — Meta / WhatsApp Business policy */
+    .ds-wac{display:block;margin:6px 0 0;padding:0 4px;font-size:12.5px;line-height:1.7;font-weight:500;color:#8a8f98;text-align:center;direction:rtl;white-space:normal;overflow-wrap:anywhere;max-width:100%;box-sizing:border-box}.ds-wac-en{display:block;font-size:11px;line-height:1.5;color:#a3a8b0;direction:ltr;margin-top:2px}
+</style>
 <style>
 /* ══ HOME v2 — premium look (header, banners, parcel, offers, vendors). Categories grid unchanged. ══ */
 :root{--plum:#4a0d2b;--gold:#f5b544;--ink:#1a1022;--card:#fff;--line:#f1e6ec;--soft:#8b7f88}
@@ -620,6 +622,7 @@ img{-webkit-user-drag:none}
   <div class="bf-line">السجل التجاري: <b dir="ltr">1165100337</b></div>
   <div class="bf-line">العنوان: قبة – حي الازهار – الشعلة – القصيم، المملكة العربية السعودية</div>
   <div class="bf-line">الجوال / واتساب: <a href="tel:+966560957163" dir="ltr">+966 56 095 7163</a></div>
+  <div class="ds-wac">بالتواصل معنا عبر واتساب، توافق على استلام رسائل تخص طلباتك. للإيقاف أرسل: إيقاف<span class="ds-wac-en" dir="ltr" lang="en">By contacting us on WhatsApp, you agree to receive messages about your orders. To stop, send: STOP</span></div>
   <div class="bf-line">البريد الإلكتروني: <a href="mailto:info@deliverystep.app" dir="ltr">info@deliverystep.app</a></div>
   <div class="bf-en-block" dir="ltr" lang="en">Delivery Step Est. · Commercial Registration (CR) No. 1165100337<br/>Al Azhar District, Al Shuala, Qubbah, Al Qassim, Saudi Arabia<br/><span style="white-space:nowrap">+966 56 095 7163</span> · <span style="white-space:nowrap">info@deliverystep.app</span></div>
   <div class="bf-links"><a href="/privacy-policy">سياسة الخصوصية</a> · <span dir="ltr">© 2026 Delivery Step</span></div>
@@ -746,6 +749,7 @@ img{-webkit-user-drag:none}
       <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
       أرسل عبر واتساب
     </button>
+    <div class="ds-wac" style="margin:-4px 0 12px">بالتواصل معنا عبر واتساب، توافق على استلام رسائل تخص طلباتك. للإيقاف أرسل: إيقاف<span class="ds-wac-en" dir="ltr" lang="en">By contacting us on WhatsApp, you agree to receive messages about your orders. To stop, send: STOP</span></div>
     <button onclick="closeConfirm()" style="width:100%;background:#f3f4f6;color:#6b7280;border:none;border-radius:16px;padding:13px;font-size:14px;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer">
       إغلاق
     </button>
@@ -754,7 +758,7 @@ img{-webkit-user-drag:none}
 
 <script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
 <script src="/ds-order-sync.js?v=3" defer></script>
-<script src="/dssearch.js?v=5" defer></script>
+<script src="/dssearch.js?v=6" defer></script>
 <script>
 const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
