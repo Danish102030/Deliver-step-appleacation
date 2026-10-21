@@ -72,7 +72,7 @@ img{-webkit-user-drag:none}
 <body>
 
 <div class="topbar">
-  <button class="btn-back" onclick="window.location.href='/'" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+  <button class="btn-back" id="home-btn" onclick="window.location.href='/'" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
   <button class="btn-back" id="back-btn" style="display:none" onclick="resetToMain()" aria-label="رجوع للفئات"><i class="ti ti-arrow-right"></i></button>
   <div class="topbar-title" id="page-heading">سوبرماركت · قبة</div>
   <button class="cart-btn" onclick="window.location.href='/cart'" aria-label="السلة">
@@ -236,6 +236,7 @@ function resetToMain() {
 }
 function showMain() {
   SUB = null;
+  document.getElementById('home-btn').style.display = '';
   document.getElementById('page-heading').textContent = 'سوبرماركت · قبة';
   document.getElementById('back-btn').style.display = 'none';
   renderCats(allCats);
@@ -271,6 +272,7 @@ async function goToCategory(name, fromHistory) {
 function showSubCategories(parentName, subs, fromHistory) {
   if (!fromHistory) { try { history.pushState({ dsSub: parentName }, ''); } catch(_) {} }
   SUB = parentName;
+  document.getElementById('home-btn').style.display = 'none';   // one back arrow only: back to the sections
   document.getElementById('page-heading').textContent = parentName;
   document.getElementById('back-btn').style.display = 'flex';
   document.getElementById('cat-count').textContent = subs.length + ' فئة';
