@@ -415,6 +415,7 @@ body.has-ob{padding-bottom:150px}
 .oh-m{font-size:11.5px;color:var(--soft);margin-top:2px}
 .oh-r{text-align:left;flex-shrink:0}
 .oh-p{font-size:13px;font-weight:900;color:var(--ink)}
+.oh-again{display:inline-block;margin-top:6px;background:#fdf2f8;color:var(--rose);border:none;border-radius:9px;padding:4px 10px;font-size:11.5px;font-weight:900;font-family:inherit;cursor:pointer}
 .oh-st{font-size:10.5px;font-weight:800;margin-top:2px;color:#15803d}.oh-st.x{color:#b91c1c}.oh-st.old{color:#9ca3af}
 .os-empty{text-align:center;padding:26px 10px 10px;color:var(--soft);font-size:13.5px;line-height:1.8}
 .os-empty .big{font-size:44px;display:block;margin-bottom:6px}
@@ -1038,6 +1039,8 @@ function openOrders(fromBar){
   document.getElementById('os-bg').classList.add('on'); document.getElementById('os').classList.add('on'); document.body.style.overflow='hidden';
   renderOrders(); loadMyOrders(true);
 }
+// "🔁 اطلب مرة ثانية" (only in طلباتي): the helper file loads only when tapped
+function dsReorderGo(id){ if(window.dsReorder){ closeOrders(); return window.dsReorder(id); } const s=document.createElement('script'); s.src='/ds-lib/ds-reorder-1.js'; s.onload=()=>{ if(window.dsReorder){ closeOrders(); window.dsReorder(id); } }; document.head.appendChild(s); }
 function closeOrders(){ document.getElementById('os-bg').classList.remove('on'); document.getElementById('os').classList.remove('on'); document.body.style.overflow=''; }
 function renderOrders(){
   const bd=document.getElementById('os-bd'), ph=_myPhone();
@@ -1055,7 +1058,7 @@ function renderOrders(){
   if(past.length){ h+='<div class="os-lb">🧾 طلباتك السابقة</div>'+past.map(o=>{ const x=o.order_status==='cancelled'||o.order_status==='canceled';
     return `<div class="oh" onclick="window.location.href='${_trackUrl(o)}'"><div class="oh-ic">${/سوبرماركت/.test(o.vendor_name)?'🛒':'🍽️'}</div>
       <div class="oh-b"><div class="oh-n">${_esc(o.vendor_name)}</div><div class="oh-m">${_ago(o.created_at)}${o.n?' · '+o.n+' منتج':''}</div></div>
-      <div class="oh-r"><div class="oh-p">${o.total!=null?_num(o.total)+' ر.س':''}</div><div class="oh-st${x?' x':''}${ORD_DONE.includes(o.order_status)?'':' old'}">${ORD_DONE.includes(o.order_status)?_esc(ORD_LABEL[o.order_status]||o.order_status):'منتهي'}</div></div></div>`; }).join(''); }
+      <div class="oh-r"><div class="oh-p">${o.total!=null?_num(o.total)+' ر.س':''}</div><div class="oh-st${x?' x':''}${ORD_DONE.includes(o.order_status)?'':' old'}">${ORD_DONE.includes(o.order_status)?_esc(ORD_LABEL[o.order_status]||o.order_status):'منتهي'}</div>${o.order_status==='delivered'&&!/طرد|🔧|خدمات منزلية|صيدلي/.test(o.vendor_name||'')?`<button type="button" class="oh-again" onclick="event.stopPropagation();dsReorderGo('${_esc(o.id)}')">🔁 اطلب مرة ثانية</button>`:''}</div></div>`; }).join(''); }
   h+='<a class="os-all" href="/account">كل الطلبات وبطاقة الولاء ←</a>';
   bd.innerHTML=h;
 }

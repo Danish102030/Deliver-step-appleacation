@@ -386,7 +386,23 @@ function toggleFav(ev,id){
   try{if(navigator.vibrate)navigator.vibrate(30);}catch(e){}
   return false;
 }
+// Items of THIS restaurant already in the cart (e.g. from "اطلب مرة ثانية" or an earlier visit) are picked up,
+// so adding more here never replaces them at checkout.
+let _cartRestored=false;
+function _restoreSavedCart(){
+  if(_cartRestored||!currentRestaurant||!menuItems.length) return; _cartRestored=true;
+  try{
+    const ex=JSON.parse(localStorage.getItem('qibah_cart')||'[]'); let k=0;
+    (Array.isArray(ex)?ex:[]).forEach(i=>{
+      if((i.vendor||i.restaurant)!==currentRestaurant.name) return;
+      const m=menuItems.find(x=>x.id===i.id), mods=Array.isArray(i.modifiers)?i.modifiers:[], q=Math.max(1,Number(i.qty)||1);
+      if(m&&!mods.length&&!cart[i.id]) cart[i.id]={item:{...m,price:Number(i.price)},qty:q};
+      else cart[String(i.id)+'_saved'+(k++)]={item:{...(m||{}),id:i.id,name:i.name,price:Number(i.price),image_url:i.image||(m&&m.image_url)||''},qty:q,modifiers:mods};
+    });
+  }catch(e){}
+}
 function loadRestaurant(){
+  _restoreSavedCart();
   const r=currentRestaurant;
   var _fb=document.getElementById('menu-fav-btn');
   if(_fb){_fb.setAttribute('data-fav',r.id);_fb.setAttribute('onclick',"return toggleFav(event,'"+r.id+"')");_fb.innerHTML=_isFav(r.id)?'❤️':'🤍';}
@@ -413,6 +429,7 @@ function loadRestaurant(){
   document.title=r.name+' - قبة';
   renderCatBar();
   renderMenu();
+  try{ updateCartBar(); }catch(e){}
 }
 
 // ── Category bar: round buttons with an icon picked from the category name (no setup needed) ──
