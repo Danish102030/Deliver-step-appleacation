@@ -93,3 +93,6 @@ update public.supermarket_products p
 
 -- 6) the test product is hidden from customers
 update public.supermarket_products set is_active = false where name = 'Test' and category_name = 'المعلبات';
+
+-- Step 2 (live): public.sm_home() — one call for the supermarket front page (sections + counts, collections, most ordered);
+-- slugs breakfast/lunch/dinner/sweets/kashta/cold are reserved for the collection pages (/category/<key>).

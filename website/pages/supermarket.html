@@ -6,147 +6,163 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
   <meta name="theme-color" content="#be185d"/>
   <title>سوبرماركت - خطوة التوصيل</title>
+  <meta name="description" content="سوبرماركت خطوة التوصيل — فواكه وخضار، ألبان، مخبوزات، مشروبات وأكثر من ١٩٠٠ منتج توصل لباب بيتك."/>
   <link rel="preconnect" href="https://cdn.jsdelivr.net"/>
   <link rel="preconnect" href="https://vjuhxpttssmyomqqomdx.supabase.co"/>
-  <!-- Fonts + icons come from our own server (kept 1 year on the phone) and are ready with the first paint — no icon/font flash -->
   <link rel="stylesheet" href="/ds-lib/tajawal-5.3.0-all.css" onerror="this.onerror=null;this.href='https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&amp;display=swap'"/>
   <link rel="stylesheet" href="/ds-lib/ds-icons-2.47.0-1.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" media="print" onload="this.media='all'"/>
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"/></noscript>
   <style>
-    :root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f1f1f;--muted:#6b7280;--border:#f0e4e9;--bg:#f5f5f5;--white:#fff;--green:#16a34a}
+    :root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fdf2f8;--text:#1f1f1f;--muted:#6b7280;--border:#f3e8ee;--bg:#faf7f8;--white:#fff}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-    body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px));direction:rtl}
-    .topbar{background:var(--rose);padding:11px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
-    .btn-back{background:rgba(255,255,255,0.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
-    .topbar-title{font-size:16px;font-weight:700;color:#fff;flex:1}
-    .cart-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0}
-    .cart-dot{position:absolute;top:-4px;left:-4px;width:16px;height:16px;background:#fff;color:var(--rose);border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
-    .search-wrap{background:var(--rose-dark);padding:0 16px 10px}
-    .search-box{background:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px}
-    .search-box input{border:none;outline:none;font-size:13px;color:var(--text);width:100%;font-family:'Tajawal',sans-serif;background:transparent;direction:rtl}
-    .promo-banner{margin:12px 16px 0;border-radius:16px;overflow:hidden;position:relative;height:85px;display:flex;align-items:center;padding:16px;background:linear-gradient(135deg,#9d174d,#7c3aed)}
-    .promo-banner::before{content:'';position:absolute;width:110px;height:110px;background:rgba(255,255,255,0.06);border-radius:50%;left:-20px;top:-20px}
-    .promo-text{flex:1;position:relative;z-index:1}
-    .promo-title{font-size:15px;font-weight:700;color:#fff}
-    .promo-sub{font-size:11px;color:#fce7f3;margin-top:3px}
-    .promo-cta{background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;position:relative;z-index:1;white-space:nowrap}
-    .sec-head{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px}
-    .sec-title{font-size:15px;font-weight:700;color:var(--text)}
-    .sec-count{font-size:11px;color:var(--muted);background:#f3f4f6;padding:2px 10px;border-radius:20px}
-    .cats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 12px 16px}
-    .cat-card{background:#fff;border-radius:14px;overflow:hidden;cursor:pointer;border:0.5px solid var(--border);transition:transform 0.15s}
-    .cat-card:active{transform:scale(0.95)}
-    .cat-img-wrap{width:100%;aspect-ratio:1/1;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:8px;position:relative}
-    .cat-img-wrap img{width:85%;height:85%;object-fit:contain;transition:transform 0.3s}
-    .cat-card:active .cat-img-wrap img{transform:scale(1.08)}
-    .cat-name{font-size:11px;font-weight:700;color:var(--text);text-align:center;padding:5px 6px 9px;line-height:1.3}
-    /* Premium category-tile skeleton (matches the real .cat-card shape) */
-    .skel{background:linear-gradient(90deg,#f0e4e9 25%,#fce7f3 50%,#f0e4e9 75%);background-size:200% 100%;animation:shim 1.5s infinite;border-radius:10px}
+    body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px));direction:rtl;overflow-x:hidden}
+    a{color:inherit;text-decoration:none}
+    button{font-family:inherit}
+
+    /* HEADER + SEARCH */
+    .top{background:linear-gradient(140deg,#be185d,#831843);color:#fff;padding:12px 14px 50px;position:relative}
+    .top .r{display:flex;align-items:center;gap:10px}
+    .ib{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.18);border:none;color:#fff;display:grid;place-items:center;font-size:19px;cursor:pointer;position:relative;flex-shrink:0}
+    .top h1{font-size:19px;font-weight:900;line-height:1.2}.top small{display:block;font-size:12px;opacity:.85;font-weight:600;margin-top:2px}
+    .tt{flex:1;min-width:0}
+    .cart-dot{position:absolute;top:-5px;left:-5px;background:#fde047;color:#831843;font-size:10px;font-weight:900;border-radius:9px;min-width:17px;padding:1px 5px;text-align:center}
+    .cart-dot.pop{animation:badge-pop .35s cubic-bezier(.36,.07,.19,.97)}
+    @keyframes badge-pop{0%{transform:scale(1)}30%{transform:scale(1.8)}60%{transform:scale(.82)}100%{transform:scale(1)}}
+    .srch{position:absolute;left:14px;right:14px;bottom:-22px;background:#fff;border-radius:16px;height:46px;display:flex;align-items:center;gap:8px;padding:0 14px;color:#9ca3af;font-size:13.5px;box-shadow:0 8px 22px rgba(131,24,67,.18);cursor:pointer;border:none;text-align:right}
+    .srch i{color:var(--rose);font-size:17px}
+    .bd{padding:32px 14px 10px}
+    .dl{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:800;color:#065f46;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:7px 10px;margin-bottom:12px;text-align:center;line-height:1.5}
+    .dl:empty{display:none}
+
+    /* HERO (changes with the time of day) */
+    .hero{border-radius:22px;padding:16px;display:flex;gap:12px;align-items:center;position:relative;overflow:hidden;cursor:pointer;min-height:132px}
+    .hero .t{flex:1;min-width:0}
+    .hero h2{font-size:18px;font-weight:900}.hero p{font-size:12px;font-weight:700;opacity:.82;margin:3px 0 11px;line-height:1.6}
+    .hero .go{display:inline-block;border-radius:11px;padding:7px 13px;font-size:12.5px;font-weight:900}
+    .tag{font-size:10.5px;font-weight:900;background:rgba(255,255,255,.6);border-radius:8px;padding:2px 8px;display:inline-block;margin-bottom:6px}
+    .pics{display:grid;grid-template-columns:1fr 1fr;gap:5px;flex-shrink:0}
+    .pics span{width:46px;height:46px;border-radius:12px;background:#fff;display:grid;place-items:center;overflow:hidden;font-size:24px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+    .pics img{width:100%;height:100%;object-fit:contain}
+    .h-breakfast{background:linear-gradient(135deg,#fde68a,#fbbf24);color:#4a2a00}.h-breakfast .go{background:#4a2a00;color:#fde68a}
+    .h-lunch{background:linear-gradient(135deg,#bbf7d0,#4ade80);color:#14532d}.h-lunch .go{background:#14532d;color:#dcfce7}
+    .h-dinner{background:linear-gradient(135deg,#c7d2fe,#818cf8);color:#1e1b4b}.h-dinner .go{background:#1e1b4b;color:#e0e7ff}
+    .h-cold{background:linear-gradient(135deg,#bae6fd,#38bdf8);color:#0c4a6e}.h-cold .go{background:#0c4a6e;color:#e0f2fe}
+
+    /* SECTION HEADINGS */
+    .sh{display:flex;justify-content:space-between;align-items:baseline;margin:22px 2px 10px}
+    .sh b{font-size:16px;font-weight:900}.sh span{font-size:12px;font-weight:800;color:var(--rose)}
+
+    /* COLLECTIONS */
+    .occ{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+    .oc{border-radius:18px;padding:11px 10px 10px;min-height:98px;display:flex;flex-direction:column;justify-content:space-between}
+    .oc .e{font-size:30px;line-height:1}.oc b{display:block;font-size:13px;font-weight:900;line-height:1.3}.oc small{display:block;font-size:10.5px;font-weight:700;opacity:.72;margin-top:2px}
+    .c-breakfast{background:#fef3c7;color:#78350f}.c-lunch{background:#dcfce7;color:#14532d}.c-dinner{background:#e0e7ff;color:#312e81}
+    .c-sweets{background:#fce7f3;color:#831843}.c-kashta{background:#ffedd5;color:#7c2d12}.c-cold{background:#e0f2fe;color:#0c4a6e}
+
+    /* MOST ORDERED */
+    .row{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:2px 14px 4px;scroll-snap-type:x proximity}
+    .row::-webkit-scrollbar{display:none}
+    .pc{width:126px;flex-shrink:0;background:#fff;border-radius:16px;padding:8px;border:1px solid var(--border);position:relative;scroll-snap-align:start}
+    .pc .im{height:92px;border-radius:12px;display:grid;place-items:center;background:#f8f4f6;overflow:hidden}
+    .pc .im img{width:100%;height:100%;object-fit:contain}
+    .pc .n{font-size:11.5px;font-weight:700;line-height:1.35;height:31px;overflow:hidden;margin-top:6px;color:#374151}
+    .pc .pr{display:flex;align-items:center;justify-content:space-between;margin-top:5px;min-height:32px}
+    .pc .p{font-size:13.5px;font-weight:900}
+    .rank{position:absolute;top:6px;right:6px;background:#1f1f1f;color:#fde047;font-size:9.5px;font-weight:900;border-radius:7px;padding:2px 6px;z-index:1}
+    .add-btn{width:32px;height:32px;background:var(--rose);color:#fff;border:none;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 9px rgba(190,24,93,.32)}
+    .qty-ctrl{display:flex;align-items:center;gap:2px;animation:qty-appear .25s cubic-bezier(.175,.885,.32,1.275)}
+    @keyframes qty-appear{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+    .qty-btn{width:24px;height:24px;border-radius:7px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer}
+    .qty-m{background:var(--rose-light);color:var(--rose)}.qty-p{background:var(--rose);color:#fff}
+    .qty-n{font-size:13px;font-weight:800;min-width:14px;text-align:center}
+    .qty-n.bump{animation:num-bump .28s}@keyframes num-bump{50%{transform:translateY(-5px) scale(1.35)}}
+
+    /* ALL SECTIONS — every sub-section visible */
+    .alist{display:flex;flex-direction:column;gap:9px}
+    .al{background:#fff;border:1px solid var(--border);border-radius:18px;padding:10px 11px}
+    .ah{display:flex;align-items:center;gap:10px}
+    .ah .c{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;overflow:hidden;flex-shrink:0;font-size:24px}
+    .ah .c img{width:100%;height:100%;object-fit:cover}
+    .ah .x{flex:1;min-width:0}.ah b{display:block;font-size:14.5px;font-weight:900}.ah small{font-size:11.5px;color:#9ca3af;font-weight:700}
+    .ah i{color:var(--rose);font-size:18px}
+    .as{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+    .as a{font-size:12px;font-weight:800;color:#4b5563;background:#f8f4f6;border-radius:10px;padding:6px 10px}
+    .as a:active,.al:active{opacity:.75}
+
+    /* SKELETON */
+    .sk{background:linear-gradient(90deg,#f1e6ea 25%,#faf3f6 50%,#f1e6ea 75%);background-size:200% 100%;animation:shim 1.2s infinite;border-radius:14px}
     @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
-    .sktile{background:#fff;border-radius:14px;overflow:hidden;border:0.5px solid var(--border)}
-    .sktile .s-timg{width:100%;aspect-ratio:1/1}
-    .sktile .s-tnm{height:11px;border-radius:6px;margin:8px auto 12px;width:62%}
-    .offer-strip{margin:0 16px 16px;background:#fff;border-radius:14px;border:0.5px solid var(--border);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .offer-btn{background:var(--rose);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap;flex-shrink:0}
-    .glass-nav-wrap{position:fixed;bottom:0;right:50%;transform:translateX(50%);width:100%;max-width:480px;padding:8px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,rgba(245,245,245,1) 60%,rgba(245,245,245,0));pointer-events:none;z-index:200;will-change:transform}
-    .glass-nav{background:rgba(255,255,255,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:0.5px solid rgba(255,255,255,0.95);border-radius:26px;padding:8px 6px;display:grid;grid-template-columns:repeat(4,1fr);box-shadow:0 4px 28px rgba(0,0,0,0.09);pointer-events:all}
-    .gnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 4px;border-radius:20px;transition:background 0.2s}
-    .gnav-item:active{background:rgba(190,24,93,0.08)}
-    .gnav-icon{font-size:22px;color:var(--muted)}
-    .gnav-icon.act{color:var(--rose)}
-    .gnav-label{font-size:10px;color:var(--muted);font-weight:700}
-    .gnav-label.act{color:var(--rose)}
-    .gnav-dot{width:4px;height:4px;background:var(--rose);border-radius:50%;margin:0 auto;opacity:0}
-    .gnav-dot.act{opacity:1}
-    @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    /* CART BAR (same as the category page) */
+    .cart-bar{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));right:50%;transform:translateX(50%);width:calc(100% - 32px);max-width:448px;background:var(--rose);border-radius:16px;padding:11px 15px 12px;display:none;flex-direction:column;cursor:pointer;box-shadow:0 8px 24px rgba(190,24,93,.4);z-index:100}
+    .cart-bar.show{display:flex}
+    .fd-row{display:flex;flex-direction:column;gap:6px;padding-bottom:10px;margin-bottom:9px;border-bottom:1px solid rgba(255,255,255,.18)}
+    .fd-text{font-size:12.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:5px;line-height:1.2;flex-wrap:wrap}
+    .fd-text b{font-weight:900}.fd-text .new-fee{font-weight:900}.fd-text .old-fee{text-decoration:line-through;opacity:.75;font-size:.92em}
+    .fd-track{height:7px;border-radius:6px;background:rgba(255,255,255,.24);overflow:hidden}
+    .fd-fill{height:100%;border-radius:6px;background:#fff;width:0;transition:width .5s cubic-bezier(.22,.61,.36,1)}
+    .fd-fill.done{background:linear-gradient(90deg,#ffe08a,#ffd24d)}
+    .cb-main{display:flex;align-items:center;justify-content:space-between}
+    .cb-left{display:flex;align-items:center;gap:9px}.cb-view{font-size:14px;font-weight:800;color:#fff}
+    .cart-pill{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;font-size:14px;font-weight:900;padding:4px 11px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;direction:ltr}
+    .cart-pill svg{width:16px;height:16px}
+    .toast{position:fixed;bottom:110px;right:50%;transform:translateX(50%);background:#1f1f1f;color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+    .toast.show{opacity:1}
+
+    /* BOTTOM MENU */
+    .glass-nav-wrap{position:fixed;bottom:0;right:50%;transform:translateX(50%);width:100%;max-width:480px;padding:8px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,rgba(250,247,248,1) 60%,rgba(250,247,248,0));pointer-events:none;z-index:99}
+    .glass-nav{background:rgba(255,255,255,.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:.5px solid rgba(255,255,255,.95);border-radius:26px;padding:8px 6px;display:grid;grid-template-columns:repeat(4,1fr);box-shadow:0 4px 28px rgba(0,0,0,.09);pointer-events:all}
+    .gnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 4px;border-radius:20px}
+    .gnav-icon{font-size:22px;color:var(--muted)}.gnav-icon.act{color:var(--rose)}
+    .gnav-label{font-size:10px;color:var(--muted);font-weight:700}.gnav-label.act{color:var(--rose)}
+    .gnav-dot{width:4px;height:4px;background:var(--rose);border-radius:50%;margin:0 auto;opacity:0}.gnav-dot.act{opacity:1}
   </style>
-<style>
-/* Native-app feel: text is NOT selectable / copyable; form fields (name, phone, search, notes) stay usable */
-*{-webkit-touch-callout:none}
-html,body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
-input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;-moz-user-select:text;-ms-user-select:text;user-select:text;-webkit-touch-callout:default}
-img{-webkit-user-drag:none}
-</style>
 </head>
 <body>
 
-<div class="topbar">
-  <button class="btn-back" id="home-btn" onclick="window.location.href='/'" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
-  <button class="btn-back" id="back-btn" style="display:none" onclick="resetToMain()" aria-label="رجوع للفئات"><i class="ti ti-arrow-right"></i></button>
-  <div class="topbar-title" id="page-heading">سوبرماركت · قبة</div>
-  <button class="cart-btn" onclick="window.location.href='/cart'" aria-label="السلة">
-    <i class="ti ti-shopping-cart" style="font-size:18px"></i>
-    <div class="cart-dot" id="cart-count">٠</div>
-  </button>
-</div>
-
-<div class="search-wrap">
-  <div class="search-box">
-    <i class="ti ti-search" style="font-size:16px;color:var(--rose)" aria-hidden="true"></i>
-    <input type="text" placeholder="ابحث عن أي منتج... حليب، بيبسي، أرز" readonly onclick="window.DSSearch&&DSSearch.open()" style="cursor:pointer"/>
+<div class="top">
+  <div class="r">
+    <button class="ib" onclick="window.location.href='/'" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+    <div class="tt"><h1>سوبرماركت 🛒</h1><small id="sub">توصيل لباب بيتك</small></div>
+    <button class="ib" onclick="window.location.href='/cart'" aria-label="السلة"><i class="ti ti-shopping-bag"></i><span class="cart-dot" id="cart-count">٠</span></button>
   </div>
+  <button class="srch" type="button" onclick="openSearch()"><i class="ti ti-search" aria-hidden="true"></i>ابحث عن حليب، خبز، آيسكريم…</button>
 </div>
 
-<div class="promo-banner">
-  <div class="promo-text">
-    <div class="promo-title" id="promo-title">توصيل مجاني</div>
-    <div class="promo-sub" id="promo-sub">على الطلبات فوق ٢٠٠ ريال · قبة</div>
+<div class="bd">
+  <div class="dl" id="dl"></div>
+
+  <a class="hero" id="hero" href="/category/breakfast"><div class="t"><div class="sk" style="height:96px"></div></div></a>
+
+  <div class="sh"><b>تسوّق حسب وقتك</b></div>
+  <div class="occ" id="occ"></div>
+
+  <div id="top-wrap">
+    <div class="sh"><b>⭐ الأكثر طلباً</b></div>
+    <div class="row" id="top"><div class="sk" style="width:126px;height:180px;flex-shrink:0"></div><div class="sk" style="width:126px;height:180px;flex-shrink:0"></div><div class="sk" style="width:126px;height:180px;flex-shrink:0"></div></div>
   </div>
-  <button class="promo-cta" onclick="window.location.href='/catalog'">تسوق الآن</button>
+
+  <div class="sh"><b>كل الأقسام</b><span id="acount"></span></div>
+  <div class="alist" id="aisles"><div class="sk" style="height:110px"></div><div class="sk" style="height:110px"></div><div class="sk" style="height:110px"></div></div>
 </div>
 
-<div class="sec-head">
-  <div class="sec-title">تسوق حسب الفئة</div>
-  <div class="sec-count" id="cat-count">١٢ فئة</div>
+<div class="cart-bar" id="cart-bar" onclick="window.location.href='/cart'">
+  <div class="fd-row"><div class="fd-text" id="fd-text"></div><div class="fd-track"><div class="fd-fill" id="fd-fill"></div></div></div>
+  <div class="cb-main"><div class="cb-left"><div class="cart-pill" id="cart-count-pill"></div><div class="cb-view">عرض السلة</div></div>
+    <div style="font-size:15px;font-weight:800;color:#fff" id="cart-total"></div></div>
 </div>
-
-<div class="cats-grid" id="cats-grid">
-  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
-  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
-  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
-  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
-  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
-  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
-  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
-  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
-  <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
-</div>
-
-<div class="offer-strip">
-  <div>
-    <div style="font-size:13px;font-weight:700;color:var(--text)">عروض اليوم</div>
-    <div style="font-size:11px;color:var(--muted);margin-top:2px">خصم حتى ٤٠٪ على منتجات مختارة</div>
-  </div>
-  <button class="offer-btn" onclick="window.location.href='/catalog'">شاهد العروض</button>
-</div>
+<div class="toast" id="toast"></div>
 
 <div class="glass-nav-wrap">
   <nav class="glass-nav">
-    <div class="gnav-item" onclick="window.location.href='/'">
-      <i class="ti ti-home gnav-icon" aria-hidden="true"></i>
-      <span class="gnav-label">الرئيسية</span>
-      <div class="gnav-dot"></div>
-    </div>
-    <div class="gnav-item" onclick="window.location.href='/restaurants'">
-      <i class="ti ti-tools-kitchen-2 gnav-icon" aria-hidden="true"></i>
-      <span class="gnav-label">المطاعم</span>
-      <div class="gnav-dot"></div>
-    </div>
-    <div class="gnav-item">
-      <i class="ti ti-building-store gnav-icon act" aria-hidden="true"></i>
-      <span class="gnav-label act">سوبرماركت</span>
-      <div class="gnav-dot act"></div>
-    </div>
-    <div class="gnav-item" onclick="window.location.href='/account'">
-      <i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i>
-      <span class="gnav-label">حسابي</span>
-      <div class="gnav-dot"></div>
-    </div>
+    <div class="gnav-item" onclick="window.location.href='/'"><i class="ti ti-home gnav-icon" aria-hidden="true"></i><span class="gnav-label">الرئيسية</span><div class="gnav-dot"></div></div>
+    <div class="gnav-item" onclick="window.location.href='/restaurants'"><i class="ti ti-tools-kitchen-2 gnav-icon" aria-hidden="true"></i><span class="gnav-label">المطاعم</span><div class="gnav-dot"></div></div>
+    <div class="gnav-item"><i class="ti ti-building-store gnav-icon act" aria-hidden="true"></i><span class="gnav-label act">سوبرماركت</span><div class="gnav-dot act"></div></div>
+    <div class="gnav-item" onclick="window.location.href='/account'"><i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i><span class="gnav-label">حسابي</span><div class="gnav-dot"></div></div>
   </nav>
 </div>
 <script src="/ds-lib/ds-nav-3.js"></script><!-- same bottom menu on every page (الرئيسية · سوبرماركت · طلباتي · حسابي) -->
-
 
 <script src="/dssearch.js?v=6" defer></script>
 <script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
@@ -154,199 +170,198 @@ img{-webkit-user-drag:none}
 const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
 let sb=null;
+const RIYAL=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="539 350 402 448" width="14" height="14" style="vertical-align:-2px;display:inline-block" fill="currentColor" aria-label="ريال سعودي"><path d="M772.564 422.262C788.654 404.2 798.543 396.091 817.965 385.839V686.607L772.564 695.988V422.262Z"/><path d="M917.627 573.474C927.039 553.607 928.147 544.777 930.667 524.396L582.653 599.963C574.401 618.346 571.744 628.622 570.472 646.872L917.627 573.474Z"/><path d="M917.627 665.598C927.039 645.73 928.147 636.9 930.667 616.52L774.225 649.632C773.118 667.843 774.389 677.186 773.118 695.436L917.627 665.598Z"/><path d="M917.627 757.708C927.039 737.841 928.147 729.011 930.667 708.63L788.067 739.586C780.869 749.519 776.44 766.075 773.118 787.547L917.627 757.708Z"/><path d="M691.174 726.341C705.016 709.233 719.411 687.71 729.377 670.051L561.514 706.435C553.261 724.818 550.605 735.094 549.333 753.344L691.174 726.341Z"/><path d="M683.976 396.876C700.067 378.814 709.955 370.705 729.377 360.453V671.154L683.976 680.536V396.876Z"/></svg>`;
+const CART_ICON=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/><path d="M2 3h2l2.3 12.2a1.5 1.5 0 0 0 1.5 1.2h9.4a1.5 1.5 0 0 0 1.5-1.2L20.5 8H5.2"/></svg>`;
 
-let allCats = [];
-
-const FRUIT_VEG_ID = 'a5fbf689-76ef-43ae-a440-4b8e8e9c0e6e';
-
-async function loadCatsFromDB() {
-  try {
-    const {data,error} = await sb.from('supermarket_categories')
-      .select('*')
-      .eq('is_active',true)
-      .is('parent_name', null)
-      .order('sort_order');
-    let cats = (!error && data && data.length) ? data : getDefaultCats();
-    // If fruits & vegetables is missing from results, fetch it directly by ID
-    if (!cats.find(c => c.id === FRUIT_VEG_ID)) {
-      try {
-        const {data:fv} = await sb.from('supermarket_categories')
-          .select('*').eq('id', FRUIT_VEG_ID).single();
-        if (fv) cats = [fv, ...cats];
-      } catch(e2) {}
-    }
-    allCats = cats;
-    try { sessionStorage.setItem('qibah_sm_cats', JSON.stringify(cats)); } catch(_){}
-  } catch(e) { allCats = getDefaultCats(); }
-  renderCats(allCats);
+/* the 6 "shop by your time" collections (product.collections in the database) */
+const COLL=[
+  {k:'breakfast',n:'الفطور',e:'🍳',d:'خبز، جبن، قشطة، لبن'},
+  {k:'lunch',n:'طبخ الغداء',e:'🍲',d:'رز، زيت، بهارات، دجاج'},
+  {k:'dinner',n:'عشاء خفيف',e:'🌙',d:'توست، جبن، تونة'},
+  {k:'sweets',n:'حلا وشوكولاتة',e:'🍫',d:'شوكولاتة، بسكويت، كيك'},
+  {k:'kashta',n:'كشتة وشواء',e:'🔥',d:'فحم، ماء، سناكس'},
+  {k:'cold',n:'آيسكريم وبارد',e:'🍦',d:'آيسكريم، عصائر، مشروبات'}];
+// big card on top: changes with the time of day
+function heroNow(){
+  const h=new Date().getHours();
+  if(h>=5&&h<11) return {k:'breakfast',tag:'☀️ صباح الخير',t:'جهّز فطورك',d:'صامولي، جبن، قشطة، لبن وشاي — بطلب واحد',go:'تسوّق الفطور ←',e:['🥖','🧀','🥛','🍯']};
+  if(h>=11&&h<16) return {k:'lunch',tag:'🌤️ وقت الغداء',t:'مقاضي طبخ الغداء',d:'رز، دجاج، خضار، زيت وبهارات',go:'تسوّق الغداء ←',e:['🍚','🍗','🍅','🧂']};
+  if(h>=16&&h<21) return {k:'dinner',tag:'🌇 مساء الخير',t:'عشاء خفيف وسريع',d:'توست، جبن، بيض، تونة وبرجر',go:'تسوّق العشاء ←',e:['🍞','🧀','🥚','🍔']};
+  return {k:'cold',tag:'🌙 سهرة الليلة',t:'آيسكريم ومشروبات باردة',d:'آيسكريم، عصائر، مشروبات وشيبس',go:'تسوّق الآن ←',e:['🍦','🥤','🧃','🍿']};
 }
 
-// Instant render from this session's cache (used on back-navigation → no flicker)
-function renderCachedCats(){
+function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function dsImg(u,w){u=u||'';return /^https:\/\/cdn\.shopify\.com\//i.test(u)&&!/[?&]width=/i.test(u)?u+(u.indexOf('?')<0?'?':'&')+'width='+w:u;}
+function ar(n){ try{ return Number(n).toLocaleString('ar-SA'); }catch(e){ return String(n); } }
+function catUrl(c){ return c.s ? '/category/'+c.s : '/marketproducts?cat='+encodeURIComponent(c.n); }
+function goCat(n,s){ try{ sessionStorage.setItem('qibah_cat',n); sessionStorage.setItem('qibah_cat_slug',s||''); }catch(_){} }
+function openSearch(){ if(window.DSSearch) DSSearch.open(); else setTimeout(()=>window.DSSearch&&DSSearch.open(),400); }
+
+/* ── render ── */
+let DATA=null;
+function render(d){
+  DATA=d;
+  const cats=d.cats||[], coll=d.coll||{};
+  document.getElementById('sub').textContent='توصيل لباب بيتك · '+ar(d.total||0)+' منتج';
+  // hero
+  const h=heroNow(), ci=(coll[COLL.find(c=>c.k===h.k).n]||{}).img||[];
+  const hero=document.getElementById('hero');
+  hero.className='hero h-'+h.k; hero.href='/category/'+h.k;
+  hero.innerHTML='<div class="t"><span class="tag">'+h.tag+'</span><h2>'+h.t+'</h2><p>'+h.d+'</p><span class="go">'+h.go+'</span></div><div class="pics">'+
+    [0,1,2,3].map(i=>'<span>'+(ci[i]?'<img src="'+esc(dsImg(ci[i],160))+'" alt="" loading="lazy" onerror="this.replaceWith(\''+h.e[i]+'\')"/>':h.e[i])+'</span>').join('')+'</div>';
+  // collections
+  document.getElementById('occ').innerHTML=COLL.map(c=>{ const n=(coll[c.n]||{}).c||0;
+    return '<a class="oc c-'+c.k+'" href="/category/'+c.k+'"><div class="e">'+c.e+'</div><div><b>'+c.n+'</b><small>'+(n?ar(n)+' منتج':c.d)+'</small></div></a>'; }).join('');
+  // most ordered
+  const top=d.top||[];
+  document.getElementById('top-wrap').style.display=top.length?'':'none';
+  document.getElementById('top').innerHTML=top.map((p,i)=>
+    '<div class="pc" data-id="'+esc(p.id)+'">'+(i<3?'<span class="rank">#'+(i+1)+'</span>':'')+
+    '<div class="im">'+(p.image_url?'<img src="'+esc(dsImg(p.image_url,300))+'" alt="'+esc(p.name)+'" loading="lazy"/>':'<i class="ti ti-shopping-bag" style="font-size:36px;color:#e5d5dc"></i>')+'</div>'+
+    '<div class="n">'+esc(p.name)+'</div><div class="pr"><span class="p">'+RIYAL+' '+Number(p.price).toFixed(2)+'</span><span id="ctrl-'+esc(p.id)+'"></span></div></div>').join('');
+  top.forEach(p=>updateCtrl(p.id));
+  // all sections, every sub-section visible
+  const aisles=cats.filter(c=>!c.p);
+  document.getElementById('acount').textContent=ar(aisles.length)+' قسم';
+  document.getElementById('aisles').innerHTML=aisles.map(a=>{
+    const subs=cats.filter(c=>c.p===a.n), total=subs.length?subs.reduce((s,c)=>s+(c.c||0),0):(a.c||0);
+    return '<div class="al"><a class="ah" href="'+catUrl(a)+'" onclick="goCat(\''+esc(a.n)+'\',\''+esc(a.s||'')+'\')"><span class="c" style="background:'+esc(a.b||'#fdf2f8')+'">'+
+      (a.i?'<img src="'+esc(dsImg(a.i,160))+'" alt="" loading="lazy"/>':'🛒')+'</span><span class="x"><b>'+esc(a.n)+'</b><small>'+ar(total)+' منتج'+(subs.length?' · '+ar(subs.length)+' قسم فرعي':'')+'</small></span><i class="ti ti-chevron-left"></i></a>'+
+      (subs.length?'<div class="as">'+subs.map(s=>'<a href="'+catUrl(s)+'" onclick="goCat(\''+esc(s.n)+'\',\''+esc(s.s||'')+'\')">'+esc(s.n)+'</a>').join('')+'</div>':'')+'</div>';
+  }).join('');
+}
+
+/* ── data: shown instantly from this phone's copy, then refreshed ── */
+const CK='ds_sm_home_v1';
+async function load(){
+  let had=false;
+  try{ const c=JSON.parse(localStorage.getItem(CK)||'null'); if(c&&c.d&&c.d.cats){ render(c.d); had=true; } }catch(e){}
+  if(!sb) return;
   try{
-    const c = sessionStorage.getItem('qibah_sm_cats');
-    if(c){ const cats = JSON.parse(c); if(cats && cats.length){ allCats = cats; renderCats(cats); return true; } }
-  }catch(_){}
-  return false;
+    const r=await sb.rpc('sm_home');
+    if(r&&!r.error&&r.data&&r.data.cats){
+      const s=JSON.stringify(r.data);
+      let old=''; try{ old=JSON.stringify((JSON.parse(localStorage.getItem(CK)||'null')||{}).d); }catch(e){}
+      try{ localStorage.setItem(CK,JSON.stringify({t:Date.now(),d:r.data})); }catch(e){}
+      if(!had||s!==old) render(r.data);
+    }else if(!had) failMsg();
+  }catch(e){ if(!had) failMsg(); }
 }
+function failMsg(){ document.getElementById('aisles').innerHTML='<div class="al" style="text-align:center;color:#6b7280;font-weight:700;padding:18px">تعذر التحميل — تأكد من الإنترنت <button onclick="load()" style="margin-top:8px;display:block;margin-inline:auto;background:#be185d;color:#fff;border:none;border-radius:10px;padding:7px 14px;font-weight:800">حاول مرة ثانية</button></div>'; }
 
-function getDefaultCats(){
-  return[
-    {name:'فواكه وخضروات',image_url:'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=300&q=70',bg_color:'#f0fdf4'},
-    {name:'ألبان وبيض',image_url:'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=300&q=70',bg_color:'#fffbeb'},
-    {name:'لحوم ودواجن',image_url:'https://images.unsplash.com/photo-1582034986517-30d163aa1da9?w=300&q=70',bg_color:'#faf5ff'},
-    {name:'مشروبات باردة',image_url:'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=300&q=70',bg_color:'#eff6ff'},
-    {name:'خبز ومخبوزات',image_url:'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300&q=70',bg_color:'#fff5f7'},
-    {name:'أرز ومعكرونة',image_url:'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300&q=70',bg_color:'#f0fdf4'},
-    {name:'بهارات وتوابل',image_url:'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?w=300&q=70',bg_color:'#fffbeb'},
-    {name:'حليب وعصائر',image_url:'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300&q=70',bg_color:'#f0f9ff'},
-    {name:'معلبات وجاهزة',image_url:'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&q=70',bg_color:'#f9fafb'},
-    {name:'حلويات وسناكس',image_url:'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=300&q=70',bg_color:'#fdf4ff'},
-    {name:'منتجات التنظيف',image_url:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=70',bg_color:'#fff7ed'},
-    {name:'عناية شخصية',image_url:'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=300&q=70',bg_color:'#f0fdf4'},
-  ];
-}
-
-function renderCats(list) {
-  if (SUB) return;   // a section's sub-categories are on screen — keep them
-  const grid = document.getElementById('cats-grid');
-  document.getElementById('cat-count').textContent = list.length + ' فئة';
-  // Skip re-render if the grid already shows the same categories → no flicker
-  const sig = JSON.stringify(list.map(c => [c.name, c.image_url, c.bg_color]));
-  if (grid.dataset.sig === sig) return;
-  grid.dataset.sig = sig;
-  grid.innerHTML = list.map(c => `
-    <div class="cat-card" onclick="goToCategory('${c.name}')">
-      <div class="cat-img-wrap" style="background:${c.bg_color||'#f0fdf4'}">
-        ${c.image_url
-          ? `<img src="${c.image_url}" alt="${c.name}" loading="lazy"/>`
-          : `<div style="font-size:40px">🛒</div>`}
-      </div>
-      <div class="cat-name">${c.name}</div>
-    </div>`).join('');
-}
-
-// Sections with sub-categories open on this page; each one is a step in the phone's history,
-// so the back button / back swipe returns to the main list instead of leaving the supermarket.
-let SUB = null;
-window.addEventListener('popstate', e => { const s = e.state && e.state.dsSub; if (s) goToCategory(s, true); else if (SUB) showMain(); });
-function resetToMain() {
-  if (SUB && history.state && history.state.dsSub) { history.back(); return; }
-  showMain();
-}
-function showMain() {
-  SUB = null;
-  document.getElementById('home-btn').style.display = '';
-  document.getElementById('page-heading').textContent = 'سوبرماركت · قبة';
-  document.getElementById('back-btn').style.display = 'none';
-  renderCats(allCats);
-}
-
-function filterCats(q) {
-  const filtered = q ? allCats.filter(c => c.name.includes(q)) : allCats;
-  renderCats(filtered);
-}
-
-// Clean category address (Ninja style): /category/fruits-vegetables — old ?cat= address if a category has no slug yet
-function catUrl(name, slug){ return slug ? '/category/' + slug : '/marketproducts?cat=' + encodeURIComponent(name); }
-function goCat(name, slug){ try{ sessionStorage.setItem('qibah_cat', name); sessionStorage.setItem('qibah_cat_slug', slug||''); }catch(_){} window.location.href = catUrl(name, slug); }
-async function goToCategory(name, fromHistory) {
-  const _main = (allCats||[]).find(c => c.name === name) || {};
-  try {
-    const {data} = await sb.from('supermarket_categories')
-      .select('id, name, image_url, bg_color, slug')
-      .eq('parent_name', name)
-      .eq('is_active', true)
-      .order('sort_order');
-
-    if (data && data.length > 0) {
-      showSubCategories(name, data, fromHistory);
-    } else {
-      goCat(name, _main.slug);
-    }
-  } catch(e) {
-    goCat(name, _main.slug);
-  }
-}
-
-function showSubCategories(parentName, subs, fromHistory) {
-  if (!fromHistory) { try { history.pushState({ dsSub: parentName }, ''); } catch(_) {} }
-  SUB = parentName;
-  document.getElementById('home-btn').style.display = 'none';   // one back arrow only: back to the sections
-  document.getElementById('page-heading').textContent = parentName;
-  document.getElementById('back-btn').style.display = 'flex';
-  document.getElementById('cat-count').textContent = subs.length + ' فئة';
-
-  const grid = document.getElementById('cats-grid');
-  grid.dataset.sig = 'subcats:' + parentName; // so returning to main re-renders
-  grid.innerHTML = subs.map(c => `
-    <div class="cat-card" data-name="${c.name}" data-slug="${c.slug||''}" onclick="goCat(this.dataset.name,this.dataset.slug)">
-      <div class="cat-img-wrap" style="background:${c.bg_color||'#f0fdf4'}">
-        ${c.image_url
-          ? `<img src="${c.image_url}" alt="${c.name}" loading="lazy"/>`
-          : `<div style="font-size:40px">🛒</div>`}
-      </div>
-      <div class="cat-name">${c.name}</div>
-    </div>`).join('');
-}
-
-function updateCart() {
-  const cart = JSON.parse(localStorage.getItem('qibah_cart') || '[]');
-  document.getElementById('cart-count').textContent = cart.reduce((s,i) => s+i.qty, 0) || '٠';
-}
-
+/* ── delivery offer line (Admin → Settings) ── */
+let _fdMin=0, _smFee0=5, _smDiscMin=0, _smDiscFee=0, _twoVendorFee=7;
 async function loadDeliverySettings(){
-  if(!sb)return;
   try{
-    const{data}=await sb.from('settings').select('key,value').in('key',['supermarket_delivery_fee','supermarket_free_delivery_min','supermarket_discount_min','supermarket_discount_fee']);
-    if(!data)return;
-    let fee=null, minFree=null, dMin=0, dFee=null;
-    data.forEach(s=>{
-      if(s.key==='supermarket_delivery_fee')fee=Number(s.value);
-      if(s.key==='supermarket_free_delivery_min')minFree=Number(s.value);
-      if(s.key==='supermarket_discount_min')dMin=Number(s.value)||0;
-      if(s.key==='supermarket_discount_fee')dFee=Number(s.value);
-    });
-    const tEl=document.getElementById('promo-title');
-    const sEl=document.getElementById('promo-sub');
-    // cheaper delivery from dMin (Admin → Settings) — shown with the free-delivery offer
-    const tier=dMin>0&&dFee!==null&&!isNaN(dFee)&&fee!==null&&dFee<fee&&!(minFree>0&&dMin>=minFree);
-    if(minFree>0&&tEl&&sEl){
-      tEl.textContent='توصيل مجاني';
-      sEl.textContent='على الطلبات فوق '+minFree+' ريال'+(tier?' · توصيل '+dFee+' ريال فوق '+dMin:'')+' · قبة';
-    }else if(tier&&tEl&&sEl){
-      tEl.textContent='توصيل '+dFee+' ريال';
-      sEl.textContent='على الطلبات فوق '+dMin+' ريال · قبة';
-    }else if(fee!==null&&tEl&&sEl){
-      tEl.textContent='رسوم التوصيل '+fee+' ريال';
-      sEl.textContent='توصيل سريع لقبة الاسياح';
-    }
+    const r=await sb.from('settings').select('key,value').in('key',['supermarket_free_delivery_min','two_vendor_delivery_fee','supermarket_delivery_fee','supermarket_discount_min','supermarket_discount_fee']);
+    (r.data||[]).forEach(s=>{ const v=Number(s.value); if(String(s.value==null?'':s.value).trim()===''||isNaN(v)||v<0)return;
+      if(s.key==='supermarket_free_delivery_min')_fdMin=v; else if(s.key==='two_vendor_delivery_fee'){ if(v>0)_twoVendorFee=v; }
+      else if(s.key==='supermarket_delivery_fee')_smFee0=v; else if(s.key==='supermarket_discount_min')_smDiscMin=v; else if(s.key==='supermarket_discount_fee')_smDiscFee=v; });
+    const tier=_smDiscMin>0&&_smDiscFee<_smFee0&&!(_fdMin>0&&_smDiscMin>=_fdMin), parts=[];
+    if(tier) parts.push('توصيل '+_smDiscFee+' ريال فوق '+_smDiscMin);
+    if(_fdMin>0) parts.push('مجاني فوق '+_fdMin+' ريال');
+    document.getElementById('dl').textContent=parts.length?'🚚 '+parts.join(' · '):'';
+    updateCartBar();
   }catch(e){}
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  updateCart();
-  if(typeof supabase !== 'undefined') {
-    sb = supabase.createClient(SB_URL, SB_KEY);
-    // Back-navigation: render this session's cached categories INSTANTLY (smooth, no skeleton).
-    // First visit: show the shimmer skeleton while we fetch.
-    if (history.state && history.state.dsSub) { SUB = history.state.dsSub; goToCategory(SUB, true); }   // came back to a section
-    const hadCache = renderCachedCats();
-    if(!hadCache){
-      const grid=document.getElementById('cats-grid');
-      if(grid){
-        let sk='';
-        for(let i=0;i<9;i++)sk+='<div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>';
-        grid.dataset.sig=''; grid.innerHTML=sk;
-      }
-    }
-    loadCatsFromDB();       // refreshes silently; renderCats is a no-op if nothing changed
-    loadDeliverySettings();
-  } else {
-    // Fallback if Supabase fails to load
-    allCats = getDefaultCats();
-    renderCats(allCats);
+/* ── cart: same format as the category page (cart + checkout work unchanged) ── */
+const _SM_VENDOR='السوبرماركت';
+let cart={};
+function _vendorOf(i){ return i.vendor||i.restaurant||_SM_VENDOR; }
+function _saved(){ try{ const c=JSON.parse(localStorage.getItem('qibah_cart')||'[]'); return Array.isArray(c)?c:[]; }catch(e){ return []; } }
+function _smBlockedByTwoVendors(){ return [...new Set(_saved().filter(i=>_vendorOf(i)!==_SM_VENDOR).map(_vendorOf))].length>=2; }
+function _smOtherVendor(){ return _saved().some(i=>_vendorOf(i)!==_SM_VENDOR); }
+function loadCartFromStorage(){ cart={}; _saved().filter(i=>_vendorOf(i)===_SM_VENDOR).forEach(i=>{ cart[i.id]={item:i,qty:i.qty}; }); updateCartBar(); }
+function saveCartToStorage(){
+  const own=Object.values(cart).map(c=>({id:c.item.id,name:c.item.name,price:c.item.price,qty:c.qty,image:c.item.image_url||c.item.image||'',vendor:_SM_VENDOR,vendor_wa:'',vendor_fee:null}));
+  const others=_saved().filter(i=>_vendorOf(i)!==_SM_VENDOR);
+  localStorage.setItem('qibah_cart',JSON.stringify([...others,...own]));
+  if(!others.length){ localStorage.removeItem('qibah_restaurant'); localStorage.removeItem('qibah_delivery_fee'); }
+}
+function changeQty(id,delta,e){
+  if(e) e.stopPropagation();
+  if(delta>0&&_smBlockedByTwoVendors()){ showToast('🛍️ يمكنك الطلب من متجرين فقط في نفس السلة'); return; }
+  const prod=(DATA&&DATA.top||[]).find(p=>String(p.id)===String(id))||(cart[id]&&cart[id].item); if(!prod) return;
+  const key=prod.id, prev=cart[key]?cart[key].qty:0;
+  if(!cart[key]) cart[key]={item:prod,qty:0};
+  cart[key].qty=Math.max(0,cart[key].qty+delta); if(!cart[key].qty) delete cart[key];
+  saveCartToStorage(); updateCartBar(); updateCtrl(key);
+  if(delta>0){
+    try{ const hp=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Haptics; hp?hp.impact({style:'MEDIUM'}):(navigator.vibrate&&navigator.vibrate(45)); }catch(_){}
+    if(prev>0){ const n=document.getElementById('qn-'+key); if(n){ n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump'); } }
+    const b=document.getElementById('cart-count'); if(b){ b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+    showToast('تمت الإضافة ✓');
   }
+}
+function updateCtrl(id){
+  const el=document.getElementById('ctrl-'+id); if(!el) return;
+  const q=cart[id]?cart[id].qty:0;
+  el.innerHTML=q>0
+    ?'<span class="qty-ctrl"><button class="qty-btn qty-m" onclick="changeQty(\''+id+'\',-1,event)" aria-label="أنقص"><i class="ti ti-minus" style="font-size:12px"></i></button><span class="qty-n" id="qn-'+id+'">'+q+'</span><button class="qty-btn qty-p" onclick="changeQty(\''+id+'\',1,event)" aria-label="زد"><i class="ti ti-plus" style="font-size:12px"></i></button></span>'
+    :'<button class="add-btn" onclick="changeQty(\''+id+'\',1,event)" aria-label="أضف"><i class="ti ti-plus" style="font-size:18px"></i></button>';
+}
+function updateCartBar(){
+  const items=Object.values(cart), count=items.reduce((s,i)=>s+i.qty,0), total=items.reduce((s,i)=>s+Number(i.item.price)*i.qty,0);
+  const all=_saved().reduce((s,i)=>s+(Number(i.qty)||0),0);
+  document.getElementById('cart-count').textContent=all?ar(all):'٠';
+  const bar=document.getElementById('cart-bar');
+  if(count>0){ bar.classList.add('show'); document.getElementById('cart-count-pill').innerHTML=CART_ICON+count; document.getElementById('cart-total').innerHTML=RIYAL.replace('currentColor','#fff')+' '+total.toFixed(2); updateFreeDelivery(total); }
+  else bar.classList.remove('show');
+}
+function updateFreeDelivery(total){
+  const fill = document.getElementById('fd-fill');
+  const text = document.getElementById('fd-text');
+  if(!fill || !text) return;
+  const R = RIYAL.replace('currentColor','#fff');
+  if(_smOtherVendor()){ // restaurant item also in cart → flat two-vendor fee
+    fill.classList.remove('done'); fill.style.width = '100%';
+    text.innerHTML = '🛍️ توصيل ' + _twoVendorFee + ' ' + R + ' لطلبك من متجرين';
+    return;
+  }
+  // cheaper-delivery tier first ("أضف X ويصير التوصيل 3.5 بدل 5"), then free delivery
+  const tier = _smDiscMin>0 && _smDiscFee<_smFee0 && !(_fdMin>0 && _smDiscMin>=_fdMin);
+  const nf = x => '<span class="new-fee">'+x+' '+R+'</span> <span class="old-fee">'+_smFee0+'</span>';
+  if(tier && total < _smDiscMin){
+    fill.classList.remove('done'); fill.style.width = Math.max(0, Math.min(100, (total/_smDiscMin)*100)) + '%';
+    text.innerHTML = '🚚 أضف <b>' + (_smDiscMin-total).toFixed(2) + ' ' + R + '</b> ويصير التوصيل ' + nf(_smDiscFee);
+    return;
+  }
+  if(!(_fdMin > 0)){   // no free delivery: show the fee the customer pays now
+    fill.style.width = '100%';
+    if(tier){ fill.classList.add('done'); text.innerHTML = '🎉 توصيلك الآن ' + nf(_smDiscFee); }
+    else { fill.classList.remove('done'); text.innerHTML = '🚚 التوصيل <b>' + _smFee0 + ' ' + R + '</b>'; }
+    return;
+  }
+  const min = _fdMin;
+  const pct = Math.max(0, Math.min(100, (total/min)*100));
+  fill.style.width = pct + '%';
+  if(tier && total < min){
+    fill.classList.remove('done');
+    text.innerHTML = '✅ توصيلك ' + nf(_smDiscFee) + ' · أضف <b>' + (min-total).toFixed(2) + ' ' + R + '</b> لتوصيل مجاني';
+    return;
+  }
+  if(total >= min){
+    fill.classList.add('done');
+    text.innerHTML = '🎉 مبروك! حصلت على <b>توصيل مجاني</b>';
+  } else {
+    fill.classList.remove('done');
+    const remain = (min - total).toFixed(2);
+    text.innerHTML = (pct >= 75)
+      ? ('🔥 باقي <b>' + remain + ' ' + R + '</b> فقط للتوصيل المجاني!')
+      : ('🚚 أضف <b>' + remain + ' ' + R + '</b> لتوصيل مجاني');
+  }
+}
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1500); }
+// the big search (or another tab) changed the cart → refresh
+window.updateCart=function(){ loadCartFromStorage(); (DATA&&DATA.top||[]).forEach(p=>updateCtrl(p.id)); };
+addEventListener('pageshow',()=>window.updateCart());
+addEventListener('storage',e=>{ if(e.key==='qibah_cart') window.updateCart(); });
+
+document.addEventListener('DOMContentLoaded',()=>{
+  loadCartFromStorage();
+  if(typeof supabase!=='undefined'){ sb=supabase.createClient(SB_URL,SB_KEY); loadDeliverySettings(); }
+  load();
 });
 </script>
 <script src="/ds-lib/ds-cart-remind-2.js" defer></script>

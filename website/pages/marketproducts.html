@@ -124,6 +124,20 @@
     @keyframes num-bump{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.35)}100%{transform:translateY(0) scale(1)}}
     .cart-dot.pop{animation:badge-pop .35s cubic-bezier(.36,.07,.19,.97)}
     @keyframes badge-pop{0%{transform:scale(1)}30%{transform:scale(1.8)}60%{transform:scale(.82)}80%{transform:scale(1.15)}100%{transform:scale(1)}}
+    /* SIDE MENU: the sub-sections of a section, or of a collection (الفطور …) — switch instantly */
+    .browse{display:flex;align-items:flex-start}
+    .bmain{flex:1;min-width:0}
+    .rail{display:none}
+    body.has-rail .rail{display:block;width:86px;flex-shrink:0;position:sticky;top:var(--railtop,58px);max-height:calc(100vh - var(--railtop,58px));overflow-y:auto;scrollbar-width:none;background:#fff;border-left:1px solid var(--border);padding-bottom:150px}
+    .rail::-webkit-scrollbar{display:none}
+    .rl{display:block;width:100%;border:none;background:none;padding:10px 4px 9px;text-align:center;font-family:inherit;font-size:10.5px;font-weight:800;color:var(--muted);border-right:3px solid transparent;cursor:pointer;line-height:1.3}
+    .rl .ri{width:42px;height:42px;border-radius:13px;margin:0 auto 4px;display:grid;place-items:center;overflow:hidden;background:#f8f4f6;font-size:20px}
+    .rl .ri img{width:100%;height:100%;object-fit:cover}
+    .rl small{display:block;font-size:9.5px;color:#b8a4ad;font-weight:700;margin-top:1px}
+    .rl.on{background:var(--rose-soft);color:var(--rose);border-right-color:var(--rose)}
+    .rl.on .ri{box-shadow:0 0 0 2px var(--rose)}
+    body.has-rail .products-grid{grid-template-columns:repeat(2,1fr);padding:10px 8px}
+    body.has-rail .und-row{padding:0 8px}
   </style>
 </head>
 <body>
@@ -148,6 +162,7 @@
   <div class="info-count" id="products-count">جاري التحميل...</div>
   <div class="chips-row" id="chips-row"></div>
 </div>
+<div class="browse" id="browse"><nav class="rail" id="rail" aria-label="الأقسام الفرعية"></nav><div class="bmain">
 <div class="und-row" id="und-row"></div>
 
 <div class="products-grid" id="products-grid">
@@ -165,6 +180,7 @@
     <span id="load-more-label">عرض المزيد</span>
   </button>
 </div>
+</div></div>
 
 <!-- CART BAR + FREE-DELIVERY PROGRESS -->
 <div class="cart-bar" id="cart-bar" onclick="window.location.href='/cart'">
@@ -223,6 +239,9 @@ let sb=null;
 const PAGE_SIZE = 30;
 let cart={}, sortAsc=true, categoryName='';
 let ALL=[], SORT='cheap', PRICE='', SHOWN=PAGE_SIZE, POP={};
+// side menu + collections ("تسوّق حسب وقتك" on the supermarket page → /category/<key>; these names are reserved in the database)
+const COLLS={breakfast:['الفطور','🍳'],lunch:['طبخ الغداء','🍲'],dinner:['عشاء خفيف','🌙'],sweets:['حلا وشوكولاتة','🍫'],kashta:['كشتة وشواء','🔥'],cold:['آيسكريم وبارد','🍦']};
+let RAIL=[], SEL='', COLLN='', COLLE='', AISLE=null, CATS=[];
 let loaded=[];
 let offset=0;
 let totalCount=0;
@@ -253,7 +272,9 @@ window.addEventListener('load', async () => {
   const raw = params.get('cat') || '';
   const stored = sessionStorage.getItem('qibah_cat') || '';
   const slugM = /^\/category\/([a-z0-9-]+)\/?$/i.exec(location.pathname);
-  if (slugM) {
+  if (slugM && COLLS[slugM[1].toLowerCase()]) {          // a collection: /category/breakfast …
+    [COLLN, COLLE] = COLLS[slugM[1].toLowerCase()];
+  } else if (slugM) {
     // clean address /category/fruits-vegetables → the category's name (instant when we came from the supermarket page)
     const slug = slugM[1].toLowerCase();
     if (stored && (sessionStorage.getItem('qibah_cat_slug') || '') === slug) categoryName = stored;
@@ -279,8 +300,8 @@ window.addEventListener('load', async () => {
   }
   try { sessionStorage.setItem('qibah_cat', categoryName); } catch(e) {}
 
-  document.getElementById('page-title').textContent = categoryName || 'المنتجات';
-  document.title = categoryName + ' - قبة';
+  document.getElementById('page-title').textContent = COLLN ? COLLE + ' ' + COLLN : (categoryName || 'المنتجات');
+  document.title = (COLLN || categoryName) + ' - خطوة التوصيل';
   loadCartFromStorage();
   await fetchPage(true);
 });
@@ -303,18 +324,55 @@ async function fetchPage(reset) {
     }
     return all;
   }
-  // a whole section (e.g. «ألبان وبيض») = the products of all its sub-sections
-  let subs = [];
-  if (categoryName) { try { const k = await sb.from('supermarket_categories').select('name').eq('parent_name', categoryName).eq('is_active', true); subs = (k.data || []).map(x => x.name); } catch(e) {} }
-  let data = await loadAll(q => categoryName ? (subs.length ? q.in('category_name', subs) : q.eq('category_name', categoryName)) : q);
+  // a section shows all its sub-sections in the side menu; a sub-section shows its brothers (switch without loading)
+  await setupRail();
+  const names = RAIL.map(c => c.name);
+  let data = await loadAll(q => COLLN ? q.contains('collections', [COLLN]) : categoryName ? (names.length ? q.in('category_name', names) : q.eq('category_name', categoryName)) : q);
   if (categoryName && (!data || !data.length)) data = await loadAll(q => q.ilike('category_name', '%' + categoryName.substring(0,4) + '%'));
   isLoading = false;
   ALL = (data || []).map(p => { p._n = dsNorm(p.name + ' ' + (p.name_en || '') + ' ' + (p.brand || '')); return p; });
+  if (COLLN) buildCollRail();
+  if (RAIL.length > 1) SORT = 'pop';
+  renderRail();
   loadPopular();
   applyView();
 }
 
 // Arabic search that forgives spelling: أ/إ/آ=ا · ة=ه · ى/ی=ي · tashkeel ignored · Arabic digits = 0-9
+/* ---- Side menu ---- */
+function _e(t){ return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+async function setupRail(){
+  RAIL=[]; SEL=''; AISLE=null;
+  try{ const r=await sb.from('supermarket_categories').select('name,parent_name,slug,sort_order,image_url').eq('is_active',true); CATS=(r&&r.data)||[]; }catch(e){ CATS=[]; }
+  if(COLLN||!categoryName) return;
+  const kids=n=>CATS.filter(c=>c.parent_name===n).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+  const me=CATS.find(c=>c.name===categoryName); if(!me) return;
+  const k=kids(me.name);
+  if(k.length){ RAIL=k; AISLE=me; }
+  else if(me.parent_name){ const sib=kids(me.parent_name); if(sib.length>1){ RAIL=sib; SEL=me.name; AISLE=CATS.find(c=>c.name===me.parent_name&&!c.parent_name)||{name:me.parent_name}; } }
+  if(AISLE) document.getElementById('page-title').textContent=AISLE.name;
+}
+function buildCollRail(){
+  const seen={}; ALL.forEach(p=>{ seen[p.category_name]=1; });
+  const rank=n=>{ const me=CATS.find(x=>x.name===n)||{}, par=me.parent_name?(CATS.find(x=>x.name===me.parent_name&&!x.parent_name)||{}):me;
+    return ((par.sort_order||99)*1000)+(me.parent_name?(me.sort_order||0):0); };
+  RAIL=Object.keys(seen).sort((a,b)=>rank(a)-rank(b)).map(n=>Object.assign({},CATS.find(x=>x.name===n)||{},{name:n}));
+}
+function renderRail(){
+  const el=document.getElementById('rail'); if(!el) return;
+  const on=RAIL.length>1; document.body.classList.toggle('has-rail',on);
+  if(!on){ el.innerHTML=''; return; }
+  const cnt={}; ALL.forEach(p=>{ cnt[p.category_name]=(cnt[p.category_name]||0)+1; });
+  const item=(n,label,img,c,ico)=>'<button class="rl'+(SEL===n?' on':'')+'" data-n="'+_e(n)+'" onclick="pickRail(this.dataset.n)"><span class="ri">'+(img?'<img src="'+_e(dsImg(img,120))+'" alt="" loading="lazy"/>':(ico||'🛒'))+'</span>'+_e(label)+'<small>'+c+'</small></button>';
+  el.innerHTML=item('','الكل',null,ALL.length,'🧺')+RAIL.filter(c=>cnt[c.name]).map(c=>item(c.name,c.name,c.image_url,cnt[c.name])).join('');
+  const tb=document.querySelector('.topbar'); document.documentElement.style.setProperty('--railtop',(tb?tb.offsetHeight:58)+'px');
+  const cur=el.querySelector('.rl.on'); if(cur&&cur.scrollIntoView&&cur.offsetTop>el.clientHeight-60) el.scrollTop=cur.offsetTop-80;
+}
+function pickRail(n){
+  SEL=n||''; SHOWN=PAGE_SIZE; applyView(); renderRail();
+  if(!COLLN){ const c=SEL?CATS.find(x=>x.name===SEL):AISLE; if(c&&c.slug&&history.replaceState) history.replaceState(history.state,'','/category/'+c.slug); }
+  const b=document.getElementById('browse'); if(b&&b.getBoundingClientRect().top<0) window.scrollTo({top:window.scrollY+b.getBoundingClientRect().top-(document.querySelector('.topbar')||{offsetHeight:0}).offsetHeight,behavior:'smooth'});
+}
 // Back: to the page the customer came from on this site; opened from a shared link → the supermarket (not out of the app)
 function dsBack(){ var ok=false; try{ ok=!!document.referrer&&new URL(document.referrer).origin===location.origin; }catch(_){} if(ok&&history.length>1) history.back(); else location.href='/supermarket'; }
 function dsNorm(t){ return String(t||'').replace(/[\u064B-\u0652\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/[ىی]/g,'ي').replace(/ک/g,'ك')
@@ -339,6 +397,7 @@ function applyView(){
   let mn=R.min, mx=R.max;
   if(PRICES[PRICE]){ const p=PRICES[PRICE]; if(p[0]!=null) mn=Math.max(mn||0,p[0]); if(p[1]!=null) mx=mx==null?p[1]:Math.min(mx,p[1]); }
   let list=ALL.filter(p=>{ const v=Number(p.price)||0; return R.words.every(w=>p._n.indexOf(w)>=0)&&(mn==null||v>=mn)&&(mx==null||v<=mx); });
+  if(SEL&&!R.words.length) list=list.filter(p=>p.category_name===SEL);   // side menu choice (a search looks in the whole section)
   const sort=R.sort||SORT, num=p=>Number(p.price)||0, pop=p=>Number(POP[String(p.id)]||0);
   if(sort==='exp') list.sort((a,b)=>num(b)-num(a));
   else if(sort==='pop') list.sort((a,b)=>pop(b)-pop(a)||num(a)-num(b));
