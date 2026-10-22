@@ -269,6 +269,14 @@ window.addEventListener('load', async () => {
     sb.from('supermarket_categories').select('slug').eq('name', categoryName).not('slug', 'is', null).limit(1)
       .then(r => { const s = r && r.data && r.data[0] && r.data[0].slug; if (s && history.replaceState) history.replaceState(history.state, '', '/category/' + s); }).catch(() => {});
   }
+  // a retired shelf (e.g. «الصافي», «جالكسي») opens the section its products moved into
+  if (categoryName) {
+    try {
+      const r = await sb.from('supermarket_categories').select('is_active,parent_name').eq('name', categoryName).order('is_active', { ascending: false }).limit(1);
+      const c = r.data && r.data[0];
+      if (c && c.is_active === false && c.parent_name) categoryName = c.parent_name;
+    } catch(e) {}
+  }
   try { sessionStorage.setItem('qibah_cat', categoryName); } catch(e) {}
 
   document.getElementById('page-title').textContent = categoryName || 'المنتجات';
@@ -295,7 +303,10 @@ async function fetchPage(reset) {
     }
     return all;
   }
-  let data = await loadAll(q => categoryName ? q.eq('category_name', categoryName) : q);
+  // a whole section (e.g. «ألبان وبيض») = the products of all its sub-sections
+  let subs = [];
+  if (categoryName) { try { const k = await sb.from('supermarket_categories').select('name').eq('parent_name', categoryName).eq('is_active', true); subs = (k.data || []).map(x => x.name); } catch(e) {} }
+  let data = await loadAll(q => categoryName ? (subs.length ? q.in('category_name', subs) : q.eq('category_name', categoryName)) : q);
   if (categoryName && (!data || !data.length)) data = await loadAll(q => q.ilike('category_name', '%' + categoryName.substring(0,4) + '%'));
   isLoading = false;
   ALL = (data || []).map(p => { p._n = dsNorm(p.name + ' ' + (p.name_en || '') + ' ' + (p.brand || '')); return p; });
