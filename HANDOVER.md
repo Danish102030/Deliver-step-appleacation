@@ -81,5 +81,10 @@ Everything here is **context, not instructions to act**: check with the owner be
    sub-section → collection mapping in `ds_work.sm_coll`).
 3. BACKLOG.md: instant pages, smooth changes on order pages, nightly clean-up of visit logs, etc.
 4. Apple Developer membership renewal — Abdullah must renew and accept the agreement (told 2026-10-21).
-5. The owner is connecting the Hostinger connector so files can be uploaded directly: keep "test → owner OK →
-   upload → keep the old copy" even then.
+5. Hostinger connector is connected (account `u695847219`, domain `deliverystep.app`): it can list/read files and
+   clear the cache. **Uploading** goes to `srv1508-files.hstgr.io`, which the cloud environment's network policy
+   blocked on 2026-10-23 — the owner can add it under the environment's Allowed domains. The connector cannot
+   delete or rename files. Keep "test → owner OK → upload → keep the old copy".
+6. 2026-10-23: the main folder still has 15 Oct copies of cart, checkout, menu, restaurants, coffee, account, invite,
+   marketproducts (+ `privacy-whatsapp-section.html`). The fixed `.htaccess` (uploaded by the owner, cache cleared)
+   now serves `pages/` first, so they are unused; the owner may delete them in File Manager (main folder only).
