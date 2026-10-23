@@ -126,41 +126,14 @@ img{-webkit-user-drag:none}
   <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
 </div>
 
-<div class="glass-nav-wrap">
-  <nav class="glass-nav">
-    <div class="gnav-item" onclick="window.location.href='/'">
-      <i class="ti ti-home gnav-icon" aria-hidden="true"></i>
-      <span class="gnav-label">الرئيسية</span>
-      <div class="gnav-dot"></div>
-    </div>
-    <div class="gnav-item" onclick="window.location.href='/restaurants'">
-      <i class="ti ti-tools-kitchen-2 gnav-icon" aria-hidden="true"></i>
-      <span class="gnav-label">المطاعم</span>
-      <div class="gnav-dot"></div>
-    </div>
-    <div class="gnav-item">
-      <i class="ti ti-building-store gnav-icon act" aria-hidden="true"></i>
-      <span class="gnav-label act">سوبرماركت</span>
-      <div class="gnav-dot act"></div>
-    </div>
-    <div class="gnav-item" onclick="window.location.href='/account'">
-      <i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i>
-      <span class="gnav-label">حسابي</span>
-      <div class="gnav-dot"></div>
-    </div>
-  </nav>
-</div>
-<script src="/ds-lib/ds-nav-3.js"></script><!-- same bottom menu on every page (الرئيسية · سوبرماركت · طلباتي · حسابي) -->
-
-
-<script src="/dssearch.js?v=6" defer></script>
-<script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
 <script>
 const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
 let sb=null;
 
 let allCats = [];
+// every section's sub-categories (loaded with the sections in ONE request) → tapping a section or coming back is instant
+let SUBMAP = {}, SUBMAP_OK = false;
 
 const FRUIT_VEG_ID = 'a5fbf689-76ef-43ae-a440-4b8e8e9c0e6e';
 
@@ -169,9 +142,16 @@ async function loadCatsFromDB() {
     const {data,error} = await sb.from('supermarket_categories')
       .select('*')
       .eq('is_active',true)
-      .is('parent_name', null)
       .order('sort_order');
-    let cats = (!error && data && data.length) ? data : getDefaultCats();
+    const all = (!error && Array.isArray(data)) ? data : [];
+    let cats = all.filter(c => !c.parent_name);
+    if (!cats.length) cats = getDefaultCats();
+    if (!error && all.length) {
+      const map = {};
+      all.filter(c => c.parent_name).forEach(c => { (map[c.parent_name] = map[c.parent_name] || []).push(c); });
+      SUBMAP = map; SUBMAP_OK = true;
+      try { sessionStorage.setItem('qibah_sm_subs', JSON.stringify(map)); } catch(_){}
+    }
     // If fruits & vegetables is missing from results, fetch it directly by ID
     if (!cats.find(c => c.id === FRUIT_VEG_ID)) {
       try {
@@ -183,6 +163,7 @@ async function loadCatsFromDB() {
     allCats = cats;
     try { sessionStorage.setItem('qibah_sm_cats', JSON.stringify(cats)); } catch(_){}
   } catch(e) { allCats = getDefaultCats(); }
+  if (SUB && SUBMAP[SUB] && SUBMAP[SUB].length) showSubCategories(SUB, SUBMAP[SUB], true);   // refresh the open section quietly
   renderCats(allCats);
 }
 
@@ -259,6 +240,11 @@ function catUrl(name, slug){ return slug ? '/category/' + slug : '/marketproduct
 function goCat(name, slug){ try{ sessionStorage.setItem('qibah_cat', name); sessionStorage.setItem('qibah_cat_slug', slug||''); }catch(_){} window.location.href = catUrl(name, slug); }
 async function goToCategory(name, fromHistory) {
   const _main = (allCats||[]).find(c => c.name === name) || {};
+  if (SUBMAP_OK) {                                   // already known on this phone → no waiting
+    const subs = SUBMAP[name] || [];
+    if (subs.length) showSubCategories(name, subs, fromHistory); else goCat(name, _main.slug);
+    return;
+  }
   try {
     const {data} = await sb.from('supermarket_categories')
       .select('id, name, image_url, bg_color, slug')
@@ -287,7 +273,9 @@ function showSubCategories(parentName, subs, fromHistory) {
   document.getElementById('cat-count').textContent = subs.length + ' فئة';
 
   const grid = document.getElementById('cats-grid');
-  grid.dataset.sig = 'subcats:' + parentName; // so returning to main re-renders
+  const sig = 'subcats:' + parentName + '|' + subs.map(c => c.name + '~' + (c.image_url||'')).join('|');
+  if (grid.dataset.sig === sig) return;   // already on screen → don't redraw (no flash)
+  grid.dataset.sig = sig;                 // (returning to the main list re-renders it)
   grid.innerHTML = subs.map(c => `
     <div class="cat-card" data-name="${c.name}" data-slug="${c.slug||''}" onclick="goCat(this.dataset.name,this.dataset.slug)">
       <div class="cat-img-wrap" style="background:${c.bg_color||'#f0fdf4'}">
@@ -333,11 +321,14 @@ async function loadDeliverySettings(){
     });
     if(!slides.length&&cfg.free===undefined&&fee!==null&&!isNaN(fee)) slides.push('<div class="dslide ds-tier"><span>🚚</span><span>رسوم التوصيل '+n(fee)+' ريال</span></div>');
     _dsSpeed=[3,4,6].includes(Number(cfg.speed))?Number(cfg.speed)*1000:4000;
+    const key=JSON.stringify({s:slides,sp:_dsSpeed});
+    if(key===_dsKey) return;        // same as the copy already on screen → keep it moving, no redraw
+    _dsKey=key; try{ localStorage.setItem('ds_sm_strip_v1',key); }catch(e){}
     deliverySlider(slides);
   }catch(e){}
 }
 // delivery offers: swipe left/right, or they change by themselves every 4 seconds
-let _dsI=0, _dsT=null, _dsSpeed=4000;
+let _dsI=0, _dsT=null, _dsSpeed=4000, _dsKey='';
 function deliverySlider(slides){
   const el=document.getElementById('dslider'); if(!el) return;
   if(!slides.length){ el.innerHTML=''; return; }
@@ -377,33 +368,65 @@ async function loadProductCount(){
   }catch(e){}
 }
 
+// ── 1) right away (this script sits under the sections, so the page is drawn complete in its first frame) ──
+updateCart();
+renderHero();
+try{ const c=localStorage.getItem('ds_sm_strip_v1'); if(c){ const o=JSON.parse(c); if(o&&Array.isArray(o.s)){ _dsKey=c; _dsSpeed=o.sp||4000; deliverySlider(o.s); } } }catch(e){}
+try{ const c=JSON.parse(localStorage.getItem('ds_sm_count')||'null'); if(c&&c.n) showCount(c.n); }catch(e){}
+try{ const m=JSON.parse(sessionStorage.getItem('qibah_sm_subs')||'null'); if(m&&typeof m==='object'){ SUBMAP=m; SUBMAP_OK=true; } }catch(e){}
+renderCachedCats();
+if (history.state && history.state.dsSub) {                 // came back to a section → show it straight away
+  SUB = history.state.dsSub;
+  if (SUBMAP[SUB] && SUBMAP[SUB].length) showSubCategories(SUB, SUBMAP[SUB], true);
+  else document.body.classList.add('in-sub');
+}
+
+// ── 2) when the page is ready: refresh from the internet (quietly — nothing is redrawn if nothing changed) ──
 document.addEventListener('DOMContentLoaded', () => {
-  updateCart();
-  renderHero();
   if(typeof supabase !== 'undefined') {
     sb = supabase.createClient(SB_URL, SB_KEY);
-    // Back-navigation: render this session's cached categories INSTANTLY (smooth, no skeleton).
-    // First visit: show the shimmer skeleton while we fetch.
-    if (history.state && history.state.dsSub) { SUB = history.state.dsSub; goToCategory(SUB, true); }   // came back to a section
-    const hadCache = renderCachedCats();
-    if(!hadCache){
-      const grid=document.getElementById('cats-grid');
-      if(grid){
-        let sk='';
-        for(let i=0;i<9;i++)sk+='<div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>';
-        grid.dataset.sig=''; grid.innerHTML=sk;
-      }
-    }
-    loadCatsFromDB();       // refreshes silently; renderCats is a no-op if nothing changed
+    if (SUB && !(SUBMAP[SUB] && SUBMAP[SUB].length)) goToCategory(SUB, true);
+    loadCatsFromDB();
     loadDeliverySettings();
     loadProductCount();
-  } else {
+  } else if (!allCats.length) {
     // Fallback if Supabase fails to load
     allCats = getDefaultCats();
     renderCats(allCats);
   }
 });
 </script>
+
+<div class="glass-nav-wrap">
+  <nav class="glass-nav">
+    <div class="gnav-item" onclick="window.location.href='/'">
+      <i class="ti ti-home gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">الرئيسية</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/restaurants'">
+      <i class="ti ti-tools-kitchen-2 gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">المطاعم</span>
+      <div class="gnav-dot"></div>
+    </div>
+    <div class="gnav-item">
+      <i class="ti ti-building-store gnav-icon act" aria-hidden="true"></i>
+      <span class="gnav-label act">سوبرماركت</span>
+      <div class="gnav-dot act"></div>
+    </div>
+    <div class="gnav-item" onclick="window.location.href='/account'">
+      <i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i>
+      <span class="gnav-label">حسابي</span>
+      <div class="gnav-dot"></div>
+    </div>
+  </nav>
+</div>
+<script src="/ds-lib/ds-nav-3.js"></script><!-- same bottom menu on every page (الرئيسية · سوبرماركت · طلباتي · حسابي) -->
+
+
+<script src="/dssearch.js?v=6" defer></script>
+<script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
+
 <script src="/ds-lib/ds-cart-remind-2.js" defer></script>
 </body>
 </html>
