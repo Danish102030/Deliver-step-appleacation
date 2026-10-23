@@ -19,7 +19,7 @@
     body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px));direction:rtl}
     .topbar{background:var(--rose);padding:11px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
     .btn-back{background:rgba(255,255,255,0.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
-    .topbar-title{font-size:16px;font-weight:700;color:#fff;flex:1;line-height:1.25}
+    .topbar-title{font-size:16px;font-weight:700;color:#fff;flex:1;line-height:1.25;min-height:36px;display:flex;flex-direction:column;justify-content:center}   /* same height with or without the 2nd line → nothing moves */
     .topbar-sub{display:block;font-size:11.5px;font-weight:600;opacity:.9;margin-top:1px}
     .topbar-sub .n{direction:ltr;unicode-bidi:isolate;font-weight:800}
     /* delivery offers: slim strip, swipe left/right (Admin → Settings) */
@@ -44,7 +44,7 @@
     .h-lunch{background:linear-gradient(135deg,#bbf7d0,#4ade80);color:#14532d}.h-lunch .go{background:#14532d;color:#dcfce7}
     .h-dinner{background:linear-gradient(135deg,#c7d2fe,#818cf8);color:#1e1b4b}.h-dinner .go{background:#1e1b4b;color:#e0e7ff}
     .h-cold{background:linear-gradient(135deg,#bae6fd,#38bdf8);color:#0c4a6e}.h-cold .go{background:#0c4a6e;color:#e0f2fe}
-    body.in-sub .dslider,body.in-sub .hero{display:none}
+    .cats-grid[hidden]{display:none}
     .cart-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0}
     .cart-dot{position:absolute;top:-4px;left:-4px;width:16px;height:16px;background:#fff;color:var(--rose);border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
     .search-wrap{background:var(--rose-dark);padding:0 16px 10px}
@@ -125,6 +125,8 @@ img{-webkit-user-drag:none}
   <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
   <div class="sktile"><div class="s-timg skel"></div><div class="s-tnm skel"></div></div>
 </div>
+<!-- each opened section keeps its own grid here: going back and forth only hides/shows grids (pictures never reload → no flash) -->
+<div id="sub-grids"></div>
 
 <script>
 const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
@@ -201,11 +203,11 @@ function renderCats(list) {
   const sig = JSON.stringify(list.map(c => [c.name, c.image_url, c.bg_color]));
   if (grid.dataset.sig === sig) return;
   grid.dataset.sig = sig;
-  grid.innerHTML = list.map(c => `
+  grid.innerHTML = list.map((c, i) => `
     <div class="cat-card" onclick="goToCategory('${c.name}')">
       <div class="cat-img-wrap" style="background:${c.bg_color||'#f0fdf4'}">
         ${c.image_url
-          ? `<img src="${c.image_url}" alt="${c.name}" loading="lazy"/>`
+          ? `<img src="${c.image_url}" alt="${c.name}" loading="${i < 12 ? 'eager' : 'lazy'}"/>`
           : `<div style="font-size:40px">🛒</div>`}
       </div>
       <div class="cat-name">${c.name}</div>
@@ -227,7 +229,15 @@ function showMain() {
   document.getElementById('page-sub').style.display = '';
   document.body.classList.remove('in-sub');
   document.getElementById('back-btn').style.display = 'none';
+  showGrid(document.getElementById('cats-grid'));
   renderCats(allCats);
+  if (_mainY != null) { window.scrollTo(0, _mainY); _mainY = null; }   // back where the customer was in the list
+}
+// only ONE grid is visible; the others stay ready in the page with their pictures already drawn
+let _mainY = null;
+function showGrid(g) {
+  document.querySelectorAll('.cats-grid').forEach(x => { if (x !== g) x.hidden = true; });
+  g.hidden = false;
 }
 
 function filterCats(q) {
@@ -262,8 +272,15 @@ async function goToCategory(name, fromHistory) {
   }
 }
 
+// a finger touches a section → its sub-section pictures start loading already (they are ready when the finger lifts)
+document.addEventListener('touchstart', e => {
+  const c = e.target.closest && e.target.closest('#cats-grid .cat-card'); if (!c || !SUBMAP_OK) return;
+  const name = c.querySelector('.cat-name') && c.querySelector('.cat-name').textContent;
+  (SUBMAP[name] || []).forEach(x => { if (x.image_url) { const im = new Image(); im.src = x.image_url; } });
+}, { passive: true });
 function showSubCategories(parentName, subs, fromHistory) {
   if (!fromHistory) { try { history.pushState({ dsSub: parentName }, ''); } catch(_) {} }
+  if (!SUB) _mainY = window.scrollY;
   SUB = parentName;
   document.getElementById('home-btn').style.display = 'none';   // one back arrow only: back to the sections
   document.getElementById('page-heading').textContent = parentName;
@@ -272,15 +289,21 @@ function showSubCategories(parentName, subs, fromHistory) {
   document.getElementById('back-btn').style.display = 'flex';
   document.getElementById('cat-count').textContent = subs.length + ' فئة';
 
-  const grid = document.getElementById('cats-grid');
-  const sig = 'subcats:' + parentName + '|' + subs.map(c => c.name + '~' + (c.image_url||'')).join('|');
-  if (grid.dataset.sig === sig) return;   // already on screen → don't redraw (no flash)
-  grid.dataset.sig = sig;                 // (returning to the main list re-renders it)
+  const box = document.getElementById('sub-grids');
+  let grid = [...box.children].find(g => g.dataset.parent === parentName);
+  if (!grid) { grid = document.createElement('div'); grid.className = 'cats-grid'; grid.dataset.parent = parentName; box.appendChild(grid); }
+  showGrid(grid);
+  // start of the section on screen (the customer may have tapped it low down in the list)
+  const head = document.querySelector('.sec-head');
+  if (head && window.scrollY > head.offsetTop - 60) window.scrollTo(0, Math.max(0, head.offsetTop - 60));
+  const sig = subs.map(c => c.name + '~' + (c.image_url||'') + '~' + (c.slug||'') + '~' + (c.bg_color||'')).join('|');
+  if (grid.dataset.sig === sig) return;   // already drawn → just shown again (no flash)
+  grid.dataset.sig = sig;
   grid.innerHTML = subs.map(c => `
     <div class="cat-card" data-name="${c.name}" data-slug="${c.slug||''}" onclick="goCat(this.dataset.name,this.dataset.slug)">
       <div class="cat-img-wrap" style="background:${c.bg_color||'#f0fdf4'}">
         ${c.image_url
-          ? `<img src="${c.image_url}" alt="${c.name}" loading="lazy"/>`
+          ? `<img src="${c.image_url}" alt="${c.name}"/>`
           : `<div style="font-size:40px">🛒</div>`}
       </div>
       <div class="cat-name">${c.name}</div>
