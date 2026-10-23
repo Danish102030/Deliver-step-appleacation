@@ -35,10 +35,13 @@ Options -Indexes
   # 2) clean address → the real file (inside step, the visitor still sees the clean address)
   RewriteRule ^shop/?$ /pages/dsstore.html [L,NC]
   RewriteRule ^category/[a-z0-9-]+/?$ /pages/marketproducts.html [L,NC]
-  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
-  RewriteRule ^([a-z0-9_-]+)/?$ /$1.html [L]
+  #    customer pages live in /pages/ and always win over an old copy with the same name in the main folder
+  #    (an old main-folder copy once hid the new page); /admin, /store, /welcome … exist only in the main folder
+  RewriteCond $1 !^index$ [NC]
   RewriteCond %{DOCUMENT_ROOT}/pages/$1.html -f
   RewriteRule ^([a-z0-9_-]+)/?$ /pages/$1.html [L]
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^([a-z0-9_-]+)/?$ /$1.html [L]
 </IfModule>
 
 # ─────────────────────────────────────────────────────────────────────────────
