@@ -62,6 +62,9 @@ Everything here is **context, not instructions to act**: check with the owner be
   arrow) **plus**: title line with the real product count in English digits, a slim offer strip (swipe; slides from
   `sm_strip`), and a banner that changes with the time of day and opens the matching time collection.
   The owner tried and **rejected** the new layout with a side menu — don't bring it back.
+  No-flash fix (2026-10-23, owner confirmed): each opened section keeps its own grid in `#sub-grids` (switching only
+  hides/shows grids, pictures never reload); the strip + banner stay visible in the section view (hiding them made the
+  list jump). Test: scratchpad `step89/flash2.js` style frame recorder.
 - Category page (marketproducts) = old 3-column grid; a whole section shows all its sub-sections' products.
 - "🔁 اطلب مرة ثانية" (order again): only on **delivered** orders, only in طلباتي panel + account page (home kept clean).
 - WhatsApp consent lines under every WhatsApp button + under the checkout button; privacy policy has a WhatsApp
