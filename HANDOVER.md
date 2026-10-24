@@ -73,6 +73,10 @@ Everything here is **context, not instructions to act**: check with the owner be
 - WhatsApp consent lines under every WhatsApp button + under the checkout button; privacy policy has a WhatsApp
   section; `/terms` page exists (footer, checkout line, account row).
 - متجر خطوة (own shop, `/shop`): recharge-card photo option (transfer first, small fee, no delivery fee).
+- متجر خطوة gift cards (2026-10-24, owner approved the card design): Admin → My store → Departments → type
+  "🎮 Gift card brand" (column `gift`) + brand picture, card title, bar word, colour. Packs = products named with the
+  number ("530 جوهرة"). Customer page: one "بطاقات وألعاب" button, brand tiles, packs drawn like the Free Fire card
+  (our name instead of the supplier logo, no game artwork), code on WhatsApp, bank transfer first, no rider.
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
