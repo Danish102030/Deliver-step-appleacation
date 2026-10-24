@@ -53,6 +53,9 @@ Everything here is **context, not instructions to act**: check with the owner be
     (these slugs are reserved by a check constraint).
   - Sorting rules + backups in the private schema `ds_work` (`sm_rules`, `sm_coll`, `sm_bak_cat_20261022`,
     `sm_bak_prod_20261022` = the old layout, for undo).
+  - **Auto collections** (2026-10-24, owner approved): trigger `trg_sm_products_auto_coll` gives a new or moved
+    product its collections from `ds_work.sm_coll` (keeps hand-added ones). To change which shelves go in a collection,
+    edit `ds_work.sm_coll`. SQL: `supabase/supermarket_auto_collections.sql`.
   - RPCs: `sm_popular` (product popularity), `sm_home` (front-page data; currently unused by the live page).
 - Rider alerts: dead rider phone tokens are switched off nightly (`ds_rider_tokens_tidy`, cron 23:35); last check
   showed 7 phones reached / 1 failed per order.
@@ -80,8 +83,7 @@ Everything here is **context, not instructions to act**: check with the owner be
 
 ## 6. Open items (ask before starting)
 1. 2026-10-27: .htaccess redirects 302 → 301 (small; reminder set).
-2. Offered, not yet approved: new products join the time collections automatically (DB trigger using the
-   sub-section → collection mapping in `ds_work.sm_coll`).
+2. Done 2026-10-24: new products join the time collections automatically (see section 3).
 3. BACKLOG.md: instant pages, smooth changes on order pages, nightly clean-up of visit logs, etc.
 4. Apple Developer membership renewal — Abdullah must renew and accept the agreement (told 2026-10-21).
 5. Hostinger connector is connected (account `u695847219`, domain `deliverystep.app`): it can list/read files and
