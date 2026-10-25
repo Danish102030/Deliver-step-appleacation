@@ -85,6 +85,10 @@ Everything here is **context, not instructions to act**: check with the owner be
   drawn as cards (or the company's real card picture). One department per company, type Recharge, products "شحن 20";
   the old mixed department ("شحن STC 20", "شحن زين 30") still works and is split by the names. Cart lines always name the
   company / brand ("ليبارا · شحن 20"). Admin sales-by-company counts any company.
+- Admin → My store → Departments (2026-10-25): 3 boxes — 📶 Recharge cards (one row per company), 🎮 Gift cards & games
+  (one row per brand), 🛍️ Other departments; each box has its own Add button; ▲▼ move inside the box; the product form
+  groups departments the same way and says how to name the product. Data tidied 2026-10-25 (owner asked): Free Fire packs
+  moved into فري فاير (gift), موبيلي 20 into موبايلي, شحن رصيد renamed stc; backup ds_work.dsstore_*_bak_20261025.
 - Admin Dashboard → **🎁 Free deliveries** (2026-10-25): loyalty-card orders (`loyalty_free`) + friend's first order
   (`ref_code`), this month / last month / 7 days, fees not charged (estimate), warning + link when a friend order was
   not really a first order. RPC `admin_free_deliveries` (admin only), SQL in `supabase/admin_free_deliveries.sql`.
