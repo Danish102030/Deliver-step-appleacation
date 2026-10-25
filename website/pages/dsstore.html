@@ -245,7 +245,7 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 const CK='ds_store_cache_v3';
 // phone companies: Admin → My store → Departments, type Recharge — one department per company (its logo + amounts).
 // An older mixed department ("شحن رصيد" with "شحن stc 20", "شحن زين 30" …) is split by the company in each product name.
-const RCP=[[/stc|سوا|اس تي سي/,'stc','stc','#4f008c','#7c3aed','stc'],[/mobily|موبايلي/,'mobily','mobily','#0369a1','#38bdf8','موبايلي'],[/zain|زين/,'zain','zain','#111827','#4b5563','زين'],
+const RCP=[[/stc|سوا|اس تي سي|اس تي اس/,'stc','stc','#4f008c','#7c3aed','stc'],[/mobi?ly|mobliy|موبايلي|موبيلي|موبابلي/,'mobily','mobily','#0369a1','#38bdf8','موبايلي'],[/zain|زين|زاين/,'zain','zain','#111827','#4b5563','زين'],
   [/lebara|ليبارا/,'lebara','Lebara','#1d4ed8','#ec4899','ليبارا'],[/virgin|فيرجن/,'virgin','Virgin','#b91c1c','#ef4444','فيرجن'],[/salam|سلام/,'salam','SALAM','#047857','#10b981','سلام'],[/friendi|فرندي/,'friendi','FRiENDi','#ea580c','#f59e0b','فرندي']];
 const RCOL={blue:['#1d4ed8','#38bdf8'],orange:['#c2410c','#f59e0b'],gold:['#a16207','#facc15'],black:['#111827','#4b5563'],green:['#047857','#10b981'],purple:['#4f008c','#7c3aed'],red:['#b91c1c','#ef4444']};
 let RCO=[], RCK={};
