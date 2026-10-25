@@ -81,6 +81,10 @@ Everything here is **context, not instructions to act**: check with the owner be
   border off by itself; every pack shows the whole card with a light tilt (owner chose option A), 💎 left + "Diamonds 530"
   on the card's bottom bar. "Use drawn card" goes back to the drawn design.
 
+- Admin Dashboard → **🎁 Free deliveries** (2026-10-25): loyalty-card orders (`loyalty_free`) + friend's first order
+  (`ref_code`), this month / last month / 7 days, fees not charged (estimate), warning + link when a friend order was
+  not really a first order. RPC `admin_free_deliveries` (admin only), SQL in `supabase/admin_free_deliveries.sql`.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
