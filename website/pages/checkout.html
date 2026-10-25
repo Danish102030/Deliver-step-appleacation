@@ -982,6 +982,8 @@ async function placeOrder(){
   const _blocked=await _dsRulesBlocked();
   if(_pb)_pb.disabled=false;
   if(_blocked)return;
+  // Friend gift (free delivery) is for the FIRST order only — re-check with the phone typed in the form
+  if(await _refRecheck()){ if(_pb)_pb.disabled=false; return; }
   const btn=document.getElementById('place-btn');
   btn.innerHTML='<i class="ti ti-loader" style="font-size:18px"></i> جاري تأكيد الطلب...';btn.disabled=true;
 
@@ -1254,6 +1256,22 @@ async function checkReferral(){
       if(ok){ localStorage.setItem('ds_ref_freedel','1'); localStorage.setItem('ds_ref_mode','referee'); _refBanner('توصيل مجاني — هدية من صديقك'); if(typeof calcTotals==='function')calcTotals(); }
     }
   }catch(e){}
+}
+// true = the friend gift was removed (this phone ordered before) → the customer sees the normal fee and taps again
+async function _refRecheck(){
+  if(localStorage.getItem('ds_ref_mode')!=='referee'||typeof sb==='undefined'||!sb) return false;
+  const ph=_refNorm(document.getElementById('phone').value||''), code=(localStorage.getItem('qibah_ref')||'').trim().toUpperCase();
+  if(!ph) return false;
+  try{
+    const c=await Promise.race([sb.rpc('referral_check_code',{p_code:code,p_phone:ph}), new Promise(r=>setTimeout(()=>r(null),3000))]);
+    if(!c||c.error||c.data!==false) return false;   // no answer → the database still checks and notes it
+  }catch(e){ return false; }
+  try{ localStorage.removeItem('ds_ref_freedel'); localStorage.removeItem('ds_ref_mode'); }catch(e){}
+  const el=document.getElementById('ref-banner'); if(el){ el.style.display='flex'; el.style.background='linear-gradient(135deg,#b45309,#92400e)'; el.textContent='ℹ️ هدية الصديق (توصيل مجاني) للطلب الأول فقط — رقمك له طلبات سابقة، فتم احتساب رسوم التوصيل'; }
+  _loyRedraw();   // totals + the final summary on this step
+  showToast('رسوم التوصيل تغيّرت — راجع المجموع ثم اضغط تأكيد الطلب');
+  try{ (el||document.getElementById('place-btn')).scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){}
+  return true;
 }
 async function tryReferralCode(code){
   if(typeof sb==='undefined'||!sb||!code) return false;
