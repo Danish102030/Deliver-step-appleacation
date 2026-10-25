@@ -7,3 +7,6 @@ alter table public.ds_store_departments
   add column if not exists card_title text,     -- big word on the card, e.g. FREE FIRE (empty = automatic)
   add column if not exists card_unit text,      -- word on the card bar, e.g. Diamonds / UC / $ (empty = automatic)
   add column if not exists card_color text;     -- blue, orange, gold, black, green, purple, red (empty = automatic)
+
+-- Applied 2026-10-25 (owner chose option A: light tilt): the brand's real card picture for every pack.
+alter table public.ds_store_departments add column if not exists card_image text;

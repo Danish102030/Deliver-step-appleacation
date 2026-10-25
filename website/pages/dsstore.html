@@ -92,6 +92,13 @@
     .ffc .gadd{margin-top:5px;width:100%;height:32px;border-radius:10px;background:var(--pl);color:var(--pd);font-weight:900;font-size:12.5px}
     .ffc.on .gadd{background:var(--p);color:#fff}.ffc.out .gadd{background:#f1f5f9;color:#b91c1c}
     .pc .im .gcard{width:86%;border-radius:9px}
+    /* the brand's real card picture (Admin → Card picture): whole card, light tilt, 💎 + pack number on its bottom bar */
+    .gstage{aspect-ratio:1.25/1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,#e0e7ff,#f5f3ff 70%);border-radius:12px;overflow:hidden}
+    .gphoto{position:relative;width:84%;aspect-ratio:1.74/1;border-radius:7%/12%;overflow:hidden;background:#0b1d5c center/cover no-repeat;box-shadow:0 10px 18px rgba(30,27,75,.35);direction:ltr;container-type:inline-size;transform:rotate(-7deg)}
+    .gphoto .gp-bar{position:absolute;left:5%;right:5%;top:77.5%;height:17%;display:flex;align-items:center;justify-content:space-between;padding:0 4% 0 5%;color:#fff}
+    .gp-bar i{font-style:normal;font-size:9.5cqw;line-height:1;filter:drop-shadow(0 0 5px rgba(147,197,253,.95))}
+    .gp-bar b{font:800 8.5cqw/1 system-ui,sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.5);white-space:nowrap}
+    .pc .im .gstage{width:100%;height:100%;aspect-ratio:auto;border-radius:0}
     /* offers */
     .of{border-radius:22px;padding:14px;color:#fff;background:linear-gradient(120deg,#0f766e,#0e7490);display:flex;align-items:center;gap:12px;margin-bottom:10px}
     .of .im{width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;flex-shrink:0}
@@ -248,6 +255,7 @@ function gLook(d){ const n=norm(d.name+' '+(d.card_title||'')), g=GDEF.find(x=>x
 function gAmt(i){ const m=/(\d+(?:[.,]\d+)?)/.exec(String(i.name).replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c))); return m?m[1].replace(',','.'):''; }
 function gLabel(i,L){ const v=gAmt(i); if(!v) return i.name; return L.u==='$'?'$'+v:L.u?L.u+' '+v:v; }
 function gCard(i){ const d=giftDep(i), L=gLook(d);
+  if(d.card_image) return '<div class="gstage"><div class="gphoto" style="background-image:url(\''+esc(d.card_image)+'\')"><div class="gp-bar"><i>'+esc(L.e)+'</i><b>'+esc(gLabel(i,L))+'</b></div></div></div>';
   return '<div class="gcard" style="background:'+L.bg+'"><span class="gc-l">خطوة<br>التوصيل</span><span class="gc-t"'+(L.t.length>9?' style="font-size:'+(L.t.length>12?6:7)+'cqw"':'')+'>'+esc(L.t)+'</span><span class="gc-e">'+esc(L.e)+'</span><span class="gc-b">'+esc(gLabel(i,L))+'</span></div>'; }
 function vStatus(v){
   if(!v||v.is_open===false)return{open:false,txt:'مغلق مؤقتاً'};
@@ -267,7 +275,7 @@ async function load(){
   try{
     const [r,d,g0]=await Promise.all([
       sb.from('restaurants').select('*').eq('category','ds_store').order('created_at').limit(1),
-      sb.from('ds_store_departments').select('id,name,icon,color,kind,sort_order,gift,image_url,card_title,card_unit,card_color').eq('is_active',true).order('sort_order'),
+      sb.from('ds_store_departments').select('id,name,icon,color,kind,sort_order,gift,image_url,card_title,card_unit,card_color,card_image').eq('is_active',true).order('sort_order'),
       sb.from('settings').select('value').eq('key','ds_store_digital').limit(1).then(x=>x,()=>({data:null}))
     ]);
     try{ let v=g0&&g0.data&&g0.data[0]&&g0.data[0].value; if(typeof v==='string') v=JSON.parse(v);

@@ -77,6 +77,9 @@ Everything here is **context, not instructions to act**: check with the owner be
   "🎮 Gift card brand" (column `gift`) + brand picture, card title, bar word, colour. Packs = products named with the
   number ("530 جوهرة"). Customer page: one "بطاقات وألعاب" button, brand tiles, packs drawn like the Free Fire card
   (our name instead of the supplier logo, no game artwork), code on WhatsApp, bank transfer first, no rider.
+  2026-10-25: optional **Card picture** per brand (`card_image`, e.g. the MAS Free Fire card): Admin cuts the black
+  border off by itself; every pack shows the whole card with a light tilt (owner chose option A), 💎 left + "Diamonds 530"
+  on the card's bottom bar. "Use drawn card" goes back to the drawn design.
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
