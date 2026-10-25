@@ -99,6 +99,26 @@
     .gp-bar i{font-style:normal;font-size:9.5cqw;line-height:1;filter:drop-shadow(0 0 5px rgba(147,197,253,.95))}
     .gp-bar b{font:800 8.5cqw/1 system-ui,sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.5);white-space:nowrap}
     .pc .im .gstage{width:100%;height:100%;aspect-ratio:auto;border-radius:0}
+    /* recharge: company tiles (logo from Admin) → amounts drawn as cards */
+    .ct{background:#fff;border:1.5px solid #eef0f4;border-radius:16px;overflow:hidden;text-align:center;padding:0}
+    .ct .clg{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;color:#fff;font:900 21px/1 system-ui,sans-serif;letter-spacing:-.5px;overflow:hidden;padding:0 4px}
+    .ct .clg img{width:100%;height:100%;object-fit:cover}
+    .ct b{display:block;font-size:11.5px;font-weight:900;padding:6px 4px 8px;color:var(--text)}
+    .ct.on{border-color:var(--p);box-shadow:0 0 0 3px var(--pl)}
+    .rcg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    .rcc{background:#fff;border:1.5px solid #eef0f4;border-radius:16px;padding:8px 6px;text-align:center}
+    .rcc.on{border-color:var(--p);box-shadow:0 0 0 3px var(--pl)}.rcc.out{opacity:.5}
+    .rst{aspect-ratio:1.25/1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,#ede9fe,#f8f7ff 70%);border-radius:12px;overflow:hidden}
+    .rcard{position:relative;width:84%;aspect-ratio:1.6/1;border-radius:9%/14%;overflow:hidden;color:#fff;direction:ltr;container-type:inline-size;transform:rotate(-7deg);box-shadow:0 10px 18px rgba(30,27,75,.3)}
+    .rcard::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 2px,transparent 2px 9px)}
+    .rcard .co{position:absolute;top:9%;left:7%;max-width:60%;font:900 12cqw/1 system-ui,sans-serif;letter-spacing:-.5px;white-space:nowrap;overflow:hidden}
+    .rcard .sim{position:absolute;top:11%;right:8%;width:16%;aspect-ratio:1.3/1;border-radius:3px;background:linear-gradient(135deg,#fde68a,#d97706)}
+    .rcard .ra{position:absolute;left:7%;bottom:10%;font:900 22cqw/1 system-ui,sans-serif;white-space:nowrap}.rcard .ra small{font-size:8cqw;font-weight:800;margin-left:2%;opacity:.9}
+    .rcard .tp{position:absolute;left:7%;top:33%;font:800 6.5cqw/1 Tajawal,system-ui;direction:rtl;opacity:.85}
+    .rcc .rpr{margin-top:7px;font-size:15px;font-weight:900;color:var(--text)}.rcc .rpr span{font-size:11px;color:var(--muted)}.rcc .rpr s{font-size:11px;color:var(--muted);margin-inline-start:4px}
+    .rcc .rad{margin-top:5px;width:100%;height:32px;border-radius:10px;background:var(--pl);color:var(--pd);font-weight:900;font-size:12.5px}
+    .rcc.on .rad{background:var(--p);color:#fff}.rcc.out .rad{background:#f1f5f9;color:#b91c1c}
+    .pc .im .rst{width:100%;height:100%;aspect-ratio:auto;border-radius:0}
     /* offers */
     .of{border-radius:22px;padding:14px;color:#fff;background:linear-gradient(120deg,#0f766e,#0e7490);display:flex;align-items:center;gap:12px;margin-bottom:10px}
     .of .im{width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;flex-shrink:0}
@@ -222,8 +242,13 @@
 const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
 const sb=supabase.createClient(SB_URL,SB_KEY);
-const CK='ds_store_cache_v2';
-const CAR={stc:{n:'stc',c:'#4f008c'},mobily:{n:'mobily',c:'#0369a1'},zain:{n:'zain',c:'#111111'}};
+const CK='ds_store_cache_v3';
+// phone companies: Admin → My store → Departments, type Recharge — one department per company (its logo + amounts).
+// An older mixed department ("شحن رصيد" with "شحن stc 20", "شحن زين 30" …) is split by the company in each product name.
+const RCP=[[/stc|سوا|اس تي سي/,'stc','stc','#4f008c','#7c3aed','stc'],[/mobily|موبايلي/,'mobily','mobily','#0369a1','#38bdf8','موبايلي'],[/zain|زين/,'zain','zain','#111827','#4b5563','زين'],
+  [/lebara|ليبارا/,'lebara','Lebara','#1d4ed8','#ec4899','ليبارا'],[/virgin|فيرجن/,'virgin','Virgin','#b91c1c','#ef4444','فيرجن'],[/salam|سلام/,'salam','SALAM','#047857','#10b981','سلام'],[/friendi|فرندي/,'friendi','FRiENDi','#ea580c','#f59e0b','فرندي']];
+const RCOL={blue:['#1d4ed8','#38bdf8'],orange:['#c2410c','#f59e0b'],gold:['#a16207','#facc15'],black:['#111827','#4b5563'],green:['#047857','#10b981'],purple:['#4f008c','#7c3aed'],red:['#b91c1c','#ef4444']};
+let RCO=[], RCK={};
 let S=null, DEPS=[], ITEMS=[], MODS={}, BEST=[];
 let dep='all', q='', car=null, amt=null, gb=null, gpk=null, sheetItem=null, sheetOpt=null, sheetType=false, mode='deliver';
 // recharge card PHOTO sent on WhatsApp (Admin → My store → Store settings): no rider, small service fee, bank transfer first
@@ -234,13 +259,29 @@ const fmt=n=>{ n=Math.round(Number(n||0)*100)/100; return String(n); };
 const norm=s=>String(s||'').toLowerCase().replace(/[أإآا]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[ًٌٍَُِّْـ]/g,'').replace(/\s+/g,' ').trim();
 function price(i){ return (i.discount_price!=null&&Number(i.discount_price)>0&&Number(i.discount_price)<Number(i.price))?Number(i.discount_price):Number(i.price); }
 function depOf(i){ return DEPS.find(d=>d.name===i.category)||null; }
-// recharge card: company + amount from the product name ("شحن stc سوا 50 ريال")
+function rcAmt(i){ const m=/(\d+(?:\.\d+)?)/.exec(String(i.name).replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c))); return m?Number(m[1]):0; }
+function rcBuild(){
+  RCO=[]; RCK={};
+  const deps=DEPS.filter(d=>d.kind==='recharge'&&!d.gift), own=d=>RCP.find(p=>p[0].test(norm(d.name+' '+(d.card_title||''))));
+  const mk=(key,p,name,d,mine,list)=>{
+    let o=RCO.find(x=>x.k===key);
+    if(!o){ o={k:key,name:name,label:p?p[2]:d.name,c1:(p?p[3]:RCOL.purple[0]),c2:(p?p[4]:RCOL.purple[1]),img:'',photo:''}; RCO.push(o); }
+    if(mine){ o.name=d.name; if(d.card_title) o.label=d.card_title; const c=RCOL[d.card_color]; if(c){ o.c1=c[0]; o.c2=c[1]; } o.img=d.image_url||''; o.photo=d.card_image||''; }
+    list.forEach(i=>{ RCK[i.id]=key; });
+  };
+  // in the Admin department order; a company's own department sets its name, logo and colour
+  deps.forEach(d=>{
+    const its=ITEMS.filter(i=>i.category===d.name&&rcAmt(i)>0); if(!its.length) return;
+    const p=own(d);
+    if(p||d.image_url||d.card_title){ mk(p?p[1]:'d:'+d.id,p,d.name,d,true,its); return; }
+    const g={}; its.forEach(i=>{ const q=RCP.find(x=>x[0].test(norm(i.name))), k=q?q[1]:'d:'+d.id; (g[k]=g[k]||{p:q,l:[]}).l.push(i); });
+    Object.keys(g).forEach(k=>mk(k,g[k].p,g[k].p?g[k].p[5]:d.name,d,!g[k].p,g[k].l));
+  });
+}
+function rco(k){ return RCO.find(x=>x.k===k)||{k:k,name:'',label:'',c1:RCOL.purple[0],c2:RCOL.purple[1],img:'',photo:''}; }
+// recharge card: its company (tile) + amount from the product name ("شحن 50")
 function cardInfo(i){
-  const d=depOf(i); if(!d||d.kind!=='recharge') return null;
-  const n=norm(i.name);
-  const k=/stc|سوا/.test(n)?'stc':/mobily|موبايلي/.test(n)?'mobily':/zain|زين/.test(n)?'zain':null;
-  const m=/(\d+(?:\.\d+)?)/.exec(String(i.name).replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c)));
-  return k&&m?{k:k,v:Number(m[1])}:null;
+  const k=RCK[i.id]; return k?{k:k,v:rcAmt(i)}:null;
 }
 // gift-card brands: a department marked "Gift card brand" in Admin; its products are the packs ("530 جوهرة")
 const GCOL={blue:'radial-gradient(120% 90% at 50% 38%,#2f6fe0 0%,#163a9a 45%,#0b1d5c 78%,#081445 100%)',orange:'radial-gradient(120% 90% at 50% 38%,#fb923c 0%,#ea580c 45%,#9a3412 80%,#7c2d12 100%)',
@@ -257,6 +298,11 @@ function gLabel(i,L){ const v=gAmt(i); if(!v) return i.name; return L.u==='$'?'$
 function gCard(i){ const d=giftDep(i), L=gLook(d);
   if(d.card_image) return '<div class="gstage"><div class="gphoto" style="background-image:url(\''+esc(d.card_image)+'\')"><div class="gp-bar"><i>'+esc(L.e)+'</i><b>'+esc(gLabel(i,L))+'</b></div></div></div>';
   return '<div class="gcard" style="background:'+L.bg+'"><span class="gc-l">خطوة<br>التوصيل</span><span class="gc-t"'+(L.t.length>9?' style="font-size:'+(L.t.length>12?6:7)+'cqw"':'')+'>'+esc(L.t)+'</span><span class="gc-e">'+esc(L.e)+'</span><span class="gc-b">'+esc(gLabel(i,L))+'</span></div>'; }
+function rcCard(i){
+  const C=rco(RCK[i.id]), v=fmt(rcAmt(i));
+  if(C.photo) return '<div class="gstage"><div class="gphoto" style="background-image:url(\''+esc(C.photo)+'\')"><div class="gp-bar"><i>📶</i><b>'+esc(v)+' SAR</b></div></div></div>';
+  return '<div class="rst"><div class="rcard" style="background:linear-gradient(135deg,'+C.c1+','+C.c2+' 60%,'+C.c2+'cc)"><span class="co"'+(C.label.length>7?' style="font-size:8cqw"':'')+'>'+esc(C.label)+'</span><span class="sim"></span><span class="tp">بطاقة شحن</span><span class="ra">'+esc(v)+'<small>SAR</small></span></div></div>';
+}
 function vStatus(v){
   if(!v||v.is_open===false)return{open:false,txt:'مغلق مؤقتاً'};
   if(v.is_24h)return{open:true,txt:'مفتوح ٢٤ ساعة'};
@@ -319,12 +365,12 @@ function render(){
     pv.textContent='👀 معاينة — المتجر مخفي عن العملاء حالياً'+(st.open?'':' · '+st.txt); }
   const used=DEPS.filter(d=>ITEMS.some(i=>i.category===d.name));
   const gifts=used.filter(d=>d.gift);
-  const rcDep=used.find(d=>d.kind==='recharge');
+  rcBuild();
   const cards=ITEMS.filter(i=>cardInfo(i));
   const offers=ITEMS.filter(i=>price(i)<Number(i.price)&&!cardInfo(i)&&!giftDep(i)).slice(0,3);
   let h='';
   if(used.length) h+='<div class="sec"><div class="deps" id="deps"></div></div>';
-  if(rcDep&&cards.length) h+='<div class="sec" id="rc-sec"><div class="rc"><div class="rc-h">⚡ اشحن رصيدك <small>يوصلك الكرت مع المندوب</small></div><div class="cr" id="cr"></div><div class="am" id="am"></div><div class="md" id="md" style="display:none"></div><button class="go" id="rc-go" disabled onclick="addCard()">اختر المبلغ</button><div class="rc-n" id="rc-n">السعر = قيمة البطاقة · بدون أي زيادة</div></div></div>';
+  if(RCO.length) h+='<div class="sec" id="rc-sec"><div class="rc"><div class="rc-h">⚡ اشحن رصيدك <small>اختر الشركة ثم المبلغ</small></div><div class="gg" id="cr"></div><div class="gp"><div class="gp-h" id="rc-h2"></div><div class="rcg" id="am"></div><div class="md" id="md" style="display:none"></div><button class="go" id="rc-go" disabled onclick="addCard()">اختر المبلغ</button><div class="rc-n" id="rc-n">السعر = قيمة البطاقة · بدون أي زيادة</div></div></div></div>';
   if(gifts.length) h+='<div class="sec" id="gift-sec"><div class="rc"><div class="rc-h">🎮 بطاقات وشحن ألعاب <small>الكود يوصلك على واتساب</small></div><div class="gg" id="gg"></div><div class="gp" id="gp"></div></div></div>';
   if(offers.length) h+='<div class="sec" id="of-sec"><div class="sh"><h2>🔥 عروض</h2></div><div id="offers"></div></div>';
   h+='<div class="sec" id="best-sec" style="display:none"><div class="sh"><h2>⭐ الأكثر طلباً</h2></div><div class="hs" id="best"></div></div>';
@@ -332,14 +378,17 @@ function render(){
   if(!ITEMS.length) h='<div class="gone"><div style="font-size:52px">🛍️</div><b>قريباً</b><p>نضيف المنتجات الآن — ارجع لنا بعد شوي</p><a href="/">الرئيسية</a></div>';
   $('main').innerHTML=h;
   if(!ITEMS.length) return;
-  if(rcDep&&cards.length){ const ks=Object.keys(CAR).filter(k=>cards.some(i=>cardInfo(i).k===k)); if(!car||ks.indexOf(car)<0) car=ks[0]; }
+  if(RCO.length&&!RCO.some(o=>o.k===car)) car=RCO[0].k;
   if(gifts.length&&(!gb||!gifts.some(d=>d.name===gb))) gb=gifts[0].name;
   drawDeps(); drawRc(); drawGift(); drawOffers(offers); drawList(); refreshCart();
 }
 // the department buttons: all gift brands together are ONE button (بطاقات وألعاب)
 function depTiles(){
-  const used=DEPS.filter(d=>ITEMS.some(i=>i.category===d.name)), out=[]; let g=false;
-  used.forEach(d=>{ if(d.gift){ if(!g){ g=true; out.push({name:'__gift',label:'بطاقات وألعاب',icon:'🎮',color:'#eff6ff'}); } } else out.push({name:d.name,label:d.name,icon:d.icon,color:d.color}); });
+  const used=DEPS.filter(d=>ITEMS.some(i=>i.category===d.name)), out=[]; let g=false, r=false;
+  const rcs=used.filter(d=>d.kind==='recharge'&&!d.gift), one=rcs.length===1?rcs[0]:null;
+  used.forEach(d=>{ if(d.gift){ if(!g){ g=true; out.push({name:'__gift',label:'بطاقات وألعاب',icon:'🎮',color:'#eff6ff'}); } }
+    else if(d.kind==='recharge'){ if(!r){ r=true; out.push({name:'__rc',label:one?one.name:'شحن رصيد',icon:(one&&one.icon)||'📶',color:(one&&one.color)||'#f5f3ff'}); } }
+    else out.push({name:d.name,label:d.name,icon:d.icon,color:d.color}); });
   return out;
 }
 function drawDeps(){
@@ -371,22 +420,23 @@ function pickPack(id){ gpk=id; drawGift(); }
 function addGift(){ if(!gpk) return; putGift(gpk); gpk=null; drawGift(); }
 // a gift card is always a code on WhatsApp: no rider, no delivery fee, bank transfer first (same as the card photo)
 function putGift(id){ const i=ITEMS.find(x=>x.id===id); if(!canAdd(i)) return;
-  put(i, id+'|code', i.name+' (كود واتساب)', price(i), {ds_digital:true}); }
+  put(i, id+'|code', lineName(i)+' (كود واتساب)', price(i), {ds_digital:true}); }
 function drawRc(){
   if(!$('cr')) return;
-  const cards=ITEMS.filter(i=>cardInfo(i));
-  const ks=Object.keys(CAR).filter(k=>cards.some(i=>cardInfo(i).k===k));
-  $('cr').innerHTML=ks.map(k=>'<button class="en'+(car===k?' on':'')+'" style="'+(car===k?'background:'+CAR[k].c:'')+'" onclick="pickCar(\''+k+'\')">'+CAR[k].n+'</button>').join('');
-  const list=cards.filter(i=>cardInfo(i).k===car).sort((a,b)=>cardInfo(a).v-cardInfo(b).v);
-  $('am').style.gridTemplateColumns='repeat('+Math.min(Math.max(list.length,1),4)+',1fr)';
-  $('am').innerHTML=list.map(i=>{ const v=cardInfo(i).v, ok=i.in_stock!==false;
-    return '<button class="'+(amt===i.id?'on ':'')+(ok?'':'out')+'" '+(ok?'onclick="pickAmt(\''+i.id+'\')"':'disabled')+'><b>'+v+'</b><small>'+(ok?(price(i)!==v?fmt(price(i))+' ر.س':'ريال'):'نفذت')+'</small></button>'; }).join('');
-  const sel=ITEMS.find(i=>i.id===amt);
+  if(!RCO.some(o=>o.k===car)) car=RCO[0]&&RCO[0].k;
+  $('cr').innerHTML=RCO.map(o=>'<button class="ct'+(car===o.k?' on':'')+'" data-k="'+esc(o.k)+'" onclick="pickCar(this.dataset.k)"><div class="clg" style="background:linear-gradient(135deg,'+o.c1+','+o.c2+')">'+
+    (o.img?'<img src="'+esc(o.img)+'" alt="'+esc(o.name)+'" loading="lazy" decoding="async" onerror="this.remove()"/>':'<span class="en"'+(o.label.length>6?' style="font-size:16px"':'')+'>'+esc(o.label)+'</span>')+'</div><b>'+esc(o.name)+'</b></button>').join('');
+  const C=rco(car), list=ITEMS.filter(i=>RCK[i.id]===car).sort((a,b)=>rcAmt(a)-rcAmt(b));
+  $('rc-h2').innerHTML='📶 بطاقات <span class="en">'+esc(C.name)+'</span>';
+  $('am').innerHTML=list.map(i=>{ const ok=i.in_stock!==false, p=price(i);
+    return '<div class="rcc'+(amt===i.id?' on':'')+(ok?'':' out')+'">'+rcCard(i)+'<div class="rpr">'+fmt(p)+' <span>ر.س</span>'+(p<Number(i.price)?'<s>'+fmt(i.price)+'</s>':'')+'</div>'+
+      (ok?'<button class="rad" onclick="pickAmt(\''+i.id+'\')">'+(amt===i.id?'✓ تم الاختيار':'＋ اختر')+'</button>':'<button class="rad" disabled>نفذت</button>')+'</div>'; }).join('');
+  const sel=ITEMS.find(i=>i.id===amt&&RCK[i.id]===car);
   const md=$('md'); if(!DIG.on) mode='deliver';
   md.style.display=DIG.on?'':'none';
   if(DIG.on) md.innerHTML=modeButtons(sel,'pickMode');
   const go=$('rc-go'); go.disabled=!sel;
-  go.innerHTML=!sel?'اختر المبلغ':mode==='photo'?'📲 اطلب صورة بطاقة <span class="en">'+CAR[car].n+'</span> '+cardInfo(sel).v+' · '+fmt(price(sel)+DIG.fee)+' ر.س':'＋ أضف بطاقة <span class="en">'+CAR[car].n+'</span> '+cardInfo(sel).v+' ريال';
+  go.innerHTML=!sel?'اختر المبلغ':mode==='photo'?'📲 اطلب صورة بطاقة <span class="en">'+esc(C.label)+'</span> '+fmt(rcAmt(sel))+' · '+fmt(price(sel)+DIG.fee)+' ر.س':'＋ أضف بطاقة <span class="en">'+esc(C.label)+'</span> '+fmt(rcAmt(sel))+' ريال';
   $('rc-n').textContent=mode==='photo'?'📲 الدفع تحويل بنكي قبل الإرسال · نرسل صورة الكرت على واتساب بعد التأكد من التحويل':DIG.on?'🛵 السعر = قيمة البطاقة · يوصلك الكرت مع المندوب (التوصيل يُحسب في السلة)':'السعر = قيمة البطاقة · بدون أي زيادة';
 }
 // 🛵 delivered card  /  📲 card photo on WhatsApp (+ service fee, no delivery fee)
@@ -399,9 +449,12 @@ function pickMode(m){ mode=m; drawRc(); }
 function pickCar(k){ car=k; amt=null; drawRc(); }
 function pickAmt(id){ amt=id; drawRc(); }
 function addCard(){ if(!amt) return; if(DIG.on&&mode==='photo') addPhoto(amt); else put0(amt); amt=null; drawRc(); }
-function put0(id){ const i=ITEMS.find(x=>x.id===id); if(!canAdd(i)) return; put(i, id, i.name, price(i)); }
+// the cart / order line always says which company or brand ("شحن 20" → "ليبارا · شحن 20")
+function lineName(i){ const c=cardInfo(i), g=!c&&giftDep(i), w=c?rco(c.k).name:g?g.name:''; if(!w) return i.name;
+  const n=norm(i.name); return (n.indexOf(norm(w))>-1||(c&&n.indexOf(norm(rco(c.k).label))>-1))?i.name:w+' · '+i.name; }
+function put0(id){ const i=ITEMS.find(x=>x.id===id); if(!canAdd(i)) return; put(i, id, lineName(i), price(i)); }
 function addPhoto(id){ const i=ITEMS.find(x=>x.id===id); if(!canAdd(i)) return;
-  put(i, id+'|photo', i.name+' (صورة واتساب)', price(i)+DIG.fee, {ds_digital:true}); }
+  put(i, id+'|photo', lineName(i)+' (صورة واتساب)', price(i)+DIG.fee, {ds_digital:true}); }
 function drawOffers(list){
   const el=$('offers'); if(!el) return;
   el.innerHTML=list.map(i=>'<div class="of"><div class="im">'+(i.image_url?'<img src="'+esc(i.image_url)+'" alt="" loading="lazy" onerror="this.remove()"/>':esc((depOf(i)||{}).icon||'🎁'))+'</div>'+
@@ -412,7 +465,7 @@ function img(i){
   const c=cardInfo(i);
   if(i.image_url) return '<div class="im"><img src="'+esc(i.image_url)+'" alt="'+esc(i.name)+'" loading="lazy" decoding="async" onerror="this.parentNode.innerHTML=\''+esc((depOf(i)||{}).icon||'🛍️')+'\'"/></div>';
   if(giftDep(i)) return '<div class="im" style="background:#eef2ff">'+gCard(i)+'</div>';
-  if(c) return '<div class="im"><div class="card-im" style="background:'+CAR[c.k].c+'"><b class="en">'+CAR[c.k].n+'</b><em class="en">'+c.v+'</em></div></div>';
+  if(c) return '<div class="im">'+rcCard(i)+'</div>';
   return '<div class="im" style="background:'+esc((depOf(i)||{}).color||'#f5f3ff')+'">'+esc((depOf(i)||{}).icon||'🛍️')+'</div>';
 }
 function qtyOf(id){ return cartGet().filter(x=>x.vendor===S.name&&(x.id===id||String(x.id).indexOf(id+'|')===0)).reduce((s,x)=>s+Number(x.qty||0),0); }
@@ -430,22 +483,23 @@ function drawList(){
   if(ITEMS.some(i=>!depOf(i))) chips.push(['__other','أخرى']);
   $('chips').innerHTML=q?'':chips.map(c=>'<button class="'+(dep===c[0]?'on':'')+'" data-d="'+esc(c[0])+'" onclick="goDep(this.dataset.d,1)">'+esc(c[1])+'</button>').join('');
   let list;
-  if(q){ const nq=norm(q); list=ITEMS.filter(i=>norm(i.name+' '+(i.description||'')+' '+i.category).indexOf(nq)>-1||(cardInfo(i)&&norm(CAR[cardInfo(i).k].n+' '+cardInfo(i).v).indexOf(nq)>-1)||(giftDep(i)&&norm(gLook(giftDep(i)).t+' '+gLabel(i,gLook(giftDep(i)))).indexOf(nq)>-1)); }
+  if(q){ const nq=norm(q); list=ITEMS.filter(i=>norm(i.name+' '+(i.description||'')+' '+i.category).indexOf(nq)>-1||(cardInfo(i)&&norm(rco(cardInfo(i).k).label+' '+rco(cardInfo(i).k).name+' '+cardInfo(i).v).indexOf(nq)>-1)||(giftDep(i)&&norm(gLook(giftDep(i)).t+' '+gLabel(i,gLook(giftDep(i)))).indexOf(nq)>-1)); }
   else if(dep==='all') list=ITEMS.filter(i=>!cardInfo(i)&&!giftDep(i));
   else if(dep==='__gift') list=ITEMS.filter(i=>giftDep(i));
+  else if(dep==='__rc') list=ITEMS.filter(i=>cardInfo(i));
   else if(dep==='__other') list=ITEMS.filter(i=>!depOf(i));
   else list=ITEMS.filter(i=>i.category===dep);
   if(!q&&dep==='all'&&!list.length) list=ITEMS.slice();
   list=list.slice().sort((a,b)=>(a.in_stock===false)-(b.in_stock===false));
-  $('all-h').textContent=q?('نتائج "'+q+'"'):dep==='all'?'كل المنتجات':dep==='__other'?'أخرى':dep==='__gift'?'بطاقات وألعاب':dep;
+  $('all-h').textContent=q?('نتائج "'+q+'"'):dep==='all'?'كل المنتجات':dep==='__other'?'أخرى':dep==='__gift'?'بطاقات وألعاب':dep==='__rc'?'شحن رصيد':dep;
   const wa=String(S.whatsapp||'').replace(/\D/g,'');
   $('grid').innerHTML=list.length?list.map(card).join(''):'<div class="empty">ما لقينا "'+esc(q)+'"'+(wa?'<br><a href="https://wa.me/'+wa+'?text='+encodeURIComponent('مرحباً، أبغى من متجر خطوة التوصيل: '+q)+'" target="_blank" rel="noopener">اطلبه منّا على واتساب ونوفّره لك</a><div class="ds-wac" style="margin-top:8px">بالتواصل معنا عبر واتساب، توافق على استلام رسائل تخص طلباتك. للإيقاف أرسل: إيقاف<span class="ds-wac-en" dir="ltr" lang="en">By contacting us on WhatsApp, you agree to receive messages about your orders. To stop, send: STOP</span></div>':'')+'</div>';
   const bs=$('best-sec'), bl=BEST.map(id=>ITEMS.find(i=>i.id===id)).filter(i=>i&&i.in_stock!==false);
   if(bs){ bs.style.display=(!q&&dep==='all'&&bl.length>=2)?'':'none'; if(bl.length>=2) $('best').innerHTML=bl.map(card).join(''); }
-  ['rc-sec','of-sec','gift-sec'].forEach(id=>{ const e=$(id); if(e) e.style.display=q?'none':(id==='rc-sec'?((dep==='all'||(depOf({category:dep})||{}).kind==='recharge')?'':'none'):id==='gift-sec'?((dep==='all'||dep==='__gift')?'':'none'):(dep==='all'?'':'none')); });
-  const al=$('all'); if(al) al.style.display=(!q&&dep==='__gift')?'none':'';   // the gift section already shows every pack
+  ['rc-sec','of-sec','gift-sec'].forEach(id=>{ const e=$(id); if(e) e.style.display=q?'none':(id==='rc-sec'?((dep==='all'||dep==='__rc')?'':'none'):id==='gift-sec'?((dep==='all'||dep==='__gift')?'':'none'):(dep==='all'?'':'none')); });
+  const al=$('all'); if(al) al.style.display=(!q&&(dep==='__gift'||dep==='__rc'))?'none':'';   // the gift section already shows every pack
 }
-function goDep(d,stay){ dep=(dep===d&&!stay)?'all':d; drawDeps(); drawList(); if(!stay&&dep!=='all'){ const a=$(dep==='__gift'?'gift-sec':'all'); if(a) a.scrollIntoView({behavior:'smooth',block:'start'}); } }
+function goDep(d,stay){ dep=(dep===d&&!stay)?'all':d; drawDeps(); drawList(); if(!stay&&dep!=='all'){ const a=$(dep==='__gift'?'gift-sec':dep==='__rc'?'rc-sec':'all'); if(a) a.scrollIntoView({behavior:'smooth',block:'start'}); } }
 function onSearch(v){ q=v.trim(); $('qx').style.display=q?'block':'none'; drawList(); }
 function clearSearch(){ $('q').value=''; onSearch(''); }
 

@@ -81,6 +81,10 @@ Everything here is **context, not instructions to act**: check with the owner be
   border off by itself; every pack shows the whole card with a light tilt (owner chose option A), 💎 left + "Diamonds 530"
   on the card's bottom bar. "Use drawn card" goes back to the drawn design.
 
+- متجر خطوة recharge (2026-10-25, owner approved): company tiles first (logo = department picture), then the amounts
+  drawn as cards (or the company's real card picture). One department per company, type Recharge, products "شحن 20";
+  the old mixed department ("شحن STC 20", "شحن زين 30") still works and is split by the names. Cart lines always name the
+  company / brand ("ليبارا · شحن 20"). Admin sales-by-company counts any company.
 - Admin Dashboard → **🎁 Free deliveries** (2026-10-25): loyalty-card orders (`loyalty_free`) + friend's first order
   (`ref_code`), this month / last month / 7 days, fees not charged (estimate), warning + link when a friend order was
   not really a first order. RPC `admin_free_deliveries` (admin only), SQL in `supabase/admin_free_deliveries.sql`.
