@@ -123,6 +123,9 @@
     .selco .sl img{width:100%;height:100%;object-fit:cover}.selco .sl i{font-style:normal;font-size:24px}
     .selco b{flex:1;font-size:15px;font-weight:900;min-width:0}
     .selco button{border-radius:10px;background:#fff;border:1px solid #e9e5f5;padding:8px 10px;font-weight:800;font-size:12px;color:var(--pd);white-space:nowrap}
+    .ct.soon{opacity:.55}.ct.soon .clg{filter:grayscale(.6)}
+    .ct .sn{position:absolute;top:6px;left:6px;background:#111827;color:#fff;font-size:10px;font-weight:900;border-radius:7px;padding:2px 7px;z-index:1}
+    .ct{position:relative}
     .pick-h{grid-column:1/-1;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:-2px}
     .pc .im .rst{width:100%;height:100%;aspect-ratio:auto;border-radius:0}
     /* offers */
@@ -411,9 +414,10 @@ function drawGift(){
   const G=gb&&gifts.find(d=>d.name===gb);
   if(G){ const L=gLook(G);
     $('gg').innerHTML='<div class="selco"><div class="sl" style="background:'+L.bg+'">'+(G.image_url?'<img src="'+esc(G.image_url)+'" alt="" onerror="this.remove()"/>':'<i>'+esc(L.e)+'</i>')+'</div><b>'+esc(G.name)+'</b>'+
-      (gifts.length>1?'<button type="button" onclick="pickBrand(\'\')">↺ لعبة أخرى</button>':'')+'</div>';
-  } else $('gg').innerHTML='<div class="pick-h">👇 اختر اللعبة أو المتجر</div>'+gifts.map(d=>{ const L=gLook(d);
-    return '<button class="ct gt" data-d="'+esc(d.name)+'" onclick="pickBrand(this.dataset.d)"><div class="clg" style="background:'+L.bg+'">'+
+      (DEPS.filter(d=>d.gift).length>1?'<button type="button" onclick="pickBrand(\'\')">↺ لعبة أخرى</button>':'')+'</div>';
+  } else $('gg').innerHTML='<div class="pick-h">👇 اختر اللعبة أو المتجر</div>'+gifts.concat(DEPS.filter(d=>d.gift&&gifts.indexOf(d)<0)).map(d=>{ const L=gLook(d), ready=gifts.indexOf(d)>-1;   // ready brands first
+    // a brand with no packs yet still shows (greyed, «قريباً») so customers see what is coming
+    return '<button class="ct gt'+(ready?'':' soon')+'" data-d="'+esc(d.name)+'" onclick="'+(ready?'pickBrand(this.dataset.d)':'soonBrand(this.dataset.d)')+'">'+(ready?'':'<span class="sn">قريباً</span>')+'<div class="clg" style="background:'+L.bg+'">'+
       (d.image_url?'<img src="'+esc(d.image_url)+'" alt="'+esc(d.name)+'" loading="lazy" decoding="async" onerror="this.remove()"/>':'<span class="en"'+(L.t.length>9?' style="font-size:'+(L.t.length>12?13:16)+'px"':'')+'>'+esc(L.t)+'</span>')+'</div><b>'+esc(d.name)+'</b></button>'; }).join('');
   const d=gifts.find(x=>x.name===gb); $('gp').style.display=d?'':'none'; if(!d){ $('gp').innerHTML=''; return; }
   const L=gLook(d);
@@ -426,6 +430,7 @@ function drawGift(){
     '<button class="go" id="g-go"'+(sel?'':' disabled')+' onclick="addGift()">'+(sel?'📲 اطلب '+esc(gLabel(sel,L))+' · '+fmt(price(sel))+' ر.س':'اختر البطاقة')+'</button>'+
     '<div class="rc-n">📲 الدفع تحويل بنكي قبل الإرسال · نرسل الكود على واتساب خلال دقائق بعد التأكد من التحويل</div>';
 }
+function soonBrand(n){ toast('⏳ بطاقات '+n+' قريباً إن شاء الله'); }
 function pickBrand(n){ gb=n||null; gpk=null; drawGift(); const g=$('gift-sec'); if(g) g.scrollIntoView({behavior:'smooth',block:'start'}); }
 function pickPack(id){ gpk=id; drawGift(); }
 function addGift(){ if(!gpk) return; putGift(gpk); gpk=null; drawGift(); }
