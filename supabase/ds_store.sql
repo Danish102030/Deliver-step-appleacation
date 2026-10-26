@@ -261,3 +261,6 @@ begin
   return r;
 end $$;
 grant execute on function public.admin_ds_store_stats(int) to authenticated;
+
+-- 2026-10-26: the card-photo service fee is its own order line («رسوم الخدمة …») → logged as income with no cost.
+-- (public._ds_store_on_order_item: if the line starts with 'رسوم الخدمة' → department 'رسوم الخدمة', unit_cost 0, no stock.)

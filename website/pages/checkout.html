@@ -229,6 +229,7 @@ img{-webkit-user-drag:none}
       <div class="total-row"><span style="color:var(--muted)">المجموع الفرعي</span><span id="s-sub">٠ ريال</span></div>
       <div class="total-row"><span style="color:var(--muted)"><span id="s-del-label">رسوم التوصيل</span></span><span id="s-del">٥.٥ ريال</span></div>
       <div id="s-two-vendor-note" style="display:none;font-size:11px;color:#b45309;background:#fffbeb;border-radius:8px;padding:7px 10px;margin:4px 0">🛵 لأن طلبك من متجرين مختلفين، رسوم التوصيل <span class="tv-fee">7</span> ريال</div>
+      <div class="total-row" id="s-fee-row" style="display:none"><span style="color:var(--muted)">رسوم الخدمة <small style="font-size:11px">(صورة البطاقة على واتساب)</small></span><span id="s-fee">SAR 0.00</span></div>
       <div class="total-row"><span style="color:var(--muted)">ضريبة القيمة المضافة</span><span id="s-vat" style="color:var(--muted)">SAR 0.50</span></div>
       <div class="total-row"><span style="color:var(--muted)">الخصم</span><span id="s-disc" style="color:var(--green)">٠</span></div>
       <div class="total-row final"><span>الإجمالي</span><span class="v" id="s-tot">٠ ريال</span></div>
@@ -310,6 +311,7 @@ img{-webkit-user-drag:none}
       <div class="total-row"><span style="color:var(--muted)">المجموع</span><span id="f-sub">٠ ريال</span></div>
       <div class="total-row"><span style="color:var(--muted)"><span id="f-del-label">التوصيل</span></span><span id="f-del">٥.٥ ريال</span></div>
       <div id="f-two-vendor-note" style="display:none;font-size:11px;color:#b45309;background:#fffbeb;border-radius:8px;padding:7px 10px;margin:4px 0">🛵 طلبك من متجرين — رسوم التوصيل <span class="tv-fee">7</span> ريال</div>
+      <div class="total-row" id="f-fee-row" style="display:none"><span style="color:var(--muted)">رسوم الخدمة <small style="font-size:11px">(صورة البطاقة على واتساب)</small></span><span id="f-fee">SAR 0.00</span></div>
       <div class="total-row"><span style="color:var(--muted)">ضريبة القيمة المضافة</span><span id="f-vat" style="color:var(--muted)">SAR 0.50</span></div>
       <div class="total-row"><span style="color:var(--muted)">الخصم</span><span id="f-disc" style="color:var(--green)">٠</span></div>
       <div class="total-row final"><span>الإجمالي</span><span class="v" id="f-tot">٠ ريال</span></div>
@@ -798,8 +800,8 @@ function loadCartItems(){
   const row=i=>`
     <div class="cart-item-row">
       <div style="width:36px;height:36px;background:var(--rose-soft);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--rose);flex-shrink:0"><i class="ti ti-shopping-bag" aria-hidden="true"></i></div>
-      <div style="flex:1"><div style="font-size:13px;font-weight:700">${i.name}</div><div style="font-size:11px;color:var(--muted)">× ${i.qty} · SAR ${i.price.toFixed(2)}</div></div>
-      <div style="font-size:14px;font-weight:700;color:var(--rose-dark)">SAR ${(i.price*i.qty).toFixed(2)}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:700">${i.name}</div><div style="font-size:11px;color:var(--muted)">× ${i.qty} · SAR ${(i.price-_feeOf(i)).toFixed(2)}</div></div>
+      <div style="font-size:14px;font-weight:700;color:var(--rose-dark)">SAR ${((i.price-_feeOf(i))*i.qty).toFixed(2)}</div>
     </div>`;
   if(vendors.length>=2){
     el.innerHTML=vendors.map(v=>`
@@ -810,12 +812,28 @@ function loadCartItems(){
   }
 }
 
-const VAT=0.50;
+let VAT=0.50;
+/* متجر خطوة card photo on WhatsApp: the line price = card + service fee. Show them apart (card 23 · رسوم الخدمة 1),
+   and no 0.50 on an order that is only WhatsApp cards (nothing delivered) → total 24, the same for the rider and Admin. */
+function _feeOf(i){ if(!i||!i.ds_digital) return 0; if(i.ds_fee!=null) return Number(i.ds_fee)||0;
+  return /\|photo$/.test(String(i.id))?(Number(_dsDigCfg&&_dsDigCfg.fee!=null?_dsDigCfg.fee:1)||0):0; }
+function _feeTotal(cart){ return cart.reduce((s,i)=>s+_feeOf(i)*Number(i.qty||0),0); }
+function _vatNow(){ VAT=_dsDig().only?0:0.50; return VAT; }
+function _feeRows(cart){ const f=_feeTotal(cart);
+  [['s-fee-row','s-fee'],['f-fee-row','f-fee']].forEach(x=>{ const r=document.getElementById(x[0]); if(r){ r.style.display=f>0?'':'none'; document.getElementById(x[1]).textContent='SAR '+f.toFixed(2); } });
+  ['s-vat','f-vat'].forEach(id=>{ const e=document.getElementById(id); if(e&&e.parentNode) e.parentNode.style.display=VAT>0?'':'none'; });
+  return f; }
+// order lines: the card at its own price + one «رسوم الخدمة» line
+function _dsSplitFees(cartArr){ const out=[]; let fq=0, fp=0;
+  cartArr.forEach(i=>{ const f=_feeOf(i); if(f>0){ out.push(Object.assign({},i,{price:Number(i.price)-f})); fq+=Number(i.qty||0); fp=f; } else out.push(i); });
+  if(fq>0){ const v=cartArr.find(i=>_feeOf(i)>0)||{}; out.push({id:'service-fee',name:'رسوم الخدمة — صورة البطاقة على واتساب',price:fp,qty:fq,modifiers:[],vendor:v.vendor,restaurant:v.restaurant,vendor_wa:v.vendor_wa,restaurant_wa:v.restaurant_wa,ds_digital:true}); }
+  return out; }
 function calcTotals(){
   const cart=JSON.parse(localStorage.getItem('qibah_cart')||'[]');
-  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0); _vatNow();
   const del=getDeliveryFee(sub),cDisc=appliedCoupon?appliedCoupon.discount_amount:0,rDisc=Math.min(Number(refCredit||0),Math.max(0,sub+del+VAT-cDisc)),disc=cDisc+rDisc,tot=sub+del+VAT-disc;
-  document.getElementById('s-sub').textContent='SAR '+sub.toFixed(2);
+  const _fee=_feeRows(cart);
+  document.getElementById('s-sub').textContent='SAR '+(sub-_fee).toFixed(2);
   const delEl=document.getElementById('s-del');
   const hasLoyalty=hasLoyaltyFreeDelivery(sub);
   if(hasLoyalty){
@@ -842,13 +860,14 @@ function calcTotals(){
 
 function syncFinal(){
   const cart=JSON.parse(localStorage.getItem('qibah_cart')||'[]');
-  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0); _vatNow();
   const del=getDeliveryFee(sub),cDisc=appliedCoupon?appliedCoupon.discount_amount:0,rDisc=Math.min(Number(refCredit||0),Math.max(0,sub+del+VAT-cDisc)),disc=cDisc+rDisc,tot=sub+del+VAT-disc;
   document.getElementById('final-items-list').innerHTML=cart.map(i=>`
     <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:0.5px solid var(--border)">
-      <span style="color:var(--muted)">${i.name} × ${i.qty}</span><span style="font-weight:700">SAR ${(i.price*i.qty).toFixed(2)}</span>
+      <span style="color:var(--muted)">${i.name} × ${i.qty}</span><span style="font-weight:700">SAR ${((i.price-_feeOf(i))*i.qty).toFixed(2)}</span>
     </div>`).join('');
-  document.getElementById('f-sub').textContent='SAR '+sub.toFixed(2);
+  const _fee=_feeRows(cart);
+  document.getElementById('f-sub').textContent='SAR '+(sub-_fee).toFixed(2);
   document.getElementById('f-del').textContent=del===0?(hasLoyaltyFreeDelivery(sub)?'🎁 مجاني (بطاقة الولاء)':'مجاني'):'SAR '+del.toFixed(2);
   // Two-vendor labels + explainer note (final review step)
   const twoVF=isTwoVendorCart();
@@ -988,7 +1007,8 @@ async function placeOrder(){
   btn.innerHTML='<i class="ti ti-loader" style="font-size:18px"></i> جاري تأكيد الطلب...';btn.disabled=true;
 
   const cart=JSON.parse(localStorage.getItem('qibah_cart')||'[]');
-  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0); _vatNow();
+  const _lines=_dsSplitFees(cart);   // card and «رسوم الخدمة» as separate order lines
   const del=getDeliveryFee(sub),cDisc=appliedCoupon?appliedCoupon.discount_amount:0,rDisc=Math.min(Number(refCredit||0),Math.max(0,sub+del+VAT-cDisc)),disc=cDisc+rDisc,tot=sub+del+VAT-disc;
   const _loyFree=hasLoyaltyFreeDelivery(sub);   // this order uses the loyalty free delivery (the database re-checks it)
   let orderNum=_dsNewOrderNum();   // was 'DS-'+last 4 clock digits → repeated numbers → lost orders
@@ -1057,17 +1077,17 @@ async function placeOrder(){
   const _vendorWaForOrder=_twoV?(((_vList.find(v=>v.name!==_SM_VENDOR&&v.wa))||{}).wa||null):_vWa;
   const orderWithVendor={...order,vendor_name:_vendorNameForOrder,vendor_whatsapp:_vendorWaForOrder};
   try{
-    const _saved=await Promise.race([ saveOrderRobust(orderWithVendor, order, cart, _vendorOf, _clientRef), new Promise(function(res){ setTimeout(function(){ res(null); }, 20000); }) ]);
+    const _saved=await Promise.race([ saveOrderRobust(orderWithVendor, order, _lines, _vendorOf, _clientRef), new Promise(function(res){ setTimeout(function(){ res(null); }, 20000); }) ]);
     const _savedId=_saved&&_saved.id;
     // The server guarantees a UNIQUE number — if it had to change it, use the saved one in WhatsApp + confirmation
     if(_saved&&_saved.num&&_saved.num!==orderNum){ orderNum=_saved.num; order.order_number=orderNum; orderWithVendor.order_number=orderNum; }
     if(!_savedId){
-      queuePendingOrder(orderWithVendor, order, cart, _vendorOf, _clientRef);
+      queuePendingOrder(orderWithVendor, order, _lines, _vendorOf, _clientRef);
       showToast('⚠️ الشبكة ضعيفة — حُفظ طلبك محلياً وسيُرسَل تلقائياً. أرسل رسالة واتساب أيضاً.');
     }
     // (The push token now travels inside the order itself — see device_token above.)
     // Rider push notifications are sent server-side by a Supabase webhook on INSERT into orders.
-  }catch(e){ console.log('Order save error:',e); try{ queuePendingOrder(orderWithVendor, order, cart, _vendorOf, _clientRef); }catch(_){} }
+  }catch(e){ console.log('Order save error:',e); try{ queuePendingOrder(orderWithVendor, order, _lines, _vendorOf, _clientRef); }catch(_){} }
 
   // Increment coupon used_count
   if(appliedCoupon){
@@ -1082,7 +1102,7 @@ async function placeOrder(){
   const _fmtItem=i=>`• ${i.name} × ${i.qty} = SAR ${(i.price*i.qty).toFixed(2)}${i.modifiers&&i.modifiers.length?'\n   🍽️ اختيارات الوجبة:\n'+i.modifiers.map(m=>'   - '+m).join('\n'):''}`;
   const itemsList=_twoV
     ? _vList.map(v=>`🏪 *${v.name}:*\n${v.items.map(_fmtItem).join('\n')}`).join('\n─────────────\n')
-    : cart.map(_fmtItem).join('\n');
+    : _lines.map(_fmtItem).join('\n');
   const paymentLabel={cod:'نقداً عند الاستلام',card:'POS شبكة',bank:'تحويل بنكي',apple:'Apple Pay'}[payMethod]||payMethod;
 
   // Pharmacy order → build a block for the owner: medicine photos + a note that the

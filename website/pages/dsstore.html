@@ -454,7 +454,7 @@ function lineName(i){ const c=cardInfo(i), g=!c&&giftDep(i), w=c?rco(c.k).name:g
   const n=norm(i.name); return (n.indexOf(norm(w))>-1||(c&&n.indexOf(norm(rco(c.k).label))>-1))?i.name:w+' · '+i.name; }
 function put0(id){ const i=ITEMS.find(x=>x.id===id); if(!canAdd(i)) return; put(i, id, lineName(i), price(i)); }
 function addPhoto(id){ const i=ITEMS.find(x=>x.id===id); if(!canAdd(i)) return;
-  put(i, id+'|photo', lineName(i)+' (صورة واتساب)', price(i)+DIG.fee, {ds_digital:true}); }
+  put(i, id+'|photo', lineName(i)+' (صورة واتساب)', price(i)+DIG.fee, {ds_digital:true, ds_fee:DIG.fee}); }   // checkout shows the card and the 1-riyal service fee apart
 function drawOffers(list){
   const el=$('offers'); if(!el) return;
   el.innerHTML=list.map(i=>'<div class="of"><div class="im">'+(i.image_url?'<img src="'+esc(i.image_url)+'" alt="" loading="lazy" onerror="this.remove()"/>':esc((depOf(i)||{}).icon||'🎁'))+'</div>'+
