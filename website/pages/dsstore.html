@@ -499,7 +499,8 @@ function drawList(){
   ['rc-sec','of-sec','gift-sec'].forEach(id=>{ const e=$(id); if(e) e.style.display=q?'none':(id==='rc-sec'?((dep==='all'||dep==='__rc')?'':'none'):id==='gift-sec'?((dep==='all'||dep==='__gift')?'':'none'):(dep==='all'?'':'none')); });
   const al=$('all'); if(al) al.style.display=(!q&&(dep==='__gift'||dep==='__rc'))?'none':'';   // the gift section already shows every pack
 }
-function goDep(d,stay){ dep=(dep===d&&!stay)?'all':d; drawDeps(); drawList(); if(!stay&&dep!=='all'){ const a=$(dep==='__gift'?'gift-sec':dep==='__rc'?'rc-sec':'all'); if(a) a.scrollIntoView({behavior:'smooth',block:'start'}); } }
+function goDep(d,stay){ if(d==='__rc'||d==='__gift') stay=false;   // recharge / gift cards open their own section → always go to its top
+  dep=(dep===d&&!stay)?'all':d; drawDeps(); drawList(); if(!stay&&dep!=='all'){ const a=$(dep==='__gift'?'gift-sec':dep==='__rc'?'rc-sec':'all'); if(a) a.scrollIntoView({behavior:'smooth',block:'start'}); } }
 function onSearch(v){ q=v.trim(); $('qx').style.display=q?'block':'none'; drawList(); }
 function clearSearch(){ $('q').value=''; onSearch(''); }
 
