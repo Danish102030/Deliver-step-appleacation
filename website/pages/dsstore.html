@@ -118,6 +118,12 @@
     .rcc .rpr{margin-top:7px;font-size:15px;font-weight:900;color:var(--text)}.rcc .rpr span{font-size:11px;color:var(--muted)}.rcc .rpr s{font-size:11px;color:var(--muted);margin-inline-start:4px}
     .rcc .rad{margin-top:5px;width:100%;height:32px;border-radius:10px;background:var(--pl);color:var(--pd);font-weight:900;font-size:12.5px}
     .rcc.on .rad{background:var(--p);color:#fff}.rcc.out .rad{background:#f1f5f9;color:#b91c1c}
+    .selco{grid-column:1/-1;display:flex;align-items:center;gap:10px;background:#faf9ff;border:1.5px solid var(--p);border-radius:16px;padding:8px 10px}
+    .selco .sl{width:46px;height:46px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#fff;font:900 13px/1 system-ui,sans-serif;flex-shrink:0}
+    .selco .sl img{width:100%;height:100%;object-fit:cover}.selco .sl i{font-style:normal;font-size:24px}
+    .selco b{flex:1;font-size:15px;font-weight:900;min-width:0}
+    .selco button{border-radius:10px;background:#fff;border:1px solid #e9e5f5;padding:8px 10px;font-weight:800;font-size:12px;color:var(--pd);white-space:nowrap}
+    .pick-h{grid-column:1/-1;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:-2px}
     .pc .im .rst{width:100%;height:100%;aspect-ratio:auto;border-radius:0}
     /* offers */
     .of{border-radius:22px;padding:14px;color:#fff;background:linear-gradient(120deg,#0f766e,#0e7490);display:flex;align-items:center;gap:12px;margin-bottom:10px}
@@ -370,7 +376,7 @@ function render(){
   const offers=ITEMS.filter(i=>price(i)<Number(i.price)&&!cardInfo(i)&&!giftDep(i)).slice(0,3);
   let h='';
   if(used.length) h+='<div class="sec"><div class="deps" id="deps"></div></div>';
-  if(RCO.length) h+='<div class="sec" id="rc-sec"><div class="rc"><div class="rc-h">⚡ اشحن رصيدك <small>اختر الشركة ثم المبلغ</small></div><div class="gg" id="cr"></div><div class="gp"><div class="gp-h" id="rc-h2"></div><div class="rcg" id="am"></div><div class="md" id="md" style="display:none"></div><button class="go" id="rc-go" disabled onclick="addCard()">اختر المبلغ</button><div class="rc-n" id="rc-n">السعر = قيمة البطاقة · بدون أي زيادة</div></div></div></div>';
+  if(RCO.length) h+='<div class="sec" id="rc-sec"><div class="rc"><div class="rc-h">⚡ اشحن رصيدك <small>اختر الشركة ثم المبلغ</small></div><div class="gg" id="cr"></div><div class="gp" id="rc-gp"><div class="gp-h" id="rc-h2"></div><div class="rcg" id="am"></div><div class="md" id="md" style="display:none"></div><button class="go" id="rc-go" disabled onclick="addCard()">اختر المبلغ</button><div class="rc-n" id="rc-n">السعر = قيمة البطاقة · بدون أي زيادة</div></div></div></div>';
   if(gifts.length) h+='<div class="sec" id="gift-sec"><div class="rc"><div class="rc-h">🎮 بطاقات وشحن ألعاب <small>الكود يوصلك على واتساب</small></div><div class="gg" id="gg"></div><div class="gp" id="gp"></div></div></div>';
   if(offers.length) h+='<div class="sec" id="of-sec"><div class="sh"><h2>🔥 عروض</h2></div><div id="offers"></div></div>';
   h+='<div class="sec" id="best-sec" style="display:none"><div class="sh"><h2>⭐ الأكثر طلباً</h2></div><div class="hs" id="best"></div></div>';
@@ -378,8 +384,8 @@ function render(){
   if(!ITEMS.length) h='<div class="gone"><div style="font-size:52px">🛍️</div><b>قريباً</b><p>نضيف المنتجات الآن — ارجع لنا بعد شوي</p><a href="/">الرئيسية</a></div>';
   $('main').innerHTML=h;
   if(!ITEMS.length) return;
-  if(RCO.length&&!RCO.some(o=>o.k===car)) car=RCO[0].k;
-  if(gifts.length&&(!gb||!gifts.some(d=>d.name===gb))) gb=gifts[0].name;
+  if(car&&!RCO.some(o=>o.k===car)) car=null; if(!car&&RCO.length===1) car=RCO[0].k;   // first the customer picks the company (one company → already open)
+  if(gb&&!gifts.some(d=>d.name===gb)) gb=null; if(!gb&&gifts.length===1) gb=gifts[0].name;
   drawDeps(); drawRc(); drawGift(); drawOffers(offers); drawList(); refreshCart();
 }
 // the department buttons: all gift brands together are ONE button (بطاقات وألعاب)
@@ -401,7 +407,12 @@ function drawDeps(){
 function drawGift(){
   if(!$('gg')) return;
   const gifts=DEPS.filter(d=>d.gift&&ITEMS.some(i=>i.category===d.name));
-  $('gg').innerHTML=gifts.map(d=>{ const L=gLook(d);
+  if(gb&&!gifts.some(d=>d.name===gb)) gb=null;
+  const G=gb&&gifts.find(d=>d.name===gb);
+  if(G){ const L=gLook(G);
+    $('gg').innerHTML='<div class="selco"><div class="sl" style="background:'+L.bg+'">'+(G.image_url?'<img src="'+esc(G.image_url)+'" alt="" onerror="this.remove()"/>':'<i>'+esc(L.e)+'</i>')+'</div><b>'+esc(G.name)+'</b>'+
+      (gifts.length>1?'<button type="button" onclick="pickBrand(\'\')">↺ لعبة أخرى</button>':'')+'</div>';
+  } else $('gg').innerHTML='<div class="pick-h">👇 اختر اللعبة أو المتجر</div>'+gifts.map(d=>{ const L=gLook(d);
     return '<button class="gt'+(gb===d.name?' on':'')+'" data-d="'+esc(d.name)+'" onclick="pickBrand(this.dataset.d)"><div class="gi" style="background:'+L.bg+'">'+
       (d.image_url?'<img src="'+esc(d.image_url)+'" alt="'+esc(d.name)+'" loading="lazy" decoding="async" onerror="this.remove()"/>':'<i>'+esc(L.e)+'</i><em>'+esc(L.t)+'</em>')+'</div><b>'+esc(d.name)+'</b></button>'; }).join('');
   const d=gifts.find(x=>x.name===gb); if(!d){ $('gp').innerHTML=''; return; }
@@ -415,7 +426,7 @@ function drawGift(){
     '<button class="go" id="g-go"'+(sel?'':' disabled')+' onclick="addGift()">'+(sel?'📲 اطلب '+esc(gLabel(sel,L))+' · '+fmt(price(sel))+' ر.س':'اختر البطاقة')+'</button>'+
     '<div class="rc-n">📲 الدفع تحويل بنكي قبل الإرسال · نرسل الكود على واتساب خلال دقائق بعد التأكد من التحويل</div>';
 }
-function pickBrand(n){ gb=n; gpk=null; drawGift(); }
+function pickBrand(n){ gb=n||null; gpk=null; drawGift(); const g=$('gift-sec'); if(g) g.scrollIntoView({behavior:'smooth',block:'start'}); }
 function pickPack(id){ gpk=id; drawGift(); }
 function addGift(){ if(!gpk) return; putGift(gpk); gpk=null; drawGift(); }
 // a gift card is always a code on WhatsApp: no rider, no delivery fee, bank transfer first (same as the card photo)
@@ -423,9 +434,14 @@ function putGift(id){ const i=ITEMS.find(x=>x.id===id); if(!canAdd(i)) return;
   put(i, id+'|code', lineName(i)+' (كود واتساب)', price(i), {ds_digital:true}); }
 function drawRc(){
   if(!$('cr')) return;
-  if(!RCO.some(o=>o.k===car)) car=RCO[0]&&RCO[0].k;
-  $('cr').innerHTML=RCO.map(o=>'<button class="ct'+(car===o.k?' on':'')+'" data-k="'+esc(o.k)+'" onclick="pickCar(this.dataset.k)"><div class="clg" style="background:linear-gradient(135deg,'+o.c1+','+o.c2+')">'+
+  if(car&&!RCO.some(o=>o.k===car)) car=null;
+  const gp=$('rc-gp'); if(gp) gp.style.display=car?'':'none';
+  if(car){ const o=rco(car);
+    $('cr').innerHTML='<div class="selco"><div class="sl" style="background:linear-gradient(135deg,'+o.c1+','+o.c2+')">'+(o.img?'<img src="'+esc(o.img)+'" alt="" onerror="this.remove()"/>':'<span class="en">'+esc(o.label)+'</span>')+'</div><b>'+esc(o.name)+'</b>'+
+      (RCO.length>1?'<button type="button" onclick="pickCar(\'\')">↺ شركة أخرى</button>':'')+'</div>';
+  } else $('cr').innerHTML='<div class="pick-h">👇 اختر الشركة</div>'+RCO.map(o=>'<button class="ct'+(car===o.k?' on':'')+'" data-k="'+esc(o.k)+'" onclick="pickCar(this.dataset.k)"><div class="clg" style="background:linear-gradient(135deg,'+o.c1+','+o.c2+')">'+
     (o.img?'<img src="'+esc(o.img)+'" alt="'+esc(o.name)+'" loading="lazy" decoding="async" onerror="this.remove()"/>':'<span class="en"'+(o.label.length>6?' style="font-size:16px"':'')+'>'+esc(o.label)+'</span>')+'</div><b>'+esc(o.name)+'</b></button>').join('');
+  if(!car) return;
   const C=rco(car), list=ITEMS.filter(i=>RCK[i.id]===car).sort((a,b)=>rcAmt(a)-rcAmt(b));
   $('rc-h2').innerHTML='📶 بطاقات <span class="en">'+esc(C.name)+'</span>';
   $('am').innerHTML=list.map(i=>{ const ok=i.in_stock!==false, p=price(i);
@@ -446,7 +462,7 @@ function modeButtons(sel,fn){
          '<button type="button" class="'+(cur==='photo'?'on':'')+'" onclick="'+fn+'(\'photo\')"><b>📲 صورة على واتساب</b><small>'+(sel?fmt(price(sel)+DIG.fee)+' ر.س':'+'+fmt(DIG.fee)+' ر.س')+' · بدون توصيل</small></button>';
 }
 function pickMode(m){ mode=m; drawRc(); }
-function pickCar(k){ car=k; amt=null; drawRc(); }
+function pickCar(k){ car=k||null; amt=null; drawRc(); const r=$('rc-sec'); if(r) r.scrollIntoView({behavior:'smooth',block:'start'}); }
 function pickAmt(id){ amt=id; drawRc(); }
 function addCard(){ if(!amt) return; if(DIG.on&&mode==='photo') addPhoto(amt); else put0(amt); amt=null; drawRc(); }
 // the cart / order line always says which company or brand ("شحن 20" → "ليبارا · شحن 20")
