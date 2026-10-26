@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="robots" content="noindex"/>
+<title>فاتورة ضريبية مبسطة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo','Inter',sans-serif;background:#f1f5f9;min-height:100vh;padding:24px 16px}
+#app{max-width:620px;margin:0 auto}
+
+.page{
+  background:#fff;
+  width:100%;
+  max-width:620px;
+  margin:0 auto 24px;
+  border-right:6px solid #be185d;
+  box-shadow:0 4px 32px rgba(0,0,0,.1);
+  padding:32px 32px 32px 28px;
+  position:relative;
+}
+
+/* ── Logo & Header ── */
+.inv-top{text-align:center;margin-bottom:20px}
+.inv-logo-box{
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  background:#be185d;color:#fff;border-radius:14px;
+  padding:8px 22px;margin-bottom:12px;
+  font-family:'Cairo',sans-serif;
+}
+.inv-logo-ar{font-size:22px;font-weight:800;letter-spacing:1px;line-height:1}
+.inv-logo-en{font-size:9px;font-weight:600;letter-spacing:3px;opacity:.9;margin-top:2px}
+
+.inv-main-title{font-size:20px;font-weight:800;color:#0f172a;margin-bottom:4px}
+.inv-main-sub{font-size:13px;font-weight:400;color:#475569;margin-bottom:10px}
+.inv-company{font-size:15px;font-weight:700;color:#0f172a;margin-bottom:3px}
+.inv-company-en{font-size:12px;color:#64748b;margin-bottom:6px;direction:ltr}
+.inv-address{font-size:11px;color:#64748b;line-height:1.6}
+
+/* ── Divider ── */
+.divider{border:none;border-top:1.5px dashed #e2e8f0;margin:16px 0}
+
+/* ── Row ── */
+.inv-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0}
+.inv-row+.inv-row{border-top:1px dashed #e2e8f0}
+.row-label{text-align:right;flex:1}
+.row-label-ar{font-size:13px;font-weight:700;color:#0f172a}
+.row-label-en{font-size:10px;color:#94a3b8;margin-top:1px}
+.row-value{font-size:14px;font-weight:700;color:#0f172a;text-align:left;min-width:160px;direction:ltr}
+
+/* ── Section title ── */
+.section-title{font-size:14px;font-weight:800;color:#be185d;padding:10px 0 6px;border-bottom:2px solid #fce7f3;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.section-title-en{font-size:11px;font-weight:500;color:#94a3b8}
+
+/* ── Items ── */
+.items{width:100%;border-collapse:collapse;margin:6px 0 4px;font-size:12px}
+.items th{font-size:11px;font-weight:700;color:#475569;text-align:right;padding:7px 4px;border-bottom:1.5px solid #e2e8f0;white-space:nowrap}
+.items th small{display:block;font-size:9px;font-weight:500;color:#94a3b8}
+.items td{padding:8px 4px;border-bottom:1px dashed #e2e8f0;vertical-align:top;color:#0f172a}
+.items .num{text-align:left;direction:ltr;white-space:nowrap;font-weight:600}
+.items .qty{text-align:center;white-space:nowrap}
+.item-name{font-weight:700}
+.item-extra{font-size:10.5px;color:#64748b;white-space:pre-line;margin-top:2px}
+
+/* ── Total rows ── */
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0}
+.total-row+.total-row{border-top:1px dashed #e2e8f0}
+.total-label-ar{font-size:13px;font-weight:700;color:#0f172a}
+.total-label-en{font-size:10px;color:#94a3b8;margin-top:1px}
+.total-value{font-size:14px;font-weight:700;color:#0f172a;direction:ltr}
+.total-value.green{color:#16a34a}
+.total-value.minus{color:#16a34a}
+.grand{background:#fdf2f8;border-radius:8px;padding:10px 12px;margin-top:6px}
+.grand .total-label-ar{font-size:15px;font-weight:800}
+.grand .total-value{font-size:18px;font-weight:800;color:#be185d}
+.incl-note{font-size:10.5px;color:#64748b;text-align:center;margin-top:8px}
+
+/* ── VAT highlight ── */
+.vat-rate-row{background:#fff7ed;border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;margin:10px 0}
+.vat-rate-label{font-size:12px;font-weight:600;color:#c2410c}
+.vat-rate-label-en{font-size:10px;color:#f97316;margin-top:1px}
+.vat-rate-val{font-size:15px;font-weight:800;color:#c2410c;direction:ltr}
+
+/* ── Cancelled stamp ── */
+.void{background:#fef2f2;border:2px solid #dc2626;color:#b91c1c;border-radius:10px;padding:10px;text-align:center;font-weight:800;font-size:14px;margin-bottom:14px}
+
+/* ── Register (daily list) ── */
+.reg{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:8px}
+.reg th{background:#f8fafc;font-weight:700;color:#475569;padding:7px 5px;border-bottom:1.5px solid #e2e8f0;text-align:right;white-space:nowrap}
+.reg td{padding:7px 5px;border-bottom:1px solid #f1f5f9}
+.reg .num{direction:ltr;text-align:left;white-space:nowrap}
+.reg tfoot td{font-weight:800;border-top:2px solid #e2e8f0;background:#fdf2f8}
+
+/* ── QR code ── */
+.qr-section{text-align:center;margin-top:4px}
+.qr-label{font-size:11px;font-weight:700;color:#64748b;margin-bottom:10px}
+.qr-label-en{font-size:10px;color:#94a3b8}
+.qr-box{display:inline-block}
+.qr-box canvas,.qr-box img{border:4px solid #f1f5f9;border-radius:8px}
+
+/* ── Toolbar & messages ── */
+.toolbar{position:sticky;top:0;z-index:5;max-width:620px;margin:0 auto 16px;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:10px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.toolbar .info{flex:1;font-size:12px;color:#475569;min-width:160px}
+.toolbar .warn{color:#b45309;font-weight:700}
+.print-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#be185d;color:#fff;border:none;border-radius:10px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;transition:background .2s}
+.print-btn:hover{background:#9d174d}
+.msg{text-align:center;padding:40px 20px;color:#475569;font-size:14px;line-height:1.8}
+.msg b{color:#0f172a}
+/* ── Paper (kept last so it wins over the screen styles above) ── */
+@media print{
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff;margin:0;padding:0}
+  .no-print{display:none!important}
+  @page{margin:0;size:A4}
+  .page{border:none;box-shadow:none;min-height:unset;margin:0 auto!important}
+  .page{break-after:page;page-break-after:always}
+  .page:last-child{break-after:auto;page-break-after:auto}
+  tr{break-inside:avoid;page-break-inside:avoid}
+  /* compact on paper: one invoice per A4 sheet */
+  .page{padding:16px 22px!important}
+  .inv-top{margin-bottom:8px}
+  .inv-logo-box{padding:5px 16px;margin-bottom:6px}
+  .inv-logo-ar{font-size:18px}
+  .inv-main-title{font-size:17px;margin-bottom:0}
+  .inv-main-sub{font-size:11px;margin-bottom:4px}
+  .inv-company{font-size:13px;margin-bottom:0}
+  .inv-company-en{font-size:10.5px;margin-bottom:2px}
+  .inv-address{font-size:9.5px;line-height:1.4}
+  .divider{margin:7px 0}
+  .inv-row{padding:4px 0}
+  .row-label-ar{font-size:12px}
+  .row-label-en{font-size:9px}
+  .row-value{font-size:12.5px}
+  .section-title{padding:4px 0 3px;font-size:13px}
+  .items th,.items td{padding:4px}
+  .total-row{padding:4px 0}
+  .total-label-ar{font-size:12px}
+  .total-label-en{font-size:9px}
+  .total-value{font-size:12.5px}
+  .grand{padding:6px 10px;margin-top:4px}
+  .grand .total-value{font-size:16px}
+  .vat-rate-row{margin:5px 0;padding:5px 10px}
+  .incl-note{margin-top:4px}
+  .qr-label{margin-bottom:4px}
+  .qr-box canvas,.qr-box img{width:112px!important;height:112px!important}
+  .page *{line-height:1.3}
+  .row-label-ar,.total-label-ar,.vat-rate-label{display:inline}
+  .row-label-en,.total-label-en,.vat-rate-label-en{display:inline;margin-inline-start:6px}
+  .inv-row,.vat-rate-row{align-items:center}
+  .qr-label br{display:none}
+  .qr-label-en{margin-inline-start:6px}
+}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="app"><div class="page"><div class="msg">جارٍ تحميل الفاتورة…<br>Loading invoice…</div></div></div>
+
+<script>
+/* ============================================================
+   Simplified tax invoice — Deliver Step
+   VAT 15% on the WHOLE order. The amount the customer paid already
+   includes the VAT (prices don't change): VAT = total × 15 / 115.
+     invoice.html?id=<order id>           one order
+     invoice.html?order=DS-123456         one order (by number)
+     invoice.html?day=2026-09-24          register + every invoice of that day
+     invoice.html?day=…&vendor=<name>     same, one vendor only
+   Cancelled / deleted orders are never included in a day.
+   ============================================================ */
+const SELLER_AR = 'مؤسسة خطوة التوصيل';
+const VAT_NO = '312822539800003';
+const VAT_RATE = 15;
+const SB_URL = 'https://vjuhxpttssmyomqqomdx.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
+const KSA = {timeZone:'Asia/Riyadh'};
+const p = new URLSearchParams(location.search);
+
+const r2 = n => Math.round((Number(n) || 0) * 100) / 100;
+const money = n => r2(n).toFixed(2) + ' SR';
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isVoid = o => /^cancel/i.test(String((o && o.order_status) || '')) || !!(o && o.deleted_at);
+// VAT included in the amount paid
+function vatOf(total){ const t = r2(total); const vat = r2(t * VAT_RATE / (100 + VAT_RATE)); return {total:t, vat, net:r2(t - vat)}; }
+function fmtDate(iso){
+  const d = new Date(iso || Date.now());
+  return d.toLocaleDateString('en-CA', KSA) + ' ' + d.toLocaleTimeString('en-US', {...KSA, hour:'2-digit', minute:'2-digit', hour12:false});
+}
+function fmtTime(iso){ return new Date(iso).toLocaleTimeString('en-US', {...KSA, hour:'2-digit', minute:'2-digit', hour12:false}); }
+
+// Orders are private (closed to the public): the invoice reads them with the ADMIN's login saved on this computer.
+// Its own client only borrows that login — it never saves, refreshes or changes it (Admin keeps working as before).
+function adminLogin(){
+  try{
+    const k = Object.keys(localStorage).find(x => /^sb-.*-auth-token$/.test(x)); if(!k) return null;
+    const s = JSON.parse(localStorage.getItem(k) || 'null') || {}, ses = s.currentSession || s;
+    if(!ses.access_token) return null;
+    return {token: ses.access_token, expired: !!(ses.expires_at && ses.expires_at * 1000 < Date.now() + 30000)};
+  }catch(e){ return null; }
+}
+const login = adminLogin();
+let sb = null;
+try{ if(window.supabase && window.supabase.createClient && login && !login.expired)
+  sb = window.supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:false, autoRefreshToken:false, detectSessionInUrl:false}, global:{headers:{Authorization:'Bearer ' + login.token}}}); }catch(e){}
+
+async function getOrder(){
+  let q = sb.from('orders').select('*');
+  if(p.get('id')) q = q.eq('id', p.get('id'));
+  else q = q.eq('order_number', p.get('order')).order('created_at', {ascending:false});
+  const r = await q.limit(1);
+  if(r.error) throw r.error;
+  return (r.data || [])[0] || null;
+}
+async function getDay(day, vendor){
+  const r = await sb.from('orders').select('*')
+    .gte('created_at', day + 'T00:00:00+03:00').lte('created_at', day + 'T23:59:59.999+03:00')
+    .order('created_at', {ascending:true});
+  if(r.error) throw r.error;
+  return (r.data || []).filter(o => !isVoid(o) && (!vendor || (o.vendor_name || 'غير محدد') === vendor));
+}
+async function getItems(ids){
+  const out = {};
+  for(let i = 0; i < ids.length; i += 80){
+    const r = await sb.from('order_items').select('order_id,product_name,quantity,unit_price,total_price').in('order_id', ids.slice(i, i + 80));
+    if(r.error) throw r.error;
+    (r.data || []).forEach(it => { (out[it.order_id] = out[it.order_id] || []).push(it); });
+  }
+  return out;
+}
+
+function header(titleAr, titleEn){
+  return '<div class="inv-top">'
+    + '<div class="inv-logo-box"><div class="inv-logo-ar">خطوة</div><div class="inv-logo-en">DELIVER STEP</div></div>'
+    + '<div class="inv-main-title">' + titleAr + '</div><div class="inv-main-sub">' + titleEn + '</div>'
+    + '<div class="inv-company">' + SELLER_AR + '</div><div class="inv-company-en">Deliver Step Est.</div>'
+    + '<div class="inv-address">الأسياح، 4744 - حي الجزيرة، 52836، المملكة العربية السعودية<br>Al-Ayah, 4744 - Al-Jazeera District, 52836, Saudi Arabia</div>'
+    + '</div>';
+}
+function row(ar, en, val){
+  return '<div class="inv-row"><div class="row-label"><div class="row-label-ar">' + ar + '</div><div class="row-label-en">' + en + '</div></div><div class="row-value">' + val + '</div></div>';
+}
+function tot(ar, en, val, cls){
+  return '<div class="total-row"><div><div class="total-label-ar">' + ar + '</div><div class="total-label-en">' + en + '</div></div><div class="total-value ' + (cls || '') + '">' + val + '</div></div>';
+}
+
+// One invoice page
+function invoicePage(o, items){
+  const v = vatOf(o.total);
+  const sub = o.subtotal != null ? r2(o.subtotal) : r2(items.reduce((s, i) => s + Number(i.total_price || 0), 0));
+  const del = r2(o.delivery_fee), disc = r2(o.discount);
+  const extra = r2(v.total - sub - del + disc);          // the fixed per-order fee shown at checkout (e.g. 0.50)
+  const lines = items.map(i => {
+    const parts = String(i.product_name || 'منتج').split('\n');
+    const first = parts.shift();
+    const rest = parts.join('\n').trim();
+    const qty = Number(i.quantity) || 1;
+    const lineTotal = i.total_price != null ? Number(i.total_price) : Number(i.unit_price || 0) * qty;
+    return '<tr><td><div class="item-name">' + esc(first) + '</div>' + (rest ? '<div class="item-extra">' + esc(rest) + '</div>' : '') + '</td>'
+      + '<td class="qty">' + qty + '</td><td class="num">' + r2(i.unit_price).toFixed(2) + '</td><td class="num">' + r2(lineTotal).toFixed(2) + '</td></tr>';
+  }).join('');
+  return '<div class="page">'
+    + (isVoid(o) ? '<div class="void">⚠️ هذا الطلب ملغى — ليس عملية بيع<br>CANCELLED ORDER — NOT A SALE</div>' : '')
+    + header('فاتورة ضريبية مبسطة', 'Simplified Tax Invoice')
+    + '<hr class="divider"/>'
+    + row('رقم التعريف الضريبي', 'Tax Identification Number', VAT_NO)
+    + row('المورد', 'Vendor', esc(o.vendor_name || '—'))
+    + row('رقم الفاتورة / رقم الطلب', 'Invoice Number / Order Request', esc(o.order_number || '—'))
+    + row('تاريخ الفاتورة', 'Invoice Date', fmtDate(o.created_at))
+    + '<hr class="divider"/>'
+    + '<div class="section-title"><span>تفاصيل الفاتورة</span><span class="section-title-en">Details</span></div>'
+    + (lines ? '<table class="items"><thead><tr><th>الصنف<small>Item</small></th><th style="text-align:center">الكمية<small>Qty</small></th><th style="text-align:left">السعر<small>Price</small></th><th style="text-align:left">المجموع<small>Total</small></th></tr></thead><tbody>' + lines + '</tbody></table>' : '')
+    + tot('المجموع الفرعي', 'Items Subtotal', money(sub))
+    + tot('رسوم التوصيل', 'Delivery Fees', money(del))
+    + (Math.abs(extra) >= 0.01 ? tot(extra > 0 ? 'رسوم الخدمة' : 'تعديل', extra > 0 ? 'Service Fee' : 'Adjustment', money(extra)) : '')
+    + (disc >= 0.01 ? tot('الخصم', 'Discount', '-' + money(disc), 'minus') : '')
+    + '<hr class="divider"/>'
+    + tot('الإجمالي غير شامل الضريبة', 'Total Excluding VAT', money(v.net))
+    + '<div class="vat-rate-row"><div><div class="vat-rate-label">معدل ضريبة القيمة المضافة</div><div class="vat-rate-label-en">VAT Rate</div></div><div class="vat-rate-val">' + VAT_RATE.toFixed(1) + '%</div></div>'
+    + tot('إجمالي ضريبة القيمة المضافة', 'Total VAT', money(v.vat), 'green')
+    + '<div class="total-row grand"><div><div class="total-label-ar">الإجمالي شامل الضريبة</div><div class="total-label-en">Total Including VAT</div></div><div class="total-value">' + money(v.total) + '</div></div>'
+    + '<div class="incl-note">جميع الأسعار شاملة ضريبة القيمة المضافة ' + VAT_RATE + '% · All prices include ' + VAT_RATE + '% VAT</div>'
+    + '<hr class="divider"/>'
+    + '<div class="qr-section"><div class="qr-label">رمز الاستجابة السريع<br><span class="qr-label-en">QR Code</span></div>'
+    + '<div class="qr-box" data-qr="' + esc(zatcaQR(o.created_at, v.total, v.vat)) + '"></div></div>'
+    + '</div>';
+}
+
+// Daily register: every invoice of the day with its totals
+function registerPage(day, vendor, orders){
+  let n = 0, net = 0, vat = 0, total = 0;
+  const rows = orders.map((o, i) => {
+    const v = vatOf(o.total); n++; net += v.net; vat += v.vat; total += v.total;
+    return '<tr><td>' + (i + 1) + '</td><td class="num">' + esc(o.order_number) + '</td><td class="num">' + fmtTime(o.created_at) + '</td>'
+      + (vendor ? '' : '<td>' + esc(o.vendor_name || '—') + '</td>')
+      + '<td class="num">' + v.net.toFixed(2) + '</td><td class="num">' + v.vat.toFixed(2) + '</td><td class="num"><b>' + v.total.toFixed(2) + '</b></td></tr>';
+  }).join('');
+  return '<div class="page">'
+    + header('سجل الفواتير اليومي', 'Daily Invoice Register')
+    + '<hr class="divider"/>'
+    + row('رقم التعريف الضريبي', 'Tax Identification Number', VAT_NO)
+    + row('التاريخ', 'Date', esc(day))
+    + (vendor ? row('المورد', 'Vendor', esc(vendor)) : '')
+    + row('عدد الفواتير', 'Number of Invoices', String(n))
+    + '<table class="reg"><thead><tr><th>#</th><th>رقم الفاتورة</th><th>الوقت</th>' + (vendor ? '' : '<th>المورد</th>')
+    + '<th>قبل الضريبة</th><th>الضريبة 15%</th><th>الإجمالي</th></tr></thead><tbody>' + rows + '</tbody>'
+    + '<tfoot><tr><td colspan="' + (vendor ? 3 : 4) + '">الإجمالي · Total</td><td class="num">' + r2(net).toFixed(2) + '</td><td class="num">' + r2(vat).toFixed(2) + '</td><td class="num">' + r2(total).toFixed(2) + '</td></tr></tfoot></table>'
+    + '<div class="incl-note">المبالغ بالريال السعودي وشاملة ضريبة القيمة المضافة ' + VAT_RATE + '% · Amounts in SAR, VAT ' + VAT_RATE + '% included</div>'
+    + '</div>';
+}
+
+// ZATCA QR (TLV → base64): seller, VAT number, time, total with VAT, VAT
+function zatcaQR(ts, totalAmt, vatAmt){
+  function tlv(tag, str){ const b = new TextEncoder().encode(str); return new Uint8Array([tag, b.length, ...b]); }
+  const parts = [tlv(1, SELLER_AR), tlv(2, VAT_NO), tlv(3, new Date(ts || Date.now()).toISOString()), tlv(4, r2(totalAmt).toFixed(2)), tlv(5, r2(vatAmt).toFixed(2))];
+  const out = new Uint8Array(parts.reduce((s, a) => s + a.length, 0));
+  let i = 0; parts.forEach(a => { out.set(a, i); i += a.length; });
+  return btoa(String.fromCharCode(...out));
+}
+function drawQRs(){
+  if(typeof QRCode === 'undefined') return false;
+  document.querySelectorAll('.qr-box[data-qr]').forEach(el => {
+    new QRCode(el, {text: el.getAttribute('data-qr'), width: 140, height: 140, colorDark: '#0f172a', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M});
+  });
+  return true;
+}
+
+function toolbar(info){
+  const qrOk = typeof QRCode !== 'undefined';
+  document.getElementById('bar').innerHTML = '<div class="toolbar no-print"><div class="info">' + info
+    + (qrOk ? '' : '<div class="warn">⚠️ رمز QR لم يُحمّل — أعد تحميل الصفحة قبل الطباعة · QR code did not load — reload before printing</div>')
+    + '</div><button class="print-btn" onclick="window.print()">🖨️ طباعة · Print</button></div>';
+}
+function message(html){
+  document.getElementById('app').innerHTML = '<div class="page"><div class="msg">' + html + '</div></div>';
+}
+
+(async function main(){
+  const orderParam = p.get('order') || '';
+  let day = p.get('day') || '';
+  const vendor = p.get('vendor') || '';
+  const legacy = orderParam.match(/^DAILY-(\d{4})(\d{2})(\d{2})/);       // old daily links from the admin
+  if(!day && legacy) day = legacy[1] + '-' + legacy[2] + '-' + legacy[3];
+  if(!login){ message('الفواتير للإدارة فقط — سجّل الدخول في لوحة الإدارة على هذا الجهاز ثم افتح الفاتورة من هناك<br><b>Invoices are for Admin only — log in to Admin on this computer, then open the invoice from Admin.</b>'); return; }
+  if(login.expired){ message('انتهت جلسة لوحة الإدارة — افتح صفحة الإدارة (أو حدّثها) ثم أعد فتح الفاتورة<br><b>Your Admin login has expired — open or refresh the Admin page, then open the invoice again.</b>'); return; }
+  if(!sb){ message('تعذر الاتصال بقاعدة البيانات — تحقق من الإنترنت ثم أعد المحاولة<br><b>Could not connect — check the internet and reload.</b>'); return; }
+  try{
+    if(day){
+      const orders = await getDay(day, vendor);
+      if(!orders.length){ message('لا توجد فواتير في ' + esc(day) + (vendor ? ' — ' + esc(vendor) : '') + '<br><b>No invoices for this day.</b>'); return; }
+      const items = await getItems(orders.map(o => o.id));
+      document.getElementById('app').innerHTML = registerPage(day, vendor, orders) + orders.map(o => invoicePage(o, items[o.id] || [])).join('');
+      document.title = 'فواتير ' + day + (vendor ? ' — ' + vendor : '');
+      drawQRs();
+      toolbar('<b>' + orders.length + '</b> فاتورة + سجل اليوم · ' + orders.length + ' invoices + daily register');
+    }else if(p.get('id') || orderParam){
+      const o = await getOrder();
+      if(!o){ message('لم يتم العثور على الطلب<br><b>Order not found.</b>'); return; }
+      const items = (await getItems([o.id]))[o.id] || [];
+      document.getElementById('app').innerHTML = invoicePage(o, items);
+      document.title = 'فاتورة #' + (o.order_number || '');
+      drawQRs();
+      toolbar('فاتورة رقم <b>' + esc(o.order_number || '') + '</b>');
+    }else{
+      message('لا يوجد طلب محدد<br><b>No order selected.</b>');
+    }
+  }catch(e){
+    if(/jwt|expired|401|403/i.test(String((e && (e.message || e.code || e.status)) || '')))
+      message('انتهت جلسة لوحة الإدارة — حدّث صفحة الإدارة ثم أعد فتح الفاتورة<br><b>Your Admin login has expired — refresh the Admin page, then open the invoice again.</b>');
+    else message('تعذر تحميل الفاتورة — تحقق من الإنترنت ثم أعد المحاولة<br><b>Could not load the invoice — check the internet and reload.</b>');
+  }
+})();
+</script>
+</body>
+</html>
