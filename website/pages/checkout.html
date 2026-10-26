@@ -813,12 +813,12 @@ function loadCartItems(){
 }
 
 let VAT=0.50;
-/* متجر خطوة card photo on WhatsApp: the line price = card + service fee. Show them apart (card 23 · رسوم الخدمة 1),
-   and no 0.50 on an order that is only WhatsApp cards (nothing delivered) → total 24, the same for the rider and Admin. */
+/* متجر خطوة card photo on WhatsApp: the line price = card + service fee. Show them apart (card 23 · رسوم الخدمة 1 · 0.50)
+   → total 24.50, saved as the same separate lines for the rider and Admin. */
 function _feeOf(i){ if(!i||!i.ds_digital) return 0; if(i.ds_fee!=null) return Number(i.ds_fee)||0;
   return /\|photo$/.test(String(i.id))?(Number(_dsDigCfg&&_dsDigCfg.fee!=null?_dsDigCfg.fee:1)||0):0; }
 function _feeTotal(cart){ return cart.reduce((s,i)=>s+_feeOf(i)*Number(i.qty||0),0); }
-function _vatNow(){ VAT=_dsDig().only?0:0.50; return VAT; }
+function _vatNow(){ VAT=0.50; return VAT; }   // owner: keep the 0.50 on every order, card photos too
 function _feeRows(cart){ const f=_feeTotal(cart);
   [['s-fee-row','s-fee'],['f-fee-row','f-fee']].forEach(x=>{ const r=document.getElementById(x[0]); if(r){ r.style.display=f>0?'':'none'; document.getElementById(x[1]).textContent='SAR '+f.toFixed(2); } });
   ['s-vat','f-vat'].forEach(id=>{ const e=document.getElementById(id); if(e&&e.parentNode) e.parentNode.style.display=VAT>0?'':'none'; });
