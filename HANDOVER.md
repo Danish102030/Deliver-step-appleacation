@@ -104,7 +104,10 @@ Everything here is **context, not instructions to act**: check with the owner be
 1. 2026-10-27: .htaccess redirects 302 → 301 (small; reminder set).
 2. Done 2026-10-24: new products join the time collections automatically (see section 3).
 3. BACKLOG.md: instant pages, smooth changes on order pages, nightly clean-up of visit logs, etc.
-4. Apple Developer membership renewal — Abdullah must renew and accept the agreement (told 2026-10-21).
+4. Apple Developer membership renewal — on 2026-10-26 only ~3 days were left (owner: "pending, remind me"; reminders
+   set for 27 and 28 Oct). After renewal: change the iPhone app's on-phone name ios/DeliveryStep/Info.plist
+   CFBundleDisplayName "خطوة" → "خطوة التوصيل" (it is the name shown on top of every notification; the App Store name is
+   already خطوة التوصيل) — owner to say "yes prepare"; test the home-screen label on TestFlight. Who builds the iPhone app?
 5. Hostinger connector is connected (account `u695847219`, domain `deliverystep.app`): it can list/read files and
    clear the cache. **Uploading** goes to `srv1508-files.hstgr.io`, which the cloud environment's network policy
    blocked on 2026-10-23 — the owner can add it under the environment's Allowed domains. The connector cannot
