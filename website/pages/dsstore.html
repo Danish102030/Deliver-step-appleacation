@@ -384,8 +384,8 @@ function render(){
   if(!ITEMS.length) h='<div class="gone"><div style="font-size:52px">🛍️</div><b>قريباً</b><p>نضيف المنتجات الآن — ارجع لنا بعد شوي</p><a href="/">الرئيسية</a></div>';
   $('main').innerHTML=h;
   if(!ITEMS.length) return;
-  if(car&&!RCO.some(o=>o.k===car)) car=null; if(!car&&RCO.length===1) car=RCO[0].k;   // first the customer picks the company (one company → already open)
-  if(gb&&!gifts.some(d=>d.name===gb)) gb=null; if(!gb&&gifts.length===1) gb=gifts[0].name;
+  if(car&&!RCO.some(o=>o.k===car)) car=null;   // first the customer picks the company
+  if(gb&&!gifts.some(d=>d.name===gb)) gb=null;   // first the customer picks the game / store
   drawDeps(); drawRc(); drawGift(); drawOffers(offers); drawList(); refreshCart();
 }
 // the department buttons: all gift brands together are ONE button (بطاقات وألعاب)
@@ -413,9 +413,9 @@ function drawGift(){
     $('gg').innerHTML='<div class="selco"><div class="sl" style="background:'+L.bg+'">'+(G.image_url?'<img src="'+esc(G.image_url)+'" alt="" onerror="this.remove()"/>':'<i>'+esc(L.e)+'</i>')+'</div><b>'+esc(G.name)+'</b>'+
       (gifts.length>1?'<button type="button" onclick="pickBrand(\'\')">↺ لعبة أخرى</button>':'')+'</div>';
   } else $('gg').innerHTML='<div class="pick-h">👇 اختر اللعبة أو المتجر</div>'+gifts.map(d=>{ const L=gLook(d);
-    return '<button class="gt'+(gb===d.name?' on':'')+'" data-d="'+esc(d.name)+'" onclick="pickBrand(this.dataset.d)"><div class="gi" style="background:'+L.bg+'">'+
-      (d.image_url?'<img src="'+esc(d.image_url)+'" alt="'+esc(d.name)+'" loading="lazy" decoding="async" onerror="this.remove()"/>':'<i>'+esc(L.e)+'</i><em>'+esc(L.t)+'</em>')+'</div><b>'+esc(d.name)+'</b></button>'; }).join('');
-  const d=gifts.find(x=>x.name===gb); if(!d){ $('gp').innerHTML=''; return; }
+    return '<button class="ct gt" data-d="'+esc(d.name)+'" onclick="pickBrand(this.dataset.d)"><div class="clg" style="background:'+L.bg+'">'+
+      (d.image_url?'<img src="'+esc(d.image_url)+'" alt="'+esc(d.name)+'" loading="lazy" decoding="async" onerror="this.remove()"/>':'<span class="en"'+(L.t.length>9?' style="font-size:'+(L.t.length>12?13:16)+'px"':'')+'>'+esc(L.t)+'</span>')+'</div><b>'+esc(d.name)+'</b></button>'; }).join('');
+  const d=gifts.find(x=>x.name===gb); $('gp').style.display=d?'':'none'; if(!d){ $('gp').innerHTML=''; return; }
   const L=gLook(d);
   const packs=ITEMS.filter(i=>i.category===d.name).sort((a,b)=>(Number(gAmt(a))||0)-(Number(gAmt(b))||0)||(a.sort_order||0)-(b.sort_order||0));
   const sel=packs.find(i=>i.id===gpk&&i.in_stock!==false);
