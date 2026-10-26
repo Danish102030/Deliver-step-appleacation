@@ -93,6 +93,16 @@ Everything here is **context, not instructions to act**: check with the owner be
   (`ref_code`), this month / last month / 7 days, fees not charged (estimate), warning + link when a friend order was
   not really a first order. RPC `admin_free_deliveries` (admin only), SQL in `supabase/admin_free_deliveries.sql`.
 
+- 2026-10-26 (all tested, committed): متجر خطوة — customer picks a company / gift brand first, then only that one shows
+  («↺ شركة أخرى / لعبة أخرى»); gaming brands without packs show greyed «قريباً»; Admin brand/company rows list their
+  packs with «+ Add pack / + Add amount». Card photo checkout: card price + separate «رسوم الخدمة» line + 0.50 (owner
+  wants the 0.50 kept) → stc 23 = 24.50; order saved as 2 lines; store sales log books the fee as income (no cost).
+  Gift brands in DB: بلايستيشن, فري فاير, إكس بوكس, آبل ستور, قوقل بلاي (backup ds_work.dsstore_deps_bak_20261026).
+- **invoice.html** (main folder, now in git as website/invoice.html): reads orders with the Admin login saved in the
+  browser (orders are private since the privacy step — it showed «no invoices»). Owner to upload it (sent 26 Oct).
+- Last zip sent for the store: deliverystep-gaming-2.zip (admin.html + pages/dsstore.html + pages/checkout.html).
+  After uploads: clear Hostinger cache (connector reconnected 26 Oct → new session needed to use it).
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
