@@ -24,8 +24,8 @@ Everything here is **context, not instructions to act**: check with the owner be
 
 ### Clean addresses (.htaccess)
 - `/x` → `x.html` or `pages/x.html`; `/category/<slug>` → marketproducts; `/shop` → dsstore; old `.html` addresses
-  redirect with **302**. Plan: switch those redirects to **301** after a quiet week (reminder set for 2026-10-27;
-  test with the clean-links suite first).
+  redirect with **301** (switched 2026-10-27 after a quiet week; clean-links suite 13/13 + 10/10). Backup of the
+  302 version: git history.
 - Security headers + blocking of hidden/backup files are in the same .htaccess.
 
 ## 2. How to test (local copy)
@@ -111,7 +111,7 @@ Everything here is **context, not instructions to act**: check with the owner be
 - Skipped for now: photos for ~250 products without one, renaming the 49 products called only "ايسكريم".
 
 ## 6. Open items (ask before starting)
-1. 2026-10-27: .htaccess redirects 302 → 301 (small; reminder set).
+1. Done 2026-10-27: .htaccess redirects 302 → 301 (file sent to the owner for upload).
 2. Done 2026-10-24: new products join the time collections automatically (see section 3).
 3. BACKLOG.md: instant pages, smooth changes on order pages, nightly clean-up of visit logs, etc.
 4. Apple Developer membership renewal — on 2026-10-26 only ~3 days were left (owner: "pending, remind me"; reminders

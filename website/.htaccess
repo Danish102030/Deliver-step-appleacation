@@ -22,15 +22,15 @@ Options -Indexes
 
   # 1) old addresses → clean (only what the visitor typed / clicked; never our own inside step)
   RewriteCond %{THE_REQUEST} \s/+pages/dsstore\.html[\s?]
-  RewriteRule ^ /shop [R=302,L]
+  RewriteRule ^ /shop [R=301,L]
   RewriteCond %{THE_REQUEST} \s/+pages/[a-z0-9_-]+\.html[\s?] [NC]
   RewriteCond %{DOCUMENT_ROOT}/$1.html !-f
-  RewriteRule ^pages/([a-z0-9_-]+)\.html$ /$1 [R=302,L,NC]
+  RewriteRule ^pages/([a-z0-9_-]+)\.html$ /$1 [R=301,L,NC]
   RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
-  RewriteRule ^index\.html$ / [R=302,L,NC]
+  RewriteRule ^index\.html$ / [R=301,L,NC]
   RewriteCond %{REQUEST_URI} !^/(google[0-9a-z]+|yandex_[0-9a-z]+|pinterest-[0-9a-z]+)\.html$ [NC]
   RewriteCond %{THE_REQUEST} \s/+[a-z0-9_-]+\.html[\s?] [NC]
-  RewriteRule ^([a-z0-9_-]+)\.html$ /$1 [R=302,L,NC]
+  RewriteRule ^([a-z0-9_-]+)\.html$ /$1 [R=301,L,NC]
 
   # 2) clean address → the real file (inside step, the visitor still sees the clean address)
   RewriteRule ^shop/?$ /pages/dsstore.html [L,NC]
