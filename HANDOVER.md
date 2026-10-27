@@ -102,6 +102,13 @@ Everything here is **context, not instructions to act**: check with the owner be
 - Last zip sent for the store: deliverystep-gaming-2.zip (admin.html + pages/dsstore.html + pages/checkout.html).
   After uploads: clear Hostinger cache (connector reconnected 26 Oct → new session needed to use it).
 
+- **Loyalty reminders** (2026-10-27, owner approved): app push when a customer is 9 of 10, just earned the free
+  delivery, or has it unused 7 days. Max 1 a week per customer, 12–21 Saudi time, hourly job `loyalty-reminders`
+  (:07) → `send_loyalty_reminders()`; log `loyalty_reminder_log`; texts + on/off in settings `loyalty_reminders`;
+  taps via push_notifications rows target `loyalty_*` (ids 55–57) + notif_clicks; «ordered» = order within 3 days.
+  Admin → Marketing → Loyalty reminders (numbers, edit texts, send now, waiting list with WhatsApp for web-only
+  customers). Customers are reached via the device_token on their latest order. First send 27 Oct: 9 delivered.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".

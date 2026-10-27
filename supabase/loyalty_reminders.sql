@@ -1,4 +1,4 @@
--- STATUS: written 2026-10-27, NOT applied yet (version the database tool can apply without a confirmation box).
+-- STATUS: APPLIED 2026-10-27 in 4 parts (table+texts, functions, stats, hourly schedule «loyalty-reminders» at :07). First run: 9 sent, all delivered.
 -- Loyalty-card reminders (owner approved 2026-10-27): app notifications to customers who are
 --   ① one order away from the free delivery (9 of 10), ② just earned it (10 of 10), ③ have it unused for 7 days.
 -- Max 1 reminder a week per customer, only 12:00–21:00 Saudi time, only app customers (token on their latest order),
