@@ -1,4 +1,4 @@
--- STATUS: written 2026-10-27, NOT applied yet (waiting for the owner to confirm the database change).
+-- STATUS: written 2026-10-27, NOT applied yet (version the database tool can apply without a confirmation box).
 -- Loyalty-card reminders (owner approved 2026-10-27): app notifications to customers who are
 --   ① one order away from the free delivery (9 of 10), ② just earned it (10 of 10), ③ have it unused for 7 days.
 -- Max 1 reminder a week per customer, only 12:00–21:00 Saudi time, only app customers (token on their latest order),
@@ -17,7 +17,6 @@ create table if not exists public.loyalty_reminder_log(
 create unique index if not exists loyalty_reminder_log_once on public.loyalty_reminder_log(phone9, kind, level);
 create index if not exists loyalty_reminder_log_sent on public.loyalty_reminder_log(sent_at);
 alter table public.loyalty_reminder_log enable row level security;          -- no policies: closed to the public
-revoke all on public.loyalty_reminder_log from anon, authenticated;
 
 -- one notification row per kind → taps are counted like the owner's offers (?n=<id> → increment_notif_click)
 insert into public.push_notifications(title_ar, title_en, body_ar, body_en, target, status, recipients)
@@ -53,19 +52,12 @@ begin
     headers := '{"Content-Type":"application/json"}'::jsonb,
     timeout_milliseconds := 30000);
 end $f$;
-revoke all on function public._loyalty_push(text, text, text, bigint) from public, anon, authenticated;
 
 -- who should get which reminder now (one per customer); p_send=false only lists them
-create or replace function public.send_loyalty_reminders(p_force boolean default false, p_send boolean default true)
-returns json language plpgsql security definer set search_path to 'public', 'pg_temp' as $f$
-declare cfg jsonb; h int := extract(hour from (now() at time zone 'Asia/Riyadh')); r record; n int := 0; out json; nid bigint; t jsonb;
-begin
-  begin cfg := (select value::jsonb from public.settings where key = 'loyalty_reminders'); exception when others then cfg := null; end;
-  if not p_force and (cfg is null or coalesce((cfg->>'on')::boolean, false) = false) then return json_build_object('sent', 0, 'why', 'off'); end if;
-  if not p_force and (h < 12 or h >= 21) then return json_build_object('sent', 0, 'why', 'quiet hours'); end if;
-  create temp table if not exists _lr_pick(phone9 text, tok text, kind text, level int, name text) on commit drop;
-  truncate _lr_pick;
-  insert into _lr_pick
+-- who should get which reminder now (one per customer, max 60 per run)
+create or replace function public._loyalty_candidates()
+returns table(phone9 text, tok text, kind text, level int, name text)
+language sql stable security invoker set search_path to 'public', 'pg_temp' as $f$
   with c as (
     select public.ds_phone9(o.customer_phone) p9,
       count(*) filter (where o.order_status = 'delivered' or o.created_at < now() - interval '3 days') cnt,
@@ -101,12 +93,27 @@ begin
     -- max 1 reminder a week; «earned» right after «one away» is the natural follow-up and may come sooner
     and not exists (select 1 from public.loyalty_reminder_log l where l.phone9 = k.p9 and l.sent_at > now() - interval '7 days'
                      and not (k.kind = 'earned' and l.kind = 'one_away'))
-  limit 60;
+  limit 60
+$f$;
+
+-- send them (the hourly job, or Admin «send now»); p_send=false only says what would be sent
+create or replace function public.send_loyalty_reminders(p_force boolean default false, p_send boolean default true)
+returns json language plpgsql security definer set search_path to 'public', 'pg_temp' as $f$
+declare cfg jsonb; h int := extract(hour from (now() at time zone 'Asia/Riyadh')); r record; n int := 0; out json; nid bigint; t jsonb;
+begin
+  -- only the schedule (database itself) or a logged-in admin may run this
+  if (session_user = 'authenticator' or coalesce(current_setting('request.jwt.claims', true), '') <> '') and not public.is_admin() then
+    raise exception 'not allowed';
+  end if;
+  begin cfg := (select value::jsonb from public.settings where key = 'loyalty_reminders'); exception when others then cfg := null; end;
+  if not p_force and (cfg is null or coalesce((cfg->>'on')::boolean, false) = false) then return json_build_object('sent', 0, 'why', 'off'); end if;
+  if not p_force and (h < 12 or h >= 21) then return json_build_object('sent', 0, 'why', 'quiet hours'); end if;
   if not p_send then
-    select json_build_object('sent', 0, 'would_send', coalesce(json_agg(json_build_object('kind', kind, 'level', level)), '[]'::json)) into out from _lr_pick;
+    select json_build_object('sent', 0, 'would_send', coalesce(json_agg(json_build_object('kind', c.kind, 'level', c.level)), '[]'::json)) into out
+      from public._loyalty_candidates() c;
     return out;
   end if;
-  for r in select * from _lr_pick loop
+  for r in select * from public._loyalty_candidates() loop
     t := coalesce(cfg->'texts'->r.kind, '{}'::jsonb);
     select id into nid from public.push_notifications where target = 'loyalty_' || r.kind order by id limit 1;
     insert into public.loyalty_reminder_log(phone9, token, kind, level, notif_id) values (r.phone9, r.tok, r.kind, r.level, nid)
@@ -119,7 +126,6 @@ begin
   end loop;
   return json_build_object('sent', n);
 end $f$;
-revoke all on function public.send_loyalty_reminders(boolean, boolean) from public, anon, authenticated;
 
 -- Admin: «send to the waiting customers now» (ignores the time window, keeps the weekly limit)
 create or replace function public.admin_loyalty_send_now() returns json
@@ -128,7 +134,6 @@ begin
   if not public.is_admin() then raise exception 'not allowed'; end if;
   return public.send_loyalty_reminders(true, true);
 end $f$;
-revoke all on function public.admin_loyalty_send_now() from public, anon;
 grant execute on function public.admin_loyalty_send_now() to authenticated;
 
 -- Admin: numbers + the waiting customers (also the ones without the app → WhatsApp)
@@ -178,7 +183,6 @@ begin
   into r;
   return r;
 end $f$;
-revoke all on function public.admin_loyalty_stats(int) from public, anon;
 grant execute on function public.admin_loyalty_stats(int) to authenticated;
 
 -- every hour at :07 (the function itself keeps 12:00–21:00 Saudi time)
