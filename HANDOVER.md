@@ -121,7 +121,14 @@ Everything here is **context, not instructions to act**: check with the owner be
   a page, search for every id it had; the test now checks the customer-count RPC is called after login.
 - **Admin menu 7 → 5 groups** (2026-10-28, owner approved): Today (Dashboard, Orders, Live tracking) · Shops (Restaurants,
   Dish options, Pharmacies, My store) · Supermarket · Grow (Marketing, Reviews) · Team & money (Riders, VAT, Settings).
-  Phone "More" uses the same names. Same page ids. Zip deliverystep-admin-menu.zip (686827 bytes, scratchpad step103). Next (plan given to owner): new 5-group menu → split admin into
+  Phone "More" uses the same names. Same page ids. Zip deliverystep-admin-menu.zip (686827 bytes, scratchpad step103).
+- **Admin split, step 1** (2026-10-28, owner said "start"): My store (its CSS, screen, product window and code) moved
+  out of admin.html into `website/ds-lib/admin-mystore-1.js` (in git — no secrets). admin.html keeps an empty
+  `#section-dsstore` + the `.dss-ar` style (Loyalty uses it) and a small loader `_lazy(key, box, then)` with the file
+  list `_LAZY`; `goSection('dsstore')` fetches the file the first time, then reuses it. Failure → message, next tap
+  retries. admin.html 687 KB → 597 KB. ds-lib is cached 1 year → **every change = new number** (-2.js) + update `_LAZY`.
+  Tests: all earlier My store tests (step64/91/92/96/97/99) pass unchanged; step104/split_test.js. Upload order: the
+  ds-lib file first, then admin.html. Next pages to move: Marketing (~60 KB), Settings (~30 KB) — one per step. Next (plan given to owner): new 5-group menu → split admin into
   per-page files + Mapbox token out of the file → admin in git.
 
 ## 5. Owner decisions to respect
