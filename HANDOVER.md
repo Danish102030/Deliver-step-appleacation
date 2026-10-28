@@ -118,7 +118,10 @@ Everything here is **context, not instructions to act**: check with the owner be
   **Bug in that first upload (fixed same day, zip deliverystep-admin-fix.zip, 687108 bytes):** `initApp()` still wrote
   the removed `#report-date`, threw, and skipped everything after it (order load at start, customer order counts → every
   customer showed «🆕 عميل جديد», riders, live new-order listener + sound, 30 s poll, stale orders). Lesson: when removing
-  a page, search for every id it had; the test now checks the customer-count RPC is called after login. Next (plan given to owner): new 5-group menu → split admin into
+  a page, search for every id it had; the test now checks the customer-count RPC is called after login.
+- **Admin menu 7 → 5 groups** (2026-10-28, owner approved): Today (Dashboard, Orders, Live tracking) · Shops (Restaurants,
+  Dish options, Pharmacies, My store) · Supermarket · Grow (Marketing, Reviews) · Team & money (Riders, VAT, Settings).
+  Phone "More" uses the same names. Same page ids. Zip deliverystep-admin-menu.zip (686827 bytes, scratchpad step103). Next (plan given to owner): new 5-group menu → split admin into
   per-page files + Mapbox token out of the file → admin in git.
 
 ## 5. Owner decisions to respect
