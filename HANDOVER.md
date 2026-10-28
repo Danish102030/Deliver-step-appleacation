@@ -114,7 +114,11 @@ Everything here is **context, not instructions to act**: check with the owner be
   table, SRV- orders, settings.home_notice — not set, so no announcement shows). The checkout code box still works for
   invite codes. Home-service bookings still go to WhatsApp; the «خدمات منزلية» tile is still on the customer home page
   (offered to remove it). File: scratchpad step102 (zip deliverystep-admin-clean.zip, includes Loyalty reminders page).
-  Old `#coupons` bookmarks fall back to Dashboard. Next (plan given to owner): new 5-group menu → split admin into
+  Old `#coupons` bookmarks fall back to Dashboard.
+  **Bug in that first upload (fixed same day, zip deliverystep-admin-fix.zip, 687108 bytes):** `initApp()` still wrote
+  the removed `#report-date`, threw, and skipped everything after it (order load at start, customer order counts → every
+  customer showed «🆕 عميل جديد», riders, live new-order listener + sound, 30 s poll, stale orders). Lesson: when removing
+  a page, search for every id it had; the test now checks the customer-count RPC is called after login. Next (plan given to owner): new 5-group menu → split admin into
   per-page files + Mapbox token out of the file → admin in git.
 
 ## 5. Owner decisions to respect
