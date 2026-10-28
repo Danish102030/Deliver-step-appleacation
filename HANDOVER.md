@@ -109,6 +109,14 @@ Everything here is **context, not instructions to act**: check with the owner be
   Admin → Marketing → Loyalty reminders (numbers, edit texts, send now, waiting list with WhatsApp for web-only
   customers). Customers are reached via the device_token on their latest order. First send 27 Oct: 9 delivered.
 
+- **Admin clean-up** (2026-10-28, owner asked): pages **Coupons, Home services, Announcement, Reports** removed from
+  admin.html (menu, phone "More" menu, Marketing tabs/cards, their code) → 720 KB → 687 KB. Data untouched (coupons
+  table, SRV- orders, settings.home_notice — not set, so no announcement shows). The checkout code box still works for
+  invite codes. Home-service bookings still go to WhatsApp; the «خدمات منزلية» tile is still on the customer home page
+  (offered to remove it). File: scratchpad step102 (zip deliverystep-admin-clean.zip, includes Loyalty reminders page).
+  Old `#coupons` bookmarks fall back to Dashboard. Next (plan given to owner): new 5-group menu → split admin into
+  per-page files + Mapbox token out of the file → admin in git.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
