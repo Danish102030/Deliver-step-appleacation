@@ -120,10 +120,12 @@ Everything here is **context, not instructions to act**: check with the owner be
 1. Skipped by the owner 2026-10-27: .htaccess 302 → 301 (tested version in commit f747fcb if ever wanted).
 2. Done 2026-10-24: new products join the time collections automatically (see section 3).
 3. BACKLOG.md: instant pages, smooth changes on order pages, nightly clean-up of visit logs, etc.
-4. Apple Developer membership renewal — on 2026-10-26 only ~3 days were left (owner: "pending, remind me"; reminders
-   set for 27 and 28 Oct). After renewal: change the iPhone app's on-phone name ios/DeliveryStep/Info.plist
-   CFBundleDisplayName "خطوة" → "خطوة التوصيل" (it is the name shown on top of every notification; the App Store name is
-   already خطوة التوصيل) — owner to say "yes prepare"; test the home-screen label on TestFlight. Who builds the iPhone app?
+4. Apple Developer membership: renewed by Abdullah's login on 2026-10-28 (US$99, «processing», activation email to
+   the Account Holder's email within 2 business days). Next: transfer the Account Holder role to Ihsanullah (already
+   Admin in App Store Connect; Apple Developer app on his iPhone; ID check) — started via Membership details →
+   Update your information → Transfer Account Holder role. A support message was prepared/sent as backup.
+   Then: iPhone app name ios/DeliveryStep/Info.plist CFBundleDisplayName "خطوة" → "خطوة التوصيل"; owner has a
+   Windows laptop only → build/upload the iPhone app with Codemagic (cloud Mac) + App Store Connect API key.
 5. Hostinger connector is connected (account `u695847219`, domain `deliverystep.app`): it can list/read files and
    clear the cache. **Uploading** goes to `srv1508-files.hstgr.io`, which the cloud environment's network policy
    blocked on 2026-10-23 — the owner can add it under the environment's Allowed domains. The connector cannot
