@@ -138,6 +138,11 @@ Everything here is **context, not instructions to act**: check with the owner be
   order is found only the items. pages/account.html inline details (orders without a number) got the same line
   (my_orders has no discount → a negative difference shows as «الخصم»). Zip deliverystep-order-vat-fix.zip (step105).
 
+- **Old-app coupon KSA94** (2026-10-28): coupon is off in the database, but very old app copies have «KSA94 = 10 SAR
+  off» written inside them (root checkout.html / www/checkout.html, 4-digit DS-xxxx numbers) and never ask the
+  database. Only one customer (phone …1982) still does it (DS-1334, DS-870699, DS-735122, DS-6627). A database guard
+  (hold + warning note, mockup in scratchpad step106) was offered; **owner said no** — he will talk to the customer.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
