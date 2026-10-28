@@ -131,6 +131,13 @@ Everything here is **context, not instructions to act**: check with the owner be
   ds-lib file first, then admin.html. Next pages to move: Marketing (~60 KB), Settings (~30 KB) — one per step. Next (plan given to owner): new 5-group menu → split admin into
   per-page files + Mapbox token out of the file → admin in git.
 
+- **Customer order details VAT line** (2026-10-28, customer complaint): orders are saved right (total = items +
+  delivery + 0.50 − discount; there is no VAT column, the 0.50 is total − subtotal − delivery_fee + discount), but
+  pages/order-tracking.html added items + delivery itself (showed 31.00 for a 31.50 order) and, before the order was
+  found, showed a made-up «التوصيل 5.50». Fixed: shows «ضريبة القيمة المضافة 0.50» and the saved total; before the
+  order is found only the items. pages/account.html inline details (orders without a number) got the same line
+  (my_orders has no discount → a negative difference shows as «الخصم»). Zip deliverystep-order-vat-fix.zip (step105).
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
