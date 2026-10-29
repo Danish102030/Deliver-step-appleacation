@@ -189,6 +189,7 @@ Everything here is **context, not instructions to act**: check with the owner be
   Then the REAL logos (owner approved): ds-lib/brand-{stc,zain,mobily,ps,ff}-1.webp (copies of the Admin → My store
   department pictures, ~16 KB together; order stc → Zain → Mobily → PS → Free Fire). A changed logo = new file
   number (-2.webp) + update index.html (ds-lib is cached a year).
+  Owner then: name back to «متجر خطوة»; with Reduce Motion the logos still take turns as a soft fade (no slide).
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
