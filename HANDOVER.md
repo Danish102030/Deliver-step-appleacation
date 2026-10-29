@@ -198,6 +198,12 @@ Everything here is **context, not instructions to act**: check with the owner be
   `crLoad` (Settings) are called only when loaded. admin.html 598 KB → 477 KB. Tests: all earlier Admin tests unchanged
   + step116/lazy_test.js (40/40). Script: scratchpad step116/split2.py.
 
+- **Admin split, step 3** (2026-10-29): Categories + Products (filters, bulk, quick add, barcode) + Store staff →
+  `ds-lib/admin-supermarket-1.js` (`_LAZY.supermarket`); Dish options → `ds-lib/admin-dishes-1.js` (`_LAZY.dishes`).
+  Marketing is now `admin-marketing-2.js` (Searches «check»/«add» load the Supermarket file first). `_lazy(key,null,fn)`
+  = no page box → a toast on failure (used by «edit product» from an order). Product/category modals stay in admin.html.
+  admin.html 477 KB → 397 KB (from 720 KB on 28 Oct). Tests: step117/lazy3_test.js 25/25 + all earlier suites unchanged.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
