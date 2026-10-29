@@ -186,6 +186,8 @@ Everything here is **context, not instructions to act**: check with the owner be
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
 - No discounts on the supermarket now (the offer strip can announce them later).
 - Product count shows the real number (not a fixed "4000+").
+- Maps: keep Mapbox (owner, 29 Oct). No extra location step at checkout: riders know the customers' homes / use the
+  WhatsApp location (~20% of orders have no GPS — that is fine for the owner).
 - Skipped for now: photos for ~250 products without one, renaming the 49 products called only "ايسكريم".
 
 ## 6. Open items (ask before starting)
