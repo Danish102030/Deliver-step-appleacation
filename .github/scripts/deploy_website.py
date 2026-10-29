@@ -70,10 +70,28 @@ def connect(host, port, user, password, require_tls):
 
 
 def names(ftp, path):
-    try:
-        return {posixpath.basename(n.rstrip('/')) for n in ftp.nlst(path)}
-    except ftplib.error_perm:
-        return set()
+    """Names inside a folder. Servers differ: some NLST leave out folders or need us to step into the folder
+    first, so MLSD and a change-folder listing are tried too. A missing folder gives an empty set."""
+    found = set()
+    for how in ('nlst', 'mlsd', 'cwd'):
+        try:
+            if how == 'nlst':
+                found |= {posixpath.basename(n.rstrip('/')) for n in ftp.nlst(path)}
+            elif how == 'mlsd':
+                found |= {n for n, _ in ftp.mlsd(path)}
+            else:
+                home = ftp.pwd()
+                try:
+                    ftp.cwd(path)
+                    found |= {posixpath.basename(n.rstrip('/')) for n in ftp.nlst()}
+                finally:
+                    ftp.cwd(home)
+        except (ftplib.error_perm, ftplib.error_temp, ftplib.error_reply):
+            pass
+        if 'index.html' in found and 'pages' in found:
+            break
+    found.discard('.'); found.discard('..')
+    return found
 
 
 def is_site(ftp, path):
@@ -140,11 +158,38 @@ def upload(ftp, local_path, remote_path):
     return len(data)
 
 
+def check():
+    """Look only: show where this FTP account starts and which folder is the website. Uploads nothing."""
+    server, user, password = (os.environ.get(k, '') for k in ('FTP_SERVER', 'FTP_USERNAME', 'FTP_PASSWORD'))
+    for prefix in ('ftp://', 'ftps://'):
+        if server.startswith(prefix):
+            server = server[len(prefix):]
+    host, _, port = server.strip().rstrip('/').partition(':')
+    ftp = connect(host, int(port or 21), user.strip(), password, False)
+    try:
+        log(f'FTP account starts in: {ftp.pwd()}')
+        for c in SITE_CANDIDATES:
+            found = sorted(names(ftp, c))
+            log(f'  {c}: {len(found)} names' + (f' — e.g. {", ".join(found[:12])}' if found else '') +
+                ('  ← the website' if 'index.html' in found and 'pages' in found else ''))
+    finally:
+        try:
+            ftp.quit()
+        except Exception:
+            ftp.close()
+
+
 def main():
     if len(sys.argv) != 2:
         raise SystemExit('usage: deploy_website.py <file with the list of changed files>')
     with open(sys.argv[1], encoding='utf-8') as fh:
         wanted = [l.strip() for l in fh if l.strip()]
+    if wanted == ['--check']:
+        return check()
+    limit = int(os.environ.get('MAX_FILES', '0') or 0)
+    if limit and len(wanted) > limit:
+        raise SystemExit(f'{len(wanted)} files changed — more than {limit}, so nothing was uploaded automatically. '
+                         'If this is really wanted, run the workflow by hand and name the files.')
     files = []
     for p in wanted:
         norm = posixpath.normpath(p)

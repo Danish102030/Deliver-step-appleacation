@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       files:
-        description: 'Files to upload, separated by spaces (e.g. website/terms.html). Empty = the files changed by the last commit.'
+        description: 'Files to upload, separated by spaces (e.g. website/terms.html). Empty = the files changed by the last commit. --check = only look at the server, upload nothing.'
         type: string
         default: ''
 
@@ -53,13 +53,9 @@ jobs:
           : > files.txt
           if [ "$GITHUB_EVENT_NAME" = "push" ] && [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] \
              && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
-            # The merge that first brings this workflow to main carries months of history: some of those files were
-            # never put on the website on purpose. Upload nothing then; later merges upload only their own changes.
-            if [ -n "$(git diff --name-only --diff-filter=A "$BEFORE" "$GITHUB_SHA" -- .github/workflows/deploy-website.yml)" ]; then
-              echo "::notice::First run after the setup: nothing uploaded. Later changes are uploaded by themselves."
-            else
-              git diff --name-only --diff-filter=AMR "$BEFORE" "$GITHUB_SHA" -- website/ > files.txt
-            fi
+            git diff --name-only --diff-filter=AMR "$BEFORE" "$GITHUB_SHA" -- website/ > files.txt
+            # A normal change touches a few files. Many at once (e.g. months of history arriving together) are never
+            # uploaded by themselves — see MAX_FILES below; they can still be uploaded by hand, by name.
           elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ -n "$PICKED" ]; then
             printf '%s\n' $PICKED > files.txt
           elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
@@ -76,6 +72,7 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_DIR: ${{ secrets.FTP_DIR }}
+          MAX_FILES: ${{ github.event_name == 'push' && '12' || '0' }}
         run: python3 .github/scripts/deploy_website.py files.txt
 
       - name: Keep the replaced files

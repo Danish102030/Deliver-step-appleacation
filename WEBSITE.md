@@ -17,7 +17,7 @@ website/ds-lib/…       →  public_html/ds-lib/
 Safety: nothing on Hostinger is ever deleted; files not in `website/` (admin.html, PHP files, photos, account /
 order pages) are never touched; each file is swapped in one step; the server's old copy of every replaced file is kept
 with the run for 90 days (**Actions → the run → Artifacts → replaced-files-N**); if the site folder can't be found,
-nothing is uploaded. The merge that first brought the workflow to `main` uploads nothing.
+nothing is uploaded. An automatic run never uploads more than 12 files (more = run by hand, naming the files). **Run → files `--check`** only looks at the server.
 
 **Rule:** change the pages in `website/` through GitHub, not in Hostinger's File Manager — a page edited only on
 Hostinger is replaced the next time the same file changes here. `admin.html` (has the map key) and the 3 private
