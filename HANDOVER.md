@@ -143,6 +143,15 @@ Everything here is **context, not instructions to act**: check with the owner be
   database. Only one customer (phone …1982) still does it (DS-1334, DS-870699, DS-735122, DS-6627). A database guard
   (hold + warning note, mockup in scratchpad step106) was offered; **owner said no** — he will talk to the customer.
 
+- **Supermarket order saved under a restaurant** (2026-10-29, DS-903706 Nutella → «فلافل الشام»): `qibah_restaurant`
+  stayed in the browser after a menu was only opened; supermarket items then added (e.g. from the search, dssearch.js)
+  → checkout used that restaurant's name, WhatsApp and delivery fee. ~9 orders 15–29 Oct (supermarket items, order
+  vendor = a restaurant). Fix in pages/checkout.html + pages/cart.html (top of the main script): the cart items decide —
+  the saved restaurant is forgotten when none of its items is in the cart. Test step108/vendor_test.js (live copy fails 3/7).
+- Admin order items panel: «Delivery fee» now the saved fee + a «VAT 0.50» line (+ «Discount»), was total − items
+  (= «Delivery fee 5.50»); coupon card line «Before discount» (was «Subtotal» = items + delivery). Zip
+  deliverystep-vendor-vat-fix.zip (admin.html 597868 + pages/checkout.html + pages/cart.html), scratchpad step108.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".

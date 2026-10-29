@@ -93,6 +93,18 @@ function dsImgRetry(img){var s=img.getAttribute('src')||'';if(/^https:\/\/cdn\.s
 <div class="toast" id="toast"></div>
 
 <script>
+/* A restaurant whose menu was only OPENED stays saved (qibah_restaurant) even when the cart ends up with
+   supermarket items only (e.g. added from the search) — the order was then saved under that restaurant's name,
+   with its delivery fee, and its WhatsApp got the message (DS-903706: Nutella saved as «فلافل الشام»).
+   Every cart item carries its own shop, so the items decide: forget the saved restaurant when none of its items
+   is in the cart. Old carts without shop tags are left as they were. */
+(function(){ try{
+  var r=JSON.parse(localStorage.getItem('qibah_restaurant')||'null'); if(!r||!r.name) return;
+  var cart=JSON.parse(localStorage.getItem('qibah_cart')||'[]'); if(!Array.isArray(cart)||!cart.length) return;
+  if(!cart.some(function(i){ return i&&(i.vendor||i.restaurant); })) return;
+  if(cart.some(function(i){ return i&&(i.vendor||i.restaurant)===r.name; })) return;
+  ['qibah_restaurant','qibah_delivery_fee','qibah_delivery_disc'].forEach(function(k){ localStorage.removeItem(k); });
+}catch(e){} })();
 const sb = supabase.createClient('https://vjuhxpttssmyomqqomdx.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro');
 
 let appliedCoupon = null; // {code, discount_percent, discount_amount}
