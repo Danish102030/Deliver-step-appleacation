@@ -6,7 +6,7 @@
 #
 # One-time setup (repository → Settings → Secrets and variables → Actions → New repository secret):
 #   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD   — from hPanel → Files → FTP Accounts
-#   FTP_DIR (optional)                       — only if the site folder is not found automatically
+#   FTP_DIR (optional)                       — not needed: the site is /domains/deliverystep.app/public_html
 # Until these are added, this workflow only prints a note and uploads nothing.
 name: Deploy website to Hostinger
 

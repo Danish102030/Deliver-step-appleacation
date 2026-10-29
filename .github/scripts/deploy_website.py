@@ -29,7 +29,9 @@ import sys
 
 LOCAL_ROOT = 'website'
 BACKUP_DIR = 'replaced-files'      # the workflow keeps this folder for 90 days (Actions → the run → Artifacts)
-SITE_CANDIDATES = ['.', 'public_html', 'domains/deliverystep.app/public_html']
+# The FTP login (u695847219) sees ALL the websites of the account (/domains/<site>/public_html) and starts in
+# another folder (/public_html, the old rider-app download). Only deliverystep.app's own folder is ever used.
+SITE_CANDIDATES = ['/domains/deliverystep.app/public_html']
 
 
 def log(msg):
@@ -96,7 +98,7 @@ def names(ftp, path):
 
 def is_site(ftp, path):
     found = names(ftp, path)
-    return 'index.html' in found and 'pages' in found
+    return {'index.html', 'pages', 'ds-lib', 'admin.html'} <= found      # deliverystep.app's own files
 
 
 def find_site(ftp, wanted):
@@ -112,7 +114,7 @@ def find_site(ftp, wanted):
 
 
 def ensure_dir(ftp, path, made):
-    if path in ('', '.') or path in made:
+    if path in ('', '.', '/') or path in made:
         return
     parent = posixpath.dirname(path)
     ensure_dir(ftp, parent, made)
@@ -168,10 +170,10 @@ def check():
     ftp = connect(host, int(port or 21), user.strip(), password, False)
     try:
         log(f'FTP account starts in: {ftp.pwd()}')
-        for c in SITE_CANDIDATES + ['/', '..', '../..', '/domains', '../domains', '../../domains']:
+        for c in SITE_CANDIDATES + ['.', '/domains']:
             found = sorted(names(ftp, c))
             log(f'  {c}: {len(found)} names' + (f' — e.g. {", ".join(found[:12])}' if found else '') +
-                ('  ← the website' if 'index.html' in found and 'pages' in found else ''))
+                ('  ← the website' if is_site(ftp, c) else ''))
     finally:
         try:
             ftp.quit()
