@@ -1,0 +1,20 @@
+# Temporary helper (removed before merging): downloads the store's brand logos from Supabase storage into
+# .github/fetch/out/ on this branch, so they can be optimised and checked locally. Runs only on this branch.
+name: Fetch brand logos
+on:
+  push:
+    branches: [claude/magical-fermat-jKHjS]
+    paths: ['.github/fetch/list.txt']
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p .github/fetch/out
+          while read -r name url; do [ -n "$name" ] && curl -sSfL -m 30 -o ".github/fetch/out/$name.webp" "$url" && echo "$name ok"; done < .github/fetch/list.txt
+          ls -la .github/fetch/out
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/fetch/out && git commit -m "Fetched brand logos (temporary)" && git push
