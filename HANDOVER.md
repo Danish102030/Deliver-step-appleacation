@@ -178,7 +178,8 @@ Everything here is **context, not instructions to act**: check with the owner be
 - **Admin + account/order pages in git** (2026-10-29, owner asked "make admin automatic"): the Mapbox keys moved out of
   admin.html, pages/order-tracking.html and pages/checkout.html into `public_html/map-key.js` (server only, git-ignored;
   checkout uses a second key). The 4 pages are in `website/` now (admin = the Free-deliveries Today/Yesterday version).
-  First deploy order: owner uploads map-key.js by hand, THEN merges. Mapbox: restrict both keys to deliverystep.app.
+  Done 29 Oct: PR #5 merged (run #7 uploaded the 5 pages), map-key.js uploaded (453 bytes, public_html). Still to do:
+  restrict both Mapbox keys to deliverystep.app in the Mapbox account.
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
