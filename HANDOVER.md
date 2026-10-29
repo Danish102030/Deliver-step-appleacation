@@ -171,6 +171,10 @@ Everything here is **context, not instructions to act**: check with the owner be
   → 555 customer phones. SQL `supabase/device_tokens_new_phones.sql`. Lesson: after closing a table, test the app's
   exact request (upsert), not only a plain insert.
 
+- Admin Dashboard → 🎁 Free deliveries: + **Today / Yesterday** (Saudi day) in the period list (2026-10-29, owner
+  asked); `admin_free_deliveries` takes 'today' / 'yesterday'. Opens on "This month" as before. admin.html 597957
+  (scratchpad step110, zip deliverystep-admin-freedel-days.zip).
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
