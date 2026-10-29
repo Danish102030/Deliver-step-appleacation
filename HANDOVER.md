@@ -163,6 +163,14 @@ Everything here is **context, not instructions to act**: check with the owner be
   more than 12 files; `--check` looks only. Real test: website/terms.html (identical) uploaded OK, backup artifact kept.
   Never re-run run #2 (the failed 37-file one).
 
+- **New phones could not register for notifications 21–29 Oct** (fixed 29 Oct, owner OK): the iPhone app saves its
+  token with an upsert (`Prefer: resolution=merge-duplicates`); since the privacy step the SELECT policy is `false`,
+  and Postgres checks SELECT policies on an upsert's new row → every NEW token got 401 (old ones kept refreshing via
+  device_tokens_dedupe). Fix: the dedupe trigger sets `ds.tok_ins` = the token being saved; policy «app saves its own
+  new token» lets only that row pass. Phones still read nothing. 22 missed phones (token on their orders) added back
+  → 555 customer phones. SQL `supabase/device_tokens_new_phones.sql`. Lesson: after closing a table, test the app's
+  exact request (upsert), not only a plain insert.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
