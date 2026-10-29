@@ -22,7 +22,7 @@ nothing is uploaded. An automatic run never uploads more than 12 files (more = r
 **Rule:** change the pages in `website/` through GitHub, not in Hostinger's File Manager — a page edited only on
 Hostinger is replaced the next time the same file changes here. Since 29 Oct `admin.html`, `pages/account.html`,
 `pages/order-tracking.html` and `pages/order-confirmed.html` are here too. The Mapbox keys are NOT: they live only in
-`public_html/map-key.js` (uploaded by hand, git-ignored); the pages load `/map-key.js?v=1` before their own scripts
+`public_html/map-key.js` (uploaded by hand, git-ignored); the pages load `/map-key.js?v=2` (raise the number after every change to that file — the iPhone app keeps scripts up to a day) before their own scripts
 (`window.DS_MAPBOX_TOKEN` for admin + tracking, `window.DS_MAPBOX_TOKEN_CHECKOUT` for checkout). Without that file
 everything works except the maps / GPS address.
 
