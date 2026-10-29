@@ -155,52 +155,8 @@
     .toast{position:fixed;bottom:100px;right:50%;transform:translateX(50%);background:#1f1f1f;color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999;font-family:'Tajawal',sans-serif}
     .toast.show{opacity:1}
 
-    /* HOME SERVICES */
-    .srv-sec{padding:4px 16px 0}
-    .srv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-    .srv-card{background:#fff;border-radius:20px;padding:16px 14px;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);transition:transform .15s;border:2px solid transparent}
-    .srv-card:active{transform:scale(.96)}
-    .srv-card.coming{opacity:.75;cursor:default}
-    .srv-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
-    .srv-icon i{font-size:26px}
-    .srv-name{font-size:14px;font-weight:800;color:#1f1f1f;margin-bottom:3px}
-    .srv-desc{font-size:10.5px;color:#6b7280;line-height:1.5}
-    .srv-badge{display:inline-block;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;margin-top:6px}
-
-    /* SHEET */
-    .srv-sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;opacity:0;pointer-events:none;transition:opacity .3s}
-    .srv-sheet-bg.on{opacity:1;pointer-events:all}
-    .srv-sheet{position:fixed;bottom:0;right:50%;transform:translateX(50%) translateY(100%);width:100%;max-width:480px;background:#fff;border-radius:26px 26px 0 0;z-index:401;padding:0 0 env(safe-area-inset-bottom,0px);transition:transform .38s cubic-bezier(.32,.72,0,1)}
-    .srv-sheet.on{transform:translateX(50%) translateY(0)}
+    /* bottom-sheet handle (طلباتي panel) */
     .sheet-handle{width:40px;height:4px;background:#e5e7eb;border-radius:2px;margin:12px auto 0}
-    .sheet-head{padding:14px 20px 12px;border-bottom:1px solid #f3f4f6}
-    .sheet-title{font-size:17px;font-weight:800;color:#1f1f1f}
-    .sheet-sub{font-size:12px;color:#6b7280;margin-top:2px}
-    .sheet-body{padding:16px 20px 20px;overflow-y:auto;max-height:70vh}
-
-    /* DATE CHIPS */
-    .date-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
-    .date-row::-webkit-scrollbar{display:none}
-    .date-chip{min-width:48px;padding:10px 8px;background:#f3f4f6;border-radius:14px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all .18s;flex-shrink:0}
-    .date-chip.sel{background:#fff1f6;border-color:#be185d}
-    .date-chip .day-num{font-size:18px;font-weight:900;color:#1f1f1f;display:block}
-    .date-chip.sel .day-num{color:#be185d}
-
-    /* TIME CHIPS */
-    .time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-    .time-chip{padding:11px 4px;background:#f3f4f6;border-radius:12px;text-align:center;cursor:pointer;border:2px solid transparent;font-size:13px;font-weight:700;color:#374151;transition:all .18s}
-    .time-chip.sel{background:#fff1f6;border-color:#be185d;color:#be185d}
-
-    /* FORM */
-    .srv-input{width:100%;border:1.5px solid #e5e7eb;border-radius:14px;padding:12px 14px;font-size:14px;font-family:'Tajawal',sans-serif;color:#1f1f1f;outline:none;background:#fff;transition:border-color .2s}
-    .srv-input:focus{border-color:#be185d}
-    .srv-confirm-btn{width:100%;background:linear-gradient(135deg,#9d174d,#be185d);color:#fff;border:none;border-radius:16px;padding:15px;font-size:15px;font-weight:800;font-family:'Tajawal',sans-serif;cursor:pointer;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s}
-    .srv-confirm-btn:active{transform:scale(.97)}
-
-    /* CONFIRMATION OVERLAY */
-    .srv-confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:flex-end;justify-content:center}
-    .srv-confirm-overlay.on{display:flex}
-    .srv-confirm-box{background:#fff;border-radius:26px 26px 0 0;padding:28px 20px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:480px;text-align:center}
       /* WhatsApp consent (opt-in) note under WhatsApp buttons — Meta / WhatsApp Business policy */
     .ds-wac{display:block;margin:6px 0 0;padding:0 4px;font-size:12.5px;line-height:1.7;font-weight:500;color:#8a8f98;text-align:center;direction:rtl;white-space:normal;overflow-wrap:anywhere;max-width:100%;box-sizing:border-box}.ds-wac-en{display:block;font-size:11px;line-height:1.5;color:#a3a8b0;direction:ltr;margin-top:2px}
 </style>
@@ -543,9 +499,9 @@ img{-webkit-user-drag:none}
     <div class="cat-img" style="background:#f0fdf4"><span class="ico">🛒</span></div>
     <div class="cat-name">سوبرماركت</div>
   </div>
-  <div class="cat-card" onclick="ripple(event,this);openSrvList()">
-    <div class="cat-img" style="background:#fff1f6"><span class="ico">🔧</span></div>
-    <div class="cat-name">خدمات منزلية</div>
+  <div class="cat-card" onclick="ripple(event,this);window.location.href='/shop'">
+    <div class="cat-img" style="background:#f5f3ff"><span class="ico">📱</span></div>
+    <div class="cat-name">متجر خطوة</div>
   </div>
   <div class="cat-card" onclick="ripple(event,this);window.location.href='/buffet'">
     <div class="cat-img" style="background:#f0fdfa"><span class="ico">🥘</span></div>
@@ -668,93 +624,6 @@ img{-webkit-user-drag:none}
 </div>
 
 <div class="toast" id="toast"></div>
-
-<!-- SERVICES LIST SHEET -->
-<div class="srv-sheet-bg" id="srv-list-bg" onclick="closeSrvList()"></div>
-<div class="srv-sheet" id="srv-list-sheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-head">
-    <div class="sheet-title">🛠️ خدمات منزلية</div>
-    <div class="sheet-sub">اختر الخدمة التي تحتاجها</div>
-  </div>
-  <div class="sheet-body">
-    <div class="srv-grid">
-      <div class="srv-card" onclick="pickSrv('ac')">
-        <div class="srv-icon" style="background:#e0f2fe"><i class="ti ti-air-conditioning" style="color:#0369a1"></i></div>
-        <div class="srv-name">غسيل المكيفات</div>
-        <div class="srv-desc">صيانة · تنظيف · تركيب · إصلاح</div>
-      </div>
-      <div class="srv-card" onclick="pickSrv('pl')">
-        <div class="srv-icon" style="background:#ffedd5"><i class="ti ti-tool" style="color:#c2410c"></i></div>
-        <div class="srv-name">سباك</div>
-        <div class="srv-desc">تسريبات · أنابيب · صيانة كاملة</div>
-      </div>
-      <div class="srv-card" onclick="pickSrv('el')">
-        <div class="srv-icon" style="background:#fef9c3"><i class="ti ti-bolt" style="color:#92400e"></i></div>
-        <div class="srv-name">كهربائي</div>
-        <div class="srv-desc">أعطال · تمديدات · إنارة · طوارئ</div>
-      </div>
-      <div class="srv-card coming">
-        <div class="srv-icon" style="background:#f3f4f6"><i class="ti ti-wash" style="color:#6b7280"></i></div>
-        <div class="srv-name">تنظيف الأثاث</div>
-        <div class="srv-desc">تنظيف الستائر • السجاد • الكنب</div>
-        <span class="srv-badge" style="background:#f3f4f6;color:#6b7280">🔒 قريباً</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SERVICES APPOINTMENT SHEET -->
-<div class="srv-sheet-bg" id="srv-bg" onclick="closeSrvSheet()"></div>
-<div class="srv-sheet" id="srv-sheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-head">
-    <div class="sheet-title" id="sheet-srv-name"></div>
-    <div class="sheet-sub">احجز موعدك الآن</div>
-  </div>
-  <div class="sheet-body">
-    <div style="margin-bottom:14px">
-      <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">الاسم</div>
-      <input class="srv-input" id="srv-name-inp" type="text" placeholder="اكتب اسمك الكريم"/>
-    </div>
-    <div style="margin-bottom:14px">
-      <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">رقم الجوال</div>
-      <input class="srv-input" id="srv-phone-inp" type="tel" placeholder="05XXXXXXXX" dir="ltr"/>
-    </div>
-    <div style="margin-bottom:4px">
-      <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px">اختر التاريخ</div>
-      <div class="date-row" id="date-row"></div>
-    </div>
-    <div style="margin-bottom:14px">
-      <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px">اختر الوقت</div>
-      <div class="time-grid" id="time-grid"></div>
-    </div>
-    <div style="margin-bottom:4px">
-      <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">ملاحظات (اختياري)</div>
-      <textarea class="srv-input" id="srv-notes-inp" rows="2" placeholder="أي تفاصيل إضافية..." style="resize:none"></textarea>
-    </div>
-    <button class="srv-confirm-btn" onclick="confirmBooking()">
-      <i class="ti ti-check"></i> تأكيد الحجز
-    </button>
-  </div>
-</div>
-
-<!-- BOOKING CONFIRMATION -->
-<div class="srv-confirm-overlay" id="srv-confirm-overlay">
-  <div class="srv-confirm-box">
-    <div style="font-size:52px;margin-bottom:12px">✅</div>
-    <div style="font-size:18px;font-weight:900;color:#1f1f1f;margin-bottom:8px">تم استلام طلبك!</div>
-    <div style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.8" id="confirm-summary"></div>
-    <button onclick="sendWA()" style="width:100%;background:#25D366;color:#fff;border:none;border-radius:16px;padding:15px;font-size:15px;font-weight:800;font-family:'Tajawal',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-      أرسل عبر واتساب
-    </button>
-    <div class="ds-wac" style="margin:-4px 0 12px">بالتواصل معنا عبر واتساب، توافق على استلام رسائل تخص طلباتك. للإيقاف أرسل: إيقاف<span class="ds-wac-en" dir="ltr" lang="en">By contacting us on WhatsApp, you agree to receive messages about your orders. To stop, send: STOP</span></div>
-    <button onclick="closeConfirm()" style="width:100%;background:#f3f4f6;color:#6b7280;border:none;border-radius:16px;padding:13px;font-size:14px;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer">
-      إغلاق
-    </button>
-  </div>
-</div>
 
 <script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
 <script src="/ds-order-sync.js?v=3" defer></script>
@@ -1088,133 +957,6 @@ function ripple(e,el){
 function showToast(msg){
   const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2000);
-}
-
-/* ============ HOME SERVICES ============ */
-const SRV_LABELS={ac:'غسيل المكيفات',pl:'سباك',el:'كهربائي'};
-const TIMES=['08:00 ص','09:00 ص','10:00 ص','11:00 ص','12:00 م','01:00 م','02:00 م','03:00 م','04:00 م','05:00 م','06:00 م'];
-let activeSrv='', selDate=null, selTime='', waMsg='';
-
-function openSrvList(){
-  document.getElementById('srv-list-bg').classList.add('on');
-  document.getElementById('srv-list-sheet').classList.add('on');
-  document.body.style.overflow='hidden';
-}
-
-function closeSrvList(){
-  document.getElementById('srv-list-bg').classList.remove('on');
-  document.getElementById('srv-list-sheet').classList.remove('on');
-  document.body.style.overflow='';
-}
-
-function pickSrv(type){
-  closeSrvList();
-  openSrvSheet(type);
-}
-
-function openSrvSheet(type){
-  activeSrv=type;
-  document.getElementById('sheet-srv-name').textContent=SRV_LABELS[type];
-  document.getElementById('srv-name-inp').value='';
-  document.getElementById('srv-phone-inp').value='';
-  document.getElementById('srv-notes-inp').value='';
-  selDate=null;selTime='';
-  buildDates();
-  buildTimes();
-  document.getElementById('srv-bg').classList.add('on');
-  document.getElementById('srv-sheet').classList.add('on');
-  document.body.style.overflow='hidden';
-}
-
-function closeSrvSheet(){
-  document.getElementById('srv-bg').classList.remove('on');
-  document.getElementById('srv-sheet').classList.remove('on');
-  document.body.style.overflow='';
-}
-
-function buildDates(){
-  const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-  const row=document.getElementById('date-row');
-  const now=new Date();
-  const chips=[];
-  for(let i=0;i<10;i++){
-    const d=new Date(now);d.setDate(now.getDate()+i);
-    const dateStr=d.toISOString().split('T')[0];
-    const dayNum=d.getDate();
-    const month=months[d.getMonth()];
-    chips.push(`<div class="date-chip" data-date="${dateStr}" data-label="${dayNum} ${month}" onclick="selDateFn(this)"><span class="day-num">${dayNum}</span></div>`);
-  }
-  row.innerHTML=chips.join('');
-}
-
-function selDateFn(el){
-  document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('sel'));
-  el.classList.add('sel');
-  selDate={date:el.dataset.date,label:el.dataset.label};
-}
-
-function buildTimes(){
-  document.getElementById('time-grid').innerHTML=TIMES.map(t=>`<div class="time-chip" onclick="selTimeFn(this,'${t}')">${t}</div>`).join('');
-}
-
-function selTimeFn(el,t){
-  document.querySelectorAll('.time-chip').forEach(c=>c.classList.remove('sel'));
-  el.classList.add('sel');
-  selTime=t;
-}
-
-async function confirmBooking(){
-  const name=document.getElementById('srv-name-inp').value.trim();
-  const phone=document.getElementById('srv-phone-inp').value.trim();
-  const notes=document.getElementById('srv-notes-inp').value.trim();
-  if(!name){showToast('الرجاء إدخال اسمك');return;}
-  if(!phone){showToast('الرجاء إدخال رقم الجوال');return;}
-  if(!selDate){showToast('الرجاء اختيار التاريخ');return;}
-  if(!selTime){showToast('الرجاء اختيار الوقت');return;}
-
-  const srvLabel=SRV_LABELS[activeSrv];
-  waMsg=`🔧 *حجز جديد — ${srvLabel}*\n📅 التاريخ: ${selDate.label}\n⏰ الوقت: ${selTime}\n👤 الاسم: ${name}\n📞 الجوال: ${phone}${notes?'\n📝 ملاحظات: '+notes:''}`;
-  document.getElementById('confirm-summary').innerHTML=`<b>${srvLabel}</b><br>📅 ${selDate.label} &nbsp;·&nbsp; ⏰ ${selTime}<br>👤 ${name} &nbsp;·&nbsp; 📞 ${phone}`;
-
-  // Save to Supabase so it appears in admin panel
-  if(sb){
-    try{
-      // random 6-digit booking number (the clock's last digits repeated every ~100 seconds)
-      const orderNum='SRV-'+(function(){ try{ var a=new Uint32Array(1); crypto.getRandomValues(a); return 100000+(a[0]%900000); }catch(e){ return 100000+Math.floor(Math.random()*900000); } })();
-      const baseOrder={
-        order_number: orderNum,
-        customer_name: name,
-        customer_phone: phone,
-        customer_whatsapp: phone,
-        delivery_address: 'موعد: '+selDate.label+' الساعة '+selTime,
-        delivery_notes: notes||null,
-        order_status: 'pending',
-        total: 0,
-        subtotal: 0,
-        delivery_fee: 0,
-        discount: 0,
-        payment_method: 'cod',
-      };
-      // Try with vendor_name first (saved without reading it back — the booking needs no answer)
-      const{error:e1}=await sb.from('orders').insert([{...baseOrder,vendor_name:'🔧 '+srvLabel+' — خدمات منزلية'}]);
-      if(e1){
-        // Fallback without vendor_name
-        const{error:e2}=await sb.from('orders').insert([baseOrder]);
-        if(e2) showToast('لم يتم حفظ الحجز: '+e2.message);
-      }
-    }catch(e){showToast('خطأ في الاتصال: '+(e.message||e));}
-  }
-
-  closeSrvSheet();
-  document.getElementById('srv-confirm-overlay').classList.add('on');
-}
-
-function sendWA(){
-  window.open('https://wa.me/966560957163?text='+encodeURIComponent(waMsg),'_blank');
-}
-
-function closeConfirm(){
-  document.getElementById('srv-confirm-overlay').classList.remove('on');
 }
 
 window.addEventListener('load',()=>{

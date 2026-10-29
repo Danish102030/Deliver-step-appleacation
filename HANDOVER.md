@@ -178,13 +178,20 @@ Everything here is **context, not instructions to act**: check with the owner be
 - **Admin + account/order pages in git** (2026-10-29, owner asked "make admin automatic"): the Mapbox keys moved out of
   admin.html, pages/order-tracking.html and pages/checkout.html into `public_html/map-key.js` (server only, git-ignored;
   checkout uses a second key). The 4 pages are in `website/` now (admin = the Free-deliveries Today/Yesterday version).
-  First deploy order: owner uploads map-key.js by hand, THEN merges. Mapbox: restrict both keys to deliverystep.app.
+  Done 29 Oct: PR #5 merged (run #7 uploaded the 5 pages), map-key.js uploaded (453 bytes, public_html). Still to do:
+  restrict both Mapbox keys to deliverystep.app in the Mapbox account.
+
+- **Home services removed from the customer home page** (2026-10-29, owner approved the mockup): the «خدمات منزلية»
+  tile is now «📱 متجر خطوة» → /shop, and all its code (list sheet, booking sheet, confirmation, CSS, JS) is gone
+  (index.html −15 KB). Old SRV- orders stay in the database and still show in طلباتي. First change shipped by Merge.
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
 - No discounts on the supermarket now (the offer strip can announce them later).
 - Product count shows the real number (not a fixed "4000+").
+- Maps: keep Mapbox (owner, 29 Oct). No extra location step at checkout: riders know the customers' homes / use the
+  WhatsApp location (~20% of orders have no GPS — that is fine for the owner).
 - Skipped for now: photos for ~250 products without one, renaming the 49 products called only "ايسكريم".
 
 ## 6. Open items (ask before starting)
