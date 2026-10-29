@@ -163,6 +163,23 @@ Everything here is **context, not instructions to act**: check with the owner be
   more than 12 files; `--check` looks only. Real test: website/terms.html (identical) uploaded OK, backup artifact kept.
   Never re-run run #2 (the failed 37-file one).
 
+- **New phones could not register for notifications 21–29 Oct** (fixed 29 Oct, owner OK): the iPhone app saves its
+  token with an upsert (`Prefer: resolution=merge-duplicates`); since the privacy step the SELECT policy is `false`,
+  and Postgres checks SELECT policies on an upsert's new row → every NEW token got 401 (old ones kept refreshing via
+  device_tokens_dedupe). Fix: the dedupe trigger sets `ds.tok_ins` = the token being saved; policy «app saves its own
+  new token» lets only that row pass. Phones still read nothing. 22 missed phones (token on their orders) added back
+  → 555 customer phones. SQL `supabase/device_tokens_new_phones.sql`. Lesson: after closing a table, test the app's
+  exact request (upsert), not only a plain insert.
+
+- Admin Dashboard → 🎁 Free deliveries: + **Today / Yesterday** (Saudi day) in the period list (2026-10-29, owner
+  asked); `admin_free_deliveries` takes 'today' / 'yesterday'. Opens on "This month" as before. admin.html 597957
+  (scratchpad step110, zip deliverystep-admin-freedel-days.zip).
+
+- **Admin + account/order pages in git** (2026-10-29, owner asked "make admin automatic"): the Mapbox keys moved out of
+  admin.html, pages/order-tracking.html and pages/checkout.html into `public_html/map-key.js` (server only, git-ignored;
+  checkout uses a second key). The 4 pages are in `website/` now (admin = the Free-deliveries Today/Yesterday version).
+  First deploy order: owner uploads map-key.js by hand, THEN merges. Mapbox: restrict both keys to deliverystep.app.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".

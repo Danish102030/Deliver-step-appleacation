@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+  <meta name="theme-color" content="#065f46"/>
+  <title>تم تأكيد الطلب - خطوة التوصيل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"/>
+  <script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
+  <script src="/ds-order-sync.js" defer></script>
+  <style>
+    :root{--rose:#be185d;--green:#16a34a;--text:#1f1f1f;--muted:#6b7280;--border:#e5e7eb;--bg:#f9fafb;--amber:#f59e0b}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;direction:rtl;padding-bottom:30px}
+
+    /* TOP GREEN CARD */
+    .hero{background:linear-gradient(160deg,#064e3b,#065f46,#047857);padding:36px 24px 48px;text-align:center;position:relative;overflow:hidden;border-radius:0 0 32px 32px;box-shadow:0 8px 32px rgba(5,80,50,.25)}
+    .hero::before{content:'';position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.05);top:-80px;left:-70px}
+    .hero::after{content:'';position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.04);bottom:-60px;right:-50px}
+    .confetti{position:absolute;inset:0;pointer-events:none}
+    .dot{position:absolute;width:8px;height:8px;border-radius:50%;animation:fall linear infinite}
+    @keyframes fall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(130px) rotate(360deg);opacity:0}}
+
+    /* animated badge */
+    .badge-wrap{position:relative;width:108px;height:108px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center}
+    .ring{position:absolute;border-radius:50%;border:2.5px solid rgba(255,255,255,.22);animation:rp 2s ease-in-out infinite}
+    .ring:nth-child(1){inset:0}
+    .ring:nth-child(2){inset:-10px;border-color:rgba(255,255,255,.1);animation-delay:.45s}
+    @keyframes rp{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.1);opacity:.15}}
+    .badge-circle{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(5,150,105,.55);animation:bp .6s cubic-bezier(.175,.885,.32,1.275) forwards;transform:scale(0)}
+    @keyframes bp{0%{transform:scale(0);opacity:0}65%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+    .badge-circle i{font-size:48px;color:#fff;animation:ci .4s ease .5s both}
+    @keyframes ci{0%{transform:scale(0) rotate(-20deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+    .hero-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:5px;position:relative;z-index:1}
+    .hero-sub{font-size:12px;color:rgba(255,255,255,.75);position:relative;z-index:1}
+    .order-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);border-radius:28px;padding:7px 18px;margin-top:12px;position:relative;z-index:1}
+    .order-pill span{font-size:15px;font-weight:700;color:#fff;letter-spacing:.5px}
+
+    /* BODY */
+    .body{padding:18px 16px;display:flex;flex-direction:column;align-items:center;gap:0}
+    .wa-section{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;width:100%;text-align:center}
+    .wa-title{font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text)}
+    .wa-hint{font-size:12px;color:var(--muted);margin-bottom:10px}
+    .wa-btn{width:100%;background:#25d366;color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;transition:opacity .2s}
+    .wa-btn:active{opacity:.85}
+    .wa-btn-vendor{background:#075e54}
+    .wa-btn-vendor:active{background:#054c44}
+    .wa-sent{background:#f0fdf4;color:#15803d;border:none;border-radius:12px;padding:14px;font-size:13px;font-family:'Tajawal',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;width:100%}
+    .track-btn{width:100%;background:var(--rose);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
+    .home-btn{width:100%;background:#fff;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+    .notice{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px;font-size:12px;color:#92400e;text-align:right;margin-top:12px;line-height:1.8;width:100%}
+
+    /* STARS */
+    .stars-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 16px;width:100%;margin-top:8px;text-align:center}
+    .stars-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px}
+    .stars{display:flex;gap:4px;justify-content:center;direction:ltr;margin-bottom:8px}
+    .star{font-size:36px;color:#e5e7eb;cursor:pointer;background:none;border:none;padding:0 2px;transition:all .15s;line-height:1}
+    .star.lit{color:var(--amber);transform:scale(1.15)}
+    .stars-feedback{font-size:13px;font-weight:700;min-height:20px;color:var(--muted)}
+      /* WhatsApp consent (opt-in) note under WhatsApp buttons — Meta / WhatsApp Business policy */
+    .ds-wac{display:block;margin:6px 0 0;padding:0 4px;font-size:12.5px;line-height:1.7;font-weight:500;color:#8a8f98;text-align:center;direction:rtl;white-space:normal;overflow-wrap:anywhere;max-width:100%;box-sizing:border-box}.ds-wac-en{display:block;font-size:11px;line-height:1.5;color:#a3a8b0;direction:ltr;margin-top:2px}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="confetti">
+    <div class="dot" style="left:8%;top:5%;background:#fbbf24;animation-duration:2.8s;animation-delay:0s"></div>
+    <div class="dot" style="left:22%;top:12%;background:#f472b6;animation-duration:3.2s;animation-delay:.4s"></div>
+    <div class="dot" style="left:68%;top:8%;background:#34d399;animation-duration:2.6s;animation-delay:.7s"></div>
+    <div class="dot" style="left:82%;top:18%;background:#60a5fa;animation-duration:3.5s;animation-delay:.2s"></div>
+    <div class="dot" style="left:48%;top:3%;background:#f87171;animation-duration:3s;animation-delay:1s"></div>
+    <div class="dot" style="left:38%;top:25%;background:#a78bfa;animation-duration:2.9s;animation-delay:.6s"></div>
+  </div>
+  <div class="badge-wrap">
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="badge-circle"><i class="ti ti-check"></i></div>
+  </div>
+  <div class="hero-title">تم تأكيد طلبك! 🎉</div>
+  <div class="hero-sub">شكراً لك! طلبك قيد التنفيذ الآن</div>
+  <div class="order-pill">
+    <i class="ti ti-receipt" style="color:rgba(255,255,255,.75);font-size:14px"></i>
+    <span id="order-num">#DS-XXXX</span>
+  </div>
+</div>
+
+<div class="body">
+  <div id="ord-sync-status" style="display:none;width:100%;text-align:center;font-size:12.5px;font-weight:700;border-radius:10px;padding:10px;margin-bottom:10px"></div>
+  <div class="wa-section">
+    <div class="wa-title">📲 إرسال تفاصيل الطلب</div>
+    <div class="wa-hint">اضغط على الزرين بالترتيب لإرسال الطلب</div>
+    <div id="wa-buttons"></div>
+    <div class="ds-wac" style="margin:2px 0 0">بالتواصل معنا عبر واتساب، توافق على استلام رسائل تخص طلباتك. للإيقاف أرسل: إيقاف<span class="ds-wac-en" dir="ltr" lang="en">By contacting us on WhatsApp, you agree to receive messages about your orders. To stop, send: STOP</span></div>
+  </div>
+
+  <div class="notice">
+    <i class="ti ti-clock" style="font-size:14px;vertical-align:-2px;margin-left:4px"></i>
+    <strong>وقت التوصيل المتوقع: ٢٠-٣٠ دقيقة</strong><br/>
+    سيتواصل معك السائق قريباً على رقم هاتفك
+  </div>
+
+  <button class="track-btn" onclick="window.location.href='/pages/order-tracking.html'">
+    <i class="ti ti-map-pin" style="font-size:18px"></i>
+    تتبع طلبي
+  </button>
+  <button class="home-btn" onclick="window.location.href='/'">
+    <i class="ti ti-home" style="font-size:16px"></i>
+    العودة للرئيسية
+  </button>
+
+  <div class="stars-card">
+    <div class="stars-title">⭐ قيّم تجربتك معنا</div>
+    <div class="stars">
+      <button class="star" onclick="rate(1)">★</button>
+      <button class="star" onclick="rate(2)">★</button>
+      <button class="star" onclick="rate(3)">★</button>
+      <button class="star" onclick="rate(4)">★</button>
+      <button class="star" onclick="rate(5)">★</button>
+    </div>
+    <div class="stars-feedback" id="stars-feedback">اضغط للتقييم</div>
+    <button id="submit-review-btn" onclick="submitReview()" style="display:none;width:100%;background:#be185d;color:#fff;border:none;border-radius:12px;padding:12px;font-weight:700;margin-top:10px;font-family:'Tajawal',sans-serif;font-size:14px;cursor:pointer;display:none;align-items:center;justify-content:center;gap:8px">
+      <i class="ti ti-send" style="font-size:16px"></i> إرسال التقييم
+    </button>
+  </div>
+</div>
+
+<script>
+window.addEventListener('load', () => {
+  const orderNum   = localStorage.getItem('qibah_last_order_num') || 'DS-XXXX';
+  const ownerWa    = localStorage.getItem('qibah_owner_wa_msg');
+  const vendorWa   = localStorage.getItem('qibah_vendor_wa_msg');
+  const vendorName = localStorage.getItem('qibah_vendor_name') || 'خطوة التوصيل';
+  const isSupermarket = localStorage.getItem('qibah_is_supermarket') === 'yes';
+  const isPharmacy = localStorage.getItem('qibah_last_is_pharmacy') === '1';
+  const isParcel = localStorage.getItem('qibah_last_is_parcel') === '1';
+
+  document.getElementById('order-num').textContent = '#' + orderNum.replace('QIB-', 'DS-');
+
+  const btns = document.getElementById('wa-buttons');
+  let html = '';
+
+  // PHARMACY or PARCEL order: ONE button → send the full order to the owner (who coordinates it).
+  // No second/vendor button.
+  if (isPharmacy || isParcel) {
+    localStorage.removeItem('qibah_last_is_pharmacy');
+    localStorage.removeItem('qibah_last_is_parcel');
+    html += `<button class="wa-btn" onclick="sendWA('owner', event)">
+      <i class="ti ti-brand-whatsapp" style="font-size:20px"></i>
+      ${isParcel ? 'أرسل طلب التوصيل 📦' : 'أرسل طلب الصيدلية 💊'}
+    </button>`;
+    btns.innerHTML = html;
+    return;
+  }
+
+  // TWO-VENDOR order: owner button + one button per restaurant vendor
+  const multiVendors = JSON.parse(localStorage.getItem('qibah_vendor_wa_msgs') || 'null');
+  if (multiVendors && multiVendors.length) {
+    const nums = ['٢','٣','٤'];
+    html += `<button class="wa-btn" onclick="sendWA('owner', event)">
+      <i class="ti ti-brand-whatsapp" style="font-size:20px"></i>
+      ١. أرسل لـ خطوة التوصيل
+    </button>`;
+    multiVendors.forEach((m, ix) => {
+      html += `<button class="wa-btn wa-btn-vendor" onclick="sendWAVendorIdx(${ix}, event)">
+        <i class="ti ti-brand-whatsapp" style="font-size:20px"></i>
+        ${nums[ix]||''}. أرسل لـ ${m.name}
+      </button>`;
+    });
+    btns.innerHTML = html;
+    return;
+  }
+
+  if (isSupermarket) {
+    html += `<button class="wa-btn" onclick="sendWA('vendor', event)">
+      <i class="ti ti-brand-whatsapp" style="font-size:20px"></i>
+      أرسل الطلب لـ خطوة التوصيل 🛒
+    </button>`;
+  } else {
+    // Always show owner button
+    html += `<button class="wa-btn" onclick="sendWA('owner', event)">
+      <i class="ti ti-brand-whatsapp" style="font-size:20px"></i>
+      ١. أرسل لـ خطوة التوصيل
+    </button>`;
+    // Always show vendor button
+    html += `<button class="wa-btn wa-btn-vendor" onclick="sendWA('vendor', event)">
+      <i class="ti ti-brand-whatsapp" style="font-size:20px"></i>
+      ٢. أرسل لـ ${vendorName}
+    </button>`;
+  }
+  btns.innerHTML = html;
+});
+
+function sendWA(type, e) {
+  const key = type === 'owner' ? 'qibah_owner_wa_msg' : 'qibah_vendor_wa_msg';
+  const url  = localStorage.getItem(key);
+  if (url) window.open(url, '_blank');
+  e.currentTarget.outerHTML = `<div class="wa-sent"><i class="ti ti-circle-check" style="font-size:18px"></i> ✅ تم الإرسال بنجاح</div>`;
+  localStorage.removeItem(key);
+}
+
+function sendWAVendorIdx(ix, e) {
+  const arr = JSON.parse(localStorage.getItem('qibah_vendor_wa_msgs') || '[]');
+  const m = arr[ix];
+  if (m && m.link) window.open(m.link, '_blank');
+  e.currentTarget.outerHTML = `<div class="wa-sent"><i class="ti ti-circle-check" style="font-size:18px"></i> ✅ تم الإرسال بنجاح</div>`;
+  if (m) { m.link = ''; localStorage.setItem('qibah_vendor_wa_msgs', JSON.stringify(arr)); }
+}
+
+const feedbacks = ['','ليس جيداً 😞','يمكن أن يكون أفضل 😐','جيد 🙂','جيد جداً 😊','ممتاز! 🌟'];
+const fbColors  = ['','#ef4444','#f97316','#eab308','#22c55e','#16a34a'];
+let selectedRating = 0;
+
+function rate(n) {
+  selectedRating = n;
+  document.querySelectorAll('.star').forEach((s,i) => s.classList.toggle('lit', i < n));
+  const el = document.getElementById('stars-feedback');
+  el.textContent = feedbacks[n];
+  el.style.color  = fbColors[n];
+  document.getElementById('submit-review-btn').style.display = 'flex';
+}
+
+async function submitReview() {
+  const btn = document.getElementById('submit-review-btn');
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
+
+  const orderNumber = localStorage.getItem('qibah_last_order_num') || '';
+  let customerName = '';
+  let customerPhone = '';
+  try {
+    const cust = JSON.parse(localStorage.getItem('ds_customer') || '{}');
+    customerName = cust.name || '';
+    customerPhone = cust.phone || '';
+  } catch(e) {}
+
+  try {
+    const SB_URL = 'https://vjuhxpttssmyomqqomdx.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
+    const sbClient = supabase.createClient(SB_URL, SB_KEY);
+    await sbClient.from('reviews').insert([{
+      order_number: orderNumber,
+      customer_name: customerName,
+      customer_phone: customerPhone,
+      rating: selectedRating,
+      created_at: new Date().toISOString()
+    }]);
+  } catch(e) {
+    // Silently ignore errors — don't block the user
+  }
+
+  // Replace the entire stars-card with a success message
+  const card = document.querySelector('.stars-card');
+  if (card) {
+    card.innerHTML = '<div style="text-align:center;padding:12px;font-size:16px;font-weight:700;color:#16a34a;font-family:\'Tajawal\',sans-serif">شكراً على تقييمك! ⭐</div>';
+  }
+}
+</script>
+<script>
+/* Order-received status: if this order is still queued (weak network at checkout),
+   show a gentle "sending" note and keep trying until it reaches the system. */
+(function(){
+  var num = localStorage.getItem('qibah_last_order_num') || '';
+  function inQueue(){ try{ var q=JSON.parse(localStorage.getItem('ds_pending_orders')||'[]'); return q.some(function(it){ return it && it.op && it.op.order_number===num; }); }catch(e){ return false; } }
+  window.addEventListener('load', function(){
+    var el=document.getElementById('ord-sync-status'); if(!el||!num) return;
+    if(!inQueue()) return;   // order saved fine → no notice needed
+    el.style.display='block'; el.style.background='#fffbeb'; el.style.border='1px solid #fde68a'; el.style.color='#92400e';
+    el.innerHTML='⏳ جاري تأكيد وصول طلبك للنظام… يرجى ترك التطبيق مفتوحاً لحظة';
+    try{ if(window.dsFlushPendingOrders) window.dsFlushPendingOrders(); }catch(e){}
+    var tries=0;
+    var iv=setInterval(function(){
+      tries++;
+      try{ if(window.dsFlushPendingOrders) window.dsFlushPendingOrders(); }catch(e){}
+      if(!inQueue()){
+        clearInterval(iv);
+        el.style.background='#f0fdf4'; el.style.border='1px solid #bbf7d0'; el.style.color='#15803d';
+        el.innerHTML='✅ تم استلام طلبك في النظام بنجاح';
+        setTimeout(function(){ el.style.display='none'; }, 5000);
+      } else if(tries>=24){
+        clearInterval(iv);
+        el.innerHTML='📶 طلبك محفوظ وسيصل تلقائياً عند تحسّن الاتصال. الرجاء إرسال رسالة واتساب أيضاً للتأكيد.';
+      }
+    }, 3000);
+  });
+})();
+</script>
+<script src="/ds-lib/ds-cancel-1.js?v=2" defer></script>
+</body>
+</html>

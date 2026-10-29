@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,viewport-fit=cover"/>
+<meta name="theme-color" content="#be185d"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>تتبع الطلب - خطوة التوصيل</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/ds-lib/ds-icons-2.47.0-1.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.js"></script>
+<script src="/map-key.js?v=1"></script><script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
+<style>
+:root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f1f1f;--muted:#6b7280;--border:#f0e4e9;--bg:#f9f9f9;--white:#fff;--green:#16a34a;--green-bg:#dcfce7;--amber:#d97706;--purple:#7c3aed}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:30px;direction:rtl;padding-top:env(safe-area-inset-top)}
+
+/* TOPBAR */
+.topbar{background:var(--rose);padding:11px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(190,24,93,0.2)}
+.btn-back{background:rgba(255,255,255,0.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;text-decoration:none}
+.topbar-title{font-size:15px;font-weight:700;color:#fff;flex:1;text-align:center}
+.order-pill{background:rgba(255,255,255,0.2);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;white-space:nowrap}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#9d174d,#be185d);padding:14px 16px 52px;text-align:center}
+.num-label{font-size:10px;color:rgba(255,255,255,0.8);margin-bottom:3px}
+.num-val{font-size:26px;font-weight:700;color:#fff;letter-spacing:3px}
+.num-time{font-size:10px;color:rgba(255,255,255,0.7);margin-top:3px}
+
+/* MAIN ANIMATION CARD */
+.anim-card{background:var(--white);margin:0 16px;margin-top:-38px;border-radius:22px;padding:22px 16px 18px;box-shadow:0 6px 28px rgba(0,0,0,0.1);position:relative;z-index:2;margin-bottom:14px}
+
+/* CIRCLE */
+.circle-wrap{display:flex;justify-content:center;margin-bottom:14px}
+.circle-outer{width:140px;height:140px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center}
+.svg-ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.circle-inner{width:108px;height:108px;background:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;box-shadow:inset 0 2px 10px rgba(0,0,0,0.06)}
+
+/* STEP 2 - Cooking */
+.cooking-wrap{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center}
+.pan{font-size:34px;animation:panShake 0.5s ease-in-out infinite;display:block}
+.steam{position:absolute;top:-10px;left:50%;transform:translateX(-50%);display:flex;gap:5px}
+.s-puff{width:6px;height:6px;background:#d1d5db;border-radius:50%;animation:steamUp 1.2s ease-in-out infinite}
+.s-puff:nth-child(2){animation-delay:0.4s}
+.s-puff:nth-child(3){animation-delay:0.8s}
+.knife{font-size:18px;position:absolute;bottom:0px;right:-4px;animation:knifeChop 0.5s ease-in-out infinite}
+
+/* COFFEE — espresso pours into a cup, the cup fills, steam rises */
+.cf{position:relative;width:76px;height:80px}
+.cf-head{position:absolute;top:2px;left:50%;transform:translateX(-50%);width:44px;height:12px;border-radius:6px 6px 3px 3px;background:#3f2a1d}
+.cf-head:after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:12px;height:6px;border-radius:0 0 3px 3px;background:#2b1c13}
+.cf-stream{position:absolute;top:19px;left:50%;width:3px;margin-left:-1.5px;background:linear-gradient(#6f3d1e,#8b4a22);border-radius:2px;animation:cfPour 3.2s ease-in-out infinite}
+.cf-cup{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:40px;height:32px;background:#fff;border:3px solid var(--rose);border-top-width:2px;border-radius:3px 3px 14px 14px;overflow:hidden}
+.cf-handle{position:absolute;bottom:14px;left:calc(50% + 18px);width:12px;height:14px;border:3px solid var(--rose);border-left:none;border-radius:0 8px 8px 0}
+.cf-fill{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(#a0612f,#6f3d1e);animation:cfFill 3.2s ease-in-out infinite}
+.cf-fill:before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#d9a46c;opacity:.9}
+.cf-plate{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:56px;height:5px;border-radius:5px;background:var(--rose-light)}
+.cf-steam{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:6px;opacity:0;animation:cfSteamOn 3.2s ease-in-out infinite}
+.cf-steam i{width:4px;height:14px;border-radius:4px;background:#e5e7eb;animation:cfWave 1.4s ease-in-out infinite}
+.cf-steam i:nth-child(2){animation-delay:.25s;height:18px}.cf-steam i:nth-child(3){animation-delay:.5s}
+
+/* SUPERMARKET — products drop into the trolley one by one */
+.sm{position:relative;width:84px;height:84px}
+.sm-cart{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:46px;line-height:1;animation:smBump 2.4s ease-in-out infinite}
+.sm-it{position:absolute;top:-6px;font-size:20px;opacity:0;animation:smDrop 2.4s cubic-bezier(.5,0,.75,0) infinite}
+.sm-it:nth-of-type(1){left:22px;animation-delay:0s}.sm-it:nth-of-type(2){left:38px;animation-delay:.6s}
+.sm-it:nth-of-type(3){left:30px;animation-delay:1.2s}.sm-it:nth-of-type(4){left:44px;animation-delay:1.8s}
+
+/* LIVE MAP (drops into the same card when on the way) */
+.map-wrap{position:relative;border-radius:16px;overflow:hidden;box-shadow:0 3px 14px rgba(0,0,0,0.1);margin-bottom:14px}
+#map{height:340px;width:100%;background:#e8edf2}
+.map-eta{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:5;background:#fff;border-radius:14px;padding:6px 16px;box-shadow:0 5px 16px rgba(0,0,0,0.2);text-align:center;display:none}
+.map-eta b{font-size:19px;color:var(--rose);font-weight:700}
+.map-eta span{font-size:10px;color:var(--muted);display:block;margin-top:-2px}
+.map-live{position:absolute;top:12px;right:12px;z-index:5;background:rgba(255,255,255,0.96);color:var(--green);font-weight:700;font-size:11px;padding:5px 11px;border-radius:20px;box-shadow:0 3px 10px rgba(0,0,0,0.15);display:flex;align-items:center;gap:5px}
+.map-live i{width:7px;height:7px;border-radius:50%;background:var(--green);animation:livePulse 1.5s infinite;flex-shrink:0}
+.home-pin{width:42px;height:42px;border-radius:50% 50% 50% 4px;background:#fff;border:3px solid var(--rose);transform:rotate(45deg);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 5px 14px rgba(0,0,0,0.35)}
+.home-pin span{transform:rotate(-45deg)}
+
+/* LABELS */
+.anim-label{font-size:15px;font-weight:700;color:var(--text);text-align:center;margin-bottom:3px}
+.anim-sub{font-size:11px;color:var(--muted);text-align:center;margin-bottom:14px}
+
+/* ETA (estimate, for preparing) */
+.eta-row{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--rose-soft);border-radius:10px;padding:8px 16px;border:0.5px solid var(--rose-light);margin-bottom:14px}
+.live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:livePulse 1.5s infinite;flex-shrink:0}
+.eta-num{font-size:20px;font-weight:700;color:var(--rose)}
+.eta-txt{font-size:11px;color:var(--rose-dark);font-weight:500}
+
+/* MINI STEPS */
+.prog-steps{display:flex;align-items:flex-start}
+.ps{display:flex;flex-direction:column;align-items:center;flex:1}
+.ps-dot{width:11px;height:11px;border-radius:50%;margin-bottom:5px;flex-shrink:0;transition:all .4s}
+.pd-done{background:var(--green)}
+.pd-active{background:var(--rose);animation:dotPulse 1.2s infinite}
+.pd-wait{background:#e5e7eb}
+.ps-lbl{font-size:9px;font-weight:700;text-align:center;line-height:1.3;transition:color .4s}
+.pl-d{color:var(--green)}.pl-a{color:var(--rose)}.pl-w{color:#9ca3af}
+.ps-line{flex:1;height:2px;margin-top:5px;transition:background .4s}
+.pl-done{background:var(--green)}.pl-wait{background:#e5e7eb}
+
+/* CARDS */
+.card{background:var(--white);border:0.5px solid var(--border);border-radius:16px;padding:14px;margin-bottom:12px}
+.card-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card-title i{color:var(--rose);font-size:15px}
+
+/* RIDER CARD */
+.rider-row{display:flex;align-items:center;gap:12px}
+.rider-av{width:46px;height:46px;background:var(--rose-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid var(--rose-light)}
+.rider-name{font-size:14px;font-weight:700;color:var(--text)}
+.rider-status{font-size:10px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:4px;margin-top:2px}
+.rider-actions{margin-right:auto;display:flex;gap:8px}
+.r-btn{width:36px;height:36px;border-radius:9px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:transform .15s;text-decoration:none}
+.r-btn:active{transform:scale(0.9)}
+.r-call{background:#f0fdf4;color:var(--green)}
+.r-wa{background:var(--rose-soft);color:var(--rose)}
+
+/* ORDER ITEMS */
+.item-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:0.5px solid var(--border)}
+.item-row:last-of-type{border-bottom:none}
+.item-img{width:40px;height:40px;border-radius:8px;background:var(--rose-soft);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden}
+.item-img img{width:100%;height:100%;object-fit:cover}
+.item-name{flex:1;font-size:12px;font-weight:700;color:var(--text)}
+.item-qty{font-size:10px;color:var(--muted);margin-top:1px}
+.item-price{font-size:12px;font-weight:700;color:var(--rose)}
+
+/* TOTALS */
+.totals{margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border)}
+.total-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:2px 0}
+.total-final{display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:var(--text);padding:9px 0 0;border-top:1px solid var(--border);margin-top:6px}
+.total-final span:last-child{color:var(--rose)}
+
+/* ACTION BTNS */
+.action-row{display:flex;gap:8px;padding:0 16px;margin-bottom:14px}
+.act-btn{flex:1;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:transform .15s;text-decoration:none}
+.act-btn:active{transform:scale(0.97)}
+.act-rose{background:var(--rose);color:#fff}
+.act-white{background:var(--white);color:var(--text);border:0.5px solid var(--border)}
+
+/* RATING */
+.stars-row{display:flex;gap:10px;justify-content:center;margin-top:8px}
+.star-btn{font-size:30px;cursor:pointer;transition:transform .2s;filter:grayscale(1);background:none;border:none}
+.star-btn.lit{filter:none;transform:scale(1.15)}
+
+/* ADDR */
+.addr-row{display:flex;align-items:flex-start;gap:10px}
+.addr-ic{width:32px;height:32px;background:var(--rose-soft);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--rose);font-size:15px;flex-shrink:0}
+.addr-text{flex:1;font-size:12px;color:var(--muted);line-height:1.6}
+.map-btn{background:var(--rose-soft);color:var(--rose);border:0.5px solid var(--rose-light);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap}
+
+/* map-native rider marker helpers (mapbox home marker) */
+.mapboxgl-marker{z-index:4}
+
+@keyframes cfPour{0%,8%{height:0;opacity:1}20%,58%{height:30px;opacity:1}68%,100%{height:0;opacity:0}}
+@keyframes cfFill{0%,15%{height:0}62%,86%{height:72%}100%{height:72%}}
+@keyframes cfSteamOn{0%,58%{opacity:0}70%,92%{opacity:1}100%{opacity:0}}
+@keyframes cfWave{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-6px) scaleY(1.2) skewX(10deg)}}
+@keyframes smDrop{0%{opacity:0;transform:translateY(-6px) rotate(-12deg)}10%{opacity:1}45%{opacity:1;transform:translateY(38px) rotate(8deg)}55%,100%{opacity:0;transform:translateY(42px)}}
+@keyframes smBump{0%,100%{transform:translateX(-50%) translateY(0)}20%,45%,70%,95%{transform:translateX(-50%) translateY(2px)}}
+@keyframes popIn{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes panShake{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}}
+@keyframes steamUp{0%{opacity:.9;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-16px) scale(2.5)}}
+@keyframes knifeChop{0%,100%{transform:rotate(-25deg)}50%{transform:rotate(25deg)}}
+@keyframes houseBounce{0%{transform:scale(1)}100%{transform:scale(1.12)}}
+@keyframes spTwinkle{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 0 0 rgba(190,24,93,0.3)}50%{box-shadow:0 0 0 6px rgba(190,24,93,0)}}
+    /* WhatsApp consent (opt-in) note under WhatsApp buttons — Meta / WhatsApp Business policy */
+    .ds-wac{display:block;margin:6px 0 0;padding:0 4px;font-size:12.5px;line-height:1.7;font-weight:500;color:#8a8f98;text-align:center;direction:rtl;white-space:normal;overflow-wrap:anywhere;max-width:100%;box-sizing:border-box}.ds-wac-en{display:block;font-size:11px;line-height:1.5;color:#a3a8b0;direction:ltr;margin-top:2px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="btn-back" href="/" aria-label="رجوع"><i class="ti ti-arrow-right"></i></a>
+  <div class="topbar-title">تتبع طلبك</div>
+  <div class="order-pill" id="topbar-order">#DS-XXXX</div>
+</div>
+
+<div class="hero">
+  <div class="num-label">رقم طلبك</div>
+  <div class="num-val" id="hero-num">#DS-XXXX</div>
+  <div class="num-time" id="hero-time">جاري التحميل...</div>
+</div>
+
+<div style="padding:0 16px">
+
+  <!-- MAIN CARD: circle animation (preparing) OR live map (on the way) -->
+  <div class="anim-card">
+    <div class="circle-wrap" id="circle-wrap">
+      <div class="circle-outer">
+        <svg class="svg-ring" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="63" fill="none" stroke="#f3f4f6" stroke-width="6"/>
+          <circle id="ring-prog" cx="70" cy="70" r="63" fill="none" stroke="#16a34a" stroke-width="6"
+            stroke-linecap="round" stroke-dasharray="396" stroke-dashoffset="297"
+            style="transition:stroke-dashoffset 0.8s ease,stroke 0.5s ease"/>
+        </svg>
+        <div class="circle-inner"><div id="anim-content"></div></div>
+      </div>
+    </div>
+
+    <!-- LIVE MAP (hidden until on the way) -->
+    <div class="map-wrap" id="map-wrap" style="display:none">
+      <div id="map"></div>
+      <div class="map-eta" id="eta"><b id="etaMin">—</b><span>دقيقة · يصل إليك</span></div>
+      <div class="map-live" id="liveBadge"><i></i> مباشر</div>
+    </div>
+
+    <div class="anim-label" id="anim-label">تم استلام طلبك! ✅</div>
+    <div class="anim-sub" id="anim-sub">سيتم تجهيز طلبك قريباً</div>
+
+    <div class="eta-row" id="eta-row" style="display:none">
+      <div class="live-dot"></div>
+      <div class="eta-num" id="eta-num">٢٠-٣٠</div>
+      <div class="eta-txt">دقيقة وقت التوصيل</div>
+    </div>
+
+    <div class="prog-steps">
+      <div class="ps"><div class="ps-dot pd-done" id="pd1"></div><div class="ps-lbl pl-d" id="pl1">الطلب</div></div>
+      <div class="ps-line pl-wait" id="pline1"></div>
+      <div class="ps"><div class="ps-dot pd-wait" id="pd2"></div><div class="ps-lbl pl-w" id="pl2">التحضير</div></div>
+      <div class="ps-line pl-wait" id="pline2"></div>
+      <div class="ps"><div class="ps-dot pd-wait" id="pd3"></div><div class="ps-lbl pl-w" id="pl3">في الطريق</div></div>
+      <div class="ps-line pl-wait" id="pline3"></div>
+      <div class="ps"><div class="ps-dot pd-wait" id="pd4"></div><div class="ps-lbl pl-w" id="pl4">التسليم</div></div>
+    </div>
+  </div>
+
+  <!-- RIDER CARD -->
+  <div class="card" id="rider-card" style="display:none">
+    <div class="card-title"><i class="ti ti-motorbike"></i> السائق</div>
+    <div class="rider-row">
+      <div class="rider-av">🛵</div>
+      <div>
+        <div class="rider-name" id="rider-name">-</div>
+        <div class="rider-status"><div class="live-dot"></div> <span id="riderSub">في الطريق إليك</span></div>
+      </div>
+      <div class="rider-actions">
+        <a class="r-btn r-call" id="rider-call" href="#" aria-label="اتصال"><i class="ti ti-phone" style="font-size:16px"></i></a>
+        <a class="r-btn r-wa" id="rider-wa" href="#" target="_blank" aria-label="واتساب"><i class="ti ti-brand-whatsapp" style="font-size:16px"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER ITEMS -->
+  <div class="card" id="items-card">
+    <div class="card-title"><i class="ti ti-shopping-bag"></i> تفاصيل طلبك</div>
+    <div id="items-list"><div style="text-align:center;padding:1rem;color:var(--muted);font-size:12px">جاري التحميل...</div></div>
+    <div class="totals" id="totals-wrap" style="display:none">
+      <div class="total-row"><span>المجموع</span><span id="t-sub">-</span></div>
+      <div class="total-row"><span>التوصيل</span><span id="t-del">-</span></div>
+      <div class="total-row" id="t-vat-row" style="display:none"><span>ضريبة القيمة المضافة</span><span id="t-vat">-</span></div>
+      <div class="total-row" id="t-disc-row" style="display:none"><span>الخصم</span><span id="t-disc" style="color:var(--green)">-</span></div>
+      <div class="total-final"><span>الإجمالي</span><span id="t-total">-</span></div>
+    </div>
+  </div>
+
+  <!-- ADDRESS -->
+  <div class="card" id="addr-card" style="display:none">
+    <div class="card-title"><i class="ti ti-map-pin"></i> عنوان التوصيل</div>
+    <div class="addr-row">
+      <div class="addr-ic"><i class="ti ti-map-pin"></i></div>
+      <div class="addr-text" id="addr-text">-</div>
+      <button class="map-btn" id="map-btn">🗺️ خريطة</button>
+    </div>
+  </div>
+
+  <!-- RATING -->
+  <div class="card" id="rating-card" style="display:none">
+    <div class="card-title"><i class="ti ti-star"></i> قيّم تجربتك</div>
+    <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:6px">كيف كانت تجربتك مع خطوة التوصيل؟</div>
+    <div class="stars-row">
+      <button class="star-btn" onclick="rateOrder(1)" aria-label="1">⭐</button>
+      <button class="star-btn" onclick="rateOrder(2)" aria-label="2">⭐</button>
+      <button class="star-btn" onclick="rateOrder(3)" aria-label="3">⭐</button>
+      <button class="star-btn" onclick="rateOrder(4)" aria-label="4">⭐</button>
+      <button class="star-btn" onclick="rateOrder(5)" aria-label="5">⭐</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="action-row">
+  <a class="act-btn act-rose" href="/"><i class="ti ti-home" style="font-size:16px"></i> الرئيسية</a>
+  <button class="act-btn act-white" id="support-btn"><i class="ti ti-brand-whatsapp" style="font-size:16px"></i> تواصل معنا</button>
+</div>
+<div class="ds-wac" style="margin:-6px 0 16px;padding:0 20px">بالتواصل معنا عبر واتساب، توافق على استلام رسائل تخص طلباتك. للإيقاف أرسل: إيقاف<span class="ds-wac-en" dir="ltr" lang="en">By contacting us on WhatsApp, you agree to receive messages about your orders. To stop, send: STOP</span></div>
+
+<script>
+// ── CONFIG ──
+const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
+const MAPBOX_TOKEN=window.DS_MAPBOX_TOKEN||'';   // the key is in /map-key.js on the server only (not in GitHub)
+const OWNER_WA='966560957163';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+const RIDERS=[
+  {name:'Ihsan', phone:'0508112376'},
+  {name:'Adnan', phone:'0534611858'},
+  {name:'Jamil', phone:'0546788065'},
+  {name:'Loqman',phone:'0535313266'},
+  {name:'Adil',  phone:'0559239794'},
+];
+
+// ── ANIMATION CONFIG (circle states) ──
+const STATUS_CFG={
+  pending:{ html:'<div style="width:52px;height:52px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:popIn .5s ease"><i class="ti ti-check" style="font-size:24px;color:#16a34a"></i></div>',
+    label:'تم استلام طلبك! ✅',sub:'سيتم تجهيز طلبك قريباً',step:1,ring:'#16a34a',offset:297 },
+  assigned:{ html:'<div class="cooking-wrap"><div class="steam"><div class="s-puff"></div><div class="s-puff"></div><div class="s-puff"></div></div><div class="pan">🍳</div><div class="knife">🔪</div></div>',
+    label:'جاري تجهيز طلبك 🍳',sub:'يعمل على تحضير طلبك الآن',step:2,ring:'#f59e0b',offset:198,etaNum:'٢٠-٣٠' },
+  on_the_way:{ label:'السائق في الطريق إليك 🛵',sub:'طلبك على الطريق الآن — تتبّعه مباشر',step:3,ring:'#7c3aed',offset:99 },
+  delivered:{ html:'<div style="display:flex;flex-direction:column;align-items:center;gap:5px"><div style="font-size:34px;animation:houseBounce .8s ease infinite alternate">🏠</div><div style="display:flex;gap:5px"><span style="font-size:13px;animation:spTwinkle .8s ease-in-out infinite">✨</span><span style="font-size:13px;animation:spTwinkle .8s ease-in-out .27s infinite">🌹</span><span style="font-size:13px;animation:spTwinkle .8s ease-in-out .54s infinite">✨</span></div></div>',
+    label:'تم التسليم بنجاح! 🎉',sub:'نتمنى أن ينال طلبك إعجابك 🌹',step:4,ring:'#be185d',offset:0 },
+  cancelled:{ html:'<div style="width:52px;height:52px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:popIn .5s ease"><i class="ti ti-x" style="font-size:24px;color:#dc2626"></i></div>',
+    label:'تم إلغاء الطلب',sub:'هذا الطلب ملغي — لأي استفسار تواصل معنا',step:0,ring:'#dc2626',offset:0 },
+};
+// "Preparing" looks different for coffee shops and the supermarket (the database sends vendor_type with the order)
+const PREP_BY_TYPE={
+  coffee:{ html:'<div class="cf"><div class="cf-head"></div><div class="cf-stream"></div><div class="cf-steam"><i></i><i></i><i></i></div><div class="cf-cup"><div class="cf-fill"></div></div><div class="cf-handle"></div><div class="cf-plate"></div></div>',
+    label:'جاري تحضير قهوتك ☕',sub:'الباريستا يحضّر طلبك الآن',ring:'#a0612f',etaNum:'١٥-٢٥' },
+  supermarket:{ html:'<div class="sm"><span class="sm-it">🍎</span><span class="sm-it">🥛</span><span class="sm-it">🥖</span><span class="sm-it">🧃</span><div class="sm-cart">🛒</div></div>',
+    label:'جاري تجهيز طلباتك 🛒',sub:'نجمع منتجاتك في السلة الآن',ring:'#16a34a' },
+};
+function shopType(order){
+  if(!order) return 'restaurant';
+  if(order.vendor_type) return order.vendor_type;
+  var v=String(order.vendor_name||'').trim();
+  return (v==='سوبرماركت'||v==='السوبرماركت')?'supermarket':'restaurant';
+}
+function statusKey(s){ s=(s||'pending').toLowerCase();
+  if(s.indexOf('cancel')===0) return 'cancelled';
+  if(s==='delivered') return 'delivered';
+  if(s==='on_the_way'||s==='picked'||s==='out_for_delivery') return 'on_the_way';
+  if(s==='assigned'||s==='preparing'||s==='ready'||s==='cooking') return 'assigned';
+  return 'pending'; }
+
+let currentOrder=null, _timer=null;
+
+/* ══════════════════════════════════════════════════════════════
+   LIVE MAP TRACKING  —  copied unchanged from the working version.
+   Rider is drawn BY the map (source + circle + scooter image) so it
+   can never freeze/drift off the road line in the app WebView.
+   ══════════════════════════════════════════════════════════════ */
+var _map=null,_homeMk=null;
+function _hav(a,b,c,d){var R=6371,dLat=(c-a)*Math.PI/180,dLng=(d-b)*Math.PI/180,x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+
+function ensureMap(homeLL){
+  if(_map)return;
+  if(typeof mapboxgl==='undefined'||!MAPBOX_TOKEN||MAPBOX_TOKEN.indexOf('pk.')!==0){ return; }
+  try{
+    mapboxgl.accessToken=MAPBOX_TOKEN;
+    _map=new mapboxgl.Map({container:'map',style:'mapbox://styles/mapbox/streets-v12',center:homeLL,zoom:13,attributionControl:false});
+    _map.on('load',function(){
+      try{_map.resize();}catch(e){}
+      try{_map.addSource('route',{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:[homeLL,homeLL]}}});
+        _map.addLayer({id:'route-casing',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#831843','line-width':9,'line-opacity':.95}});
+        _map.addLayer({id:'route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#ec4899','line-width':5}});
+      }catch(e){}
+      try{_map.addSource('rider',{type:'geojson',data:{type:'Feature',geometry:{type:'Point',coordinates:homeLL}}});
+        _map.addLayer({id:'rider-halo',type:'circle',source:'rider',paint:{'circle-radius':34,'circle-color':'#16a34a','circle-opacity':0.18,'circle-blur':0.55}});
+        _map.addLayer({id:'rider-dot',type:'circle',source:'rider',paint:{'circle-radius':21,'circle-color':'#ffffff','circle-stroke-width':5,'circle-stroke-color':'#16a34a'}});
+        try{ if(!_map.hasImage('rideric')){
+          var s=120,cv=document.createElement('canvas');cv.width=s;cv.height=s;var cx=cv.getContext('2d');
+          cx.font='94px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText('🛵',s/2,s/2+4);
+          var idata=cx.getImageData(0,0,s,s);_map.addImage('rideric',{width:s,height:s,data:new Uint8Array(idata.data.buffer)},{pixelRatio:2.5});
+        } }catch(_e){}
+        _map.addLayer({id:'rider-ic',type:'symbol',source:'rider',layout:{'icon-image':'rideric','icon-size':0.85,'icon-allow-overlap':true,'icon-ignore-placement':true}});
+      }catch(e){}
+    });
+    var he=document.createElement('div'); he.className='home-pin'; he.innerHTML='<span>🏠</span>';
+    _homeMk=new mapboxgl.Marker({element:he,anchor:'bottom'}).setLngLat(homeLL).addTo(_map);
+  }catch(e){}
+}
+
+function updateRider(rLL,homeLL,name){ if(!_map)return; drawRoute(rLL,homeLL); }
+
+var _routeBusy=false;
+async function drawRoute(rLL,homeLL){
+  var geo=null,dist=null,dur=null;
+  if(!_routeBusy){ _routeBusy=true;
+    try{
+      var url='https://api.mapbox.com/directions/v5/mapbox/driving/'+rLL[0]+','+rLL[1]+';'+homeLL[0]+','+homeLL[1]+'?geometries=geojson&overview=full&access_token='+MAPBOX_TOKEN;
+      var res=await fetch(url); var j=await res.json();
+      if(j&&j.routes&&j.routes.length){ geo=j.routes[0].geometry; dist=j.routes[0].distance; dur=j.routes[0].duration; }
+    }catch(e){}
+    _routeBusy=false;
+  }
+  var coords;
+  if(geo&&geo.coordinates&&geo.coordinates.length>1){
+    coords=geo.coordinates.slice();
+    if(_hav(coords[0][1],coords[0][0],rLL[1],rLL[0])>0.03) coords.unshift(rLL); else coords[0]=rLL;
+    var li=coords.length-1;
+    if(_hav(coords[li][1],coords[li][0],homeLL[1],homeLL[0])>0.03) coords.push(homeLL); else coords[li]=homeLL;
+  }else{
+    coords=[rLL,homeLL];
+    dist=_hav(rLL[1],rLL[0],homeLL[1],homeLL[0])*1000; dur=dist/1000/25*3600;
+  }
+  geo={type:'LineString',coordinates:coords};
+  function apply(){ try{
+    var src=_map.getSource&&_map.getSource('route');
+    if(src)src.setData({type:'Feature',geometry:geo});
+    var rsrc=_map.getSource&&_map.getSource('rider');
+    if(rsrc)rsrc.setData({type:'Feature',geometry:{type:'Point',coordinates:rLL}});
+    var b=new mapboxgl.LngLatBounds(); coords.forEach(function(c){b.extend(c);}); b.extend(rLL); b.extend(homeLL);
+    _map.fitBounds(b,{padding:{top:48,bottom:48,left:48,right:48},maxZoom:15.5,duration:1000});
+  }catch(e){} }
+  if(_map.getSource&&_map.getSource('route')) apply(); else _map.once('load',apply);
+  var km=(dist||0)/1000, min=Math.max(1,Math.round((dur||(km/25*3600))/60));
+  var e=document.getElementById('eta'); if(e){ e.style.display='block'; var em=document.getElementById('etaMin'); if(em)em.textContent=min; }
+  var rs=document.getElementById('riderSub'); if(rs)rs.textContent='في الطريق إليك · '+(km<1?Math.round(km*1000)+' م':km.toFixed(1)+' كم');
+}
+
+async function fetchRiderAndDraw(order,homeLL){
+  if(!_map)return;
+  try{
+    const rLoc=(order&&order.rider)||null;   // the rider's position comes with the order (track_order)
+    if(rLoc&&rLoc.lat&&rLoc.lng){
+      updateRider([Number(rLoc.lng),Number(rLoc.lat)],homeLL,rLoc.name);
+      const lb=document.getElementById('liveBadge');
+      if(lb&&rLoc.updated_at){ var age=(Date.now()-new Date(rLoc.updated_at).getTime())/1000; if(!(age>=0))age=0;
+        if(age<60){ lb.innerHTML='<i></i> مباشر'; lb.style.color='var(--green)'; }
+        else{ var t=age<3600?Math.round(age/60)+' د':Math.round(age/3600)+' س'; lb.innerHTML='<i style="background:#f59e0b"></i> الموقع قبل '+t; lb.style.color='#b45309'; }
+      }
+    }
+  }catch(e){}
+}
+
+// ── INIT ──
+window.addEventListener('load',()=>{
+  const orderNum=(localStorage.getItem('qibah_last_order_num')||'').replace('QIB-','DS-');
+  const qs=new URLSearchParams(location.search);
+  const num=qs.get('num')||orderNum;
+  const displayNum=num||'DS-XXXX';
+  document.getElementById('hero-num').textContent='#'+displayNum;
+  document.getElementById('topbar-order').textContent='#'+displayNum;
+  setupSupportBtn(displayNum);
+  showStatus('pending',null);
+  if(num&&num!=='DS-XXXX'){ loadOrder(num); _timer=setInterval(()=>loadOrder(num),12000); }
+  else loadFromLocalStorage();
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&num) loadOrder(num); });
+});
+
+// Privacy: an order is shown only together with the phone number it was placed with
+// (the database checks it — strangers can't look up other people's orders).
+var _askedPhone='';   // a number typed in the box below wins (the order may have been placed with another number)
+function _trkPhone(){
+  var p=_askedPhone;
+  if(!p){ try{ p=(JSON.parse(localStorage.getItem('ds_customer')||'{}')||{}).phone||''; }catch(e){} }
+  if(!p){ try{ p=localStorage.getItem('ds_track_phone')||''; }catch(e){} }
+  return String(p);
+}
+var _askShown=false;
+function askPhone(num){
+  if(_askShown) return; _askShown=true;
+  var c=document.createElement('div'); c.id='phone-ask';
+  c.style.cssText='margin:0 0 14px;background:#fff;border:1px solid #f0e4e9;border-radius:14px;padding:14px;text-align:center;position:relative;z-index:3';
+  c.innerHTML='<div style="font-size:13px;font-weight:800;margin-bottom:4px">🔒 لعرض تفاصيل الطلب</div>'
+    +'<div style="font-size:11.5px;color:#6b7280;margin-bottom:8px">أدخل رقم الجوال الذي طلبت به</div>'
+    +'<input id="ask-phone" inputmode="numeric" placeholder="05XXXXXXXX" style="width:100%;border:1px solid #f0e4e9;border-radius:10px;padding:11px;text-align:center;direction:ltr;font-size:15px;font-family:inherit"/>'
+    +'<button id="ask-go" style="width:100%;margin-top:8px;border:none;border-radius:10px;background:#be185d;color:#fff;font-weight:800;padding:11px;font-size:14px;font-family:inherit">عرض الطلب</button>';
+  var card=document.querySelector('.anim-card');   // right under the status card (the card overlaps the header)
+  if(card&&card.parentNode) card.parentNode.insertBefore(c,card.nextSibling); else document.body.appendChild(c);
+  document.getElementById('ask-go').onclick=function(){
+    var v=(document.getElementById('ask-phone').value||'').trim();
+    if(v.replace(/\D/g,'').length<9){ document.getElementById('ask-phone').focus(); return; }
+    _askedPhone=v; try{ localStorage.setItem('ds_track_phone',v); }catch(e){}
+    c.remove(); _askShown=false; loadOrder(num);
+  };
+}
+async function loadOrder(num){
+  const ph=_trkPhone();
+  if(ph.replace(/\D/g,'').length<9){ askPhone(num); if(!currentOrder) loadFromLocalStorage(); return; }
+  try{
+    const{data,error}=await sb.rpc('track_order',{p_order_number:num,p_phone:ph});
+    const o=(!error&&data&&typeof data==='object')?data:null;
+    if(o){
+      currentOrder=o; renderOrder(o);
+      if(Array.isArray(o.items)&&o.items.length) renderItems(o.items); else loadItemsFromLS();
+      const a=document.getElementById('phone-ask'); if(a){ a.remove(); _askShown=false; }
+    }else{
+      if(!error) askPhone(num);           // not found with this phone → ask for the phone used in the order
+      if(!currentOrder) loadFromLocalStorage();
+    }
+  }catch(e){ if(!currentOrder) loadFromLocalStorage(); }
+}
+
+function renderOrder(o){
+  const time=new Date(o.created_at).toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
+  const payLabel={cod:'نقداً',card:'POS',bank:'تحويل بنكي',apple:'Apple Pay'}[o.payment_method]||o.payment_method||'';
+  document.getElementById('hero-time').textContent='اليوم · '+time+(payLabel?' · '+payLabel:'');
+  if(o.delivery_address){
+    document.getElementById('addr-card').style.display='block';
+    document.getElementById('addr-text').textContent=o.delivery_address;
+    if(o.delivery_lat){ document.getElementById('map-btn').onclick=()=>window.open('https://maps.google.com/?q='+o.delivery_lat+','+o.delivery_lng,'_blank'); }
+  }
+  if(o.rider_name){
+    document.getElementById('rider-card').style.display='block';
+    document.getElementById('rider-name').textContent=o.rider_name;
+    const r=RIDERS.find(x=>x.name===o.rider_name);
+    if(r){
+      document.getElementById('rider-call').href='tel:'+r.phone;
+      document.getElementById('rider-wa').href='https://api.whatsapp.com/send?phone=966'+r.phone.substring(1);
+    }
+  }
+  showStatus(o.order_status||'pending', o);
+  if(statusKey(o.order_status)==='delivered') document.getElementById('rating-card').style.display='block';
+}
+
+// ── STATUS: circle animation  OR  live map (auto-switch) ──
+function showStatus(status, order){
+  const key=statusKey(status);
+  const type=shopType(order);
+  let cfg=STATUS_CFG[key]||STATUS_CFG.pending;
+  if(key==='assigned'&&PREP_BY_TYPE[type]) cfg=Object.assign({},cfg,PREP_BY_TYPE[type]);
+  const cw=document.getElementById('circle-wrap'), mw=document.getElementById('map-wrap');
+  const onWay = (key==='on_the_way') && order && order.delivery_lat && order.delivery_lng;
+
+  if(onWay){
+    cw.style.display='none'; mw.style.display='block';
+    const homeLL=[Number(order.delivery_lng),Number(order.delivery_lat)];
+    ensureMap(homeLL); fetchRiderAndDraw(order,homeLL);
+  }else{
+    cw.style.display='flex'; mw.style.display='none';
+    const ac=document.getElementById('anim-content'), ak=key+'|'+type;
+    if(ac.dataset.k!==ak){ ac.innerHTML=cfg.html||''; ac.dataset.k=ak; }   // same state → keep the animation running smoothly (no restart every 12s)
+    document.getElementById('eta').style.display='none';
+  }
+
+  document.getElementById('anim-label').textContent=cfg.label;
+  document.getElementById('anim-sub').textContent=cfg.sub;
+  const ring=document.getElementById('ring-prog'); ring.style.stroke=cfg.ring; ring.style.strokeDashoffset=cfg.offset;
+
+  // estimate ETA row only while preparing
+  const etaRow=document.getElementById('eta-row');
+  if(key==='assigned'){ etaRow.style.display='flex'; document.getElementById('eta-num').textContent=cfg.etaNum; }
+  else etaRow.style.display='none';
+
+  // mini steps
+  for(let i=1;i<=4;i++){
+    const dot=document.getElementById('pd'+i), lbl=document.getElementById('pl'+i);
+    if(i<cfg.step){dot.className='ps-dot pd-done';lbl.className='ps-lbl pl-d';}
+    else if(i===cfg.step){dot.className='ps-dot pd-active';lbl.className='ps-lbl pl-a';}
+    else{dot.className='ps-dot pd-wait';lbl.className='ps-lbl pl-w';}
+  }
+  for(let i=1;i<=3;i++){ document.getElementById('pline'+i).className='ps-line '+(i<cfg.step?'pl-done':'pl-wait'); }
+}
+
+function renderItems(items){
+  document.getElementById('items-list').innerHTML=items.map(i=>`
+    <div class="item-row"><div class="item-img">🛍️</div>
+      <div style="flex:1"><div class="item-name">${i.product_name}</div><div class="item-qty">× ${i.quantity}</div></div>
+      <div class="item-price">SAR ${Number(i.total_price).toFixed(2)}</div></div>`).join('');
+  const sub=items.reduce((s,i)=>s+Number(i.total_price),0); showTotals(sub,currentOrder);
+}
+function loadItemsFromLS(){
+  const cart=JSON.parse(localStorage.getItem('qibah_last_cart')||'[]');
+  if(!cart.length){document.getElementById('items-list').innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted);font-size:12px">لا توجد تفاصيل</div>';return;}
+  document.getElementById('items-list').innerHTML=cart.map(i=>`
+    <div class="item-row"><div class="item-img">${i.image?'<img src="'+i.image+'" alt=""/>':'🛍️'}</div>
+      <div style="flex:1"><div class="item-name">${i.name}</div><div class="item-qty">× ${i.qty}</div></div>
+      <div class="item-price">SAR ${(i.price*i.qty).toFixed(2)}</div></div>`).join('');
+  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0); showTotals(sub,currentOrder||null);
+}
+function loadFromLocalStorage(){
+  const time=new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('hero-time').textContent='اليوم · '+time;
+  const addr=localStorage.getItem('qibah_last_address'), lat=localStorage.getItem('qibah_last_lat'), lng=localStorage.getItem('qibah_last_lng');
+  if(addr){ document.getElementById('addr-card').style.display='block'; document.getElementById('addr-text').textContent=addr;
+    if(lat) document.getElementById('map-btn').onclick=()=>window.open('https://maps.google.com/?q='+lat+','+lng,'_blank'); }
+  showStatus('pending',null); loadItemsFromLS();
+}
+// Totals as saved with the order: items + delivery + VAT (0.50) − discount = the amount the customer pays.
+// Before the order is found (no phone yet) only the items are known, so delivery/VAT/total wait for it.
+function showTotals(sub,order){
+  const row=(id,on)=>{ document.getElementById(id).style.display=on?'flex':'none'; };
+  document.getElementById('t-sub').textContent='SAR '+sub.toFixed(2);
+  if(!order){
+    row('t-vat-row',false); row('t-disc-row',false);
+    document.getElementById('t-del').textContent='-'; document.getElementById('t-total').textContent='-';
+    document.getElementById('totals-wrap').style.display='block'; return;
+  }
+  const s=Number(order.subtotal!=null?order.subtotal:sub), del=Number(order.delivery_fee||0), disc=Number(order.discount||0);
+  const tot=order.total!=null?Number(order.total):s+del-disc;
+  const vat=Math.max(0,Math.round((tot-s-del+disc)*100)/100);
+  document.getElementById('t-sub').textContent='SAR '+s.toFixed(2);
+  document.getElementById('t-del').textContent=del===0?'مجاني':'SAR '+del.toFixed(2);
+  row('t-vat-row',vat>=0.01); document.getElementById('t-vat').textContent='SAR '+vat.toFixed(2);
+  row('t-disc-row',disc>0); document.getElementById('t-disc').textContent='-SAR '+disc.toFixed(2);
+  document.getElementById('t-total').textContent='SAR '+tot.toFixed(2);
+  document.getElementById('totals-wrap').style.display='block';
+}
+function setupSupportBtn(num){
+  const msg='مرحباً خطوة التوصيل! لدي استفسار عن طلبي رقم #'+num;
+  document.getElementById('support-btn').onclick=()=>window.open('https://api.whatsapp.com/send?phone='+OWNER_WA+'&text='+encodeURIComponent(msg),'_blank');
+}
+function rateOrder(stars){
+  document.querySelectorAll('.star-btn').forEach((el,i)=>el.classList.toggle('lit',i<stars));
+  setTimeout(()=>{ document.getElementById('rating-card').innerHTML=
+    '<div style="text-align:center;padding:10px"><div style="font-size:30px;margin-bottom:6px">🌹</div>'+
+    '<div style="font-size:14px;font-weight:700;color:var(--text)">شكراً على تقييمك!</div>'+
+    '<div style="font-size:11px;color:var(--muted);margin-top:4px">نسعى دائماً لتحسين خدمتنا</div></div>'; },800);
+}
+</script>
+<script src="/ds-lib/ds-cancel-3.js" defer></script>
+</body>
+</html>

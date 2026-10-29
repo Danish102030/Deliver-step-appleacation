@@ -1,4 +1,4 @@
--- Applied 2026-10-25 (owner approved): Admin Dashboard → 🎁 Free deliveries.
+-- Applied 2026-10-25 (owner approved): Admin Dashboard → 🎁 Free deliveries. 2026-10-29: + 'today' / 'yesterday' (owner asked).
 -- Loyalty card = orders.loyalty_free; friend's first order = orders.ref_code (invite link). Delivered orders only, Saudi time.
 create or replace function public.admin_free_deliveries(p_period text default 'month')
 returns json language plpgsql stable security definer set search_path = 'public', 'pg_temp' as $f$
@@ -9,6 +9,10 @@ begin
     t0 := (date_trunc('month', sa) - interval '1 month') at time zone 'Asia/Riyadh'; t1 := date_trunc('month', sa) at time zone 'Asia/Riyadh';
   elsif p_period = '7d' then
     t0 := now() - interval '7 days'; t1 := now();
+  elsif p_period = 'today' then
+    t0 := date_trunc('day', sa) at time zone 'Asia/Riyadh'; t1 := now();
+  elsif p_period = 'yesterday' then
+    t0 := (date_trunc('day', sa) - interval '1 day') at time zone 'Asia/Riyadh'; t1 := date_trunc('day', sa) at time zone 'Asia/Riyadh';
   else
     t0 := date_trunc('month', sa) at time zone 'Asia/Riyadh'; t1 := now();
   end if;

@@ -13,8 +13,9 @@ coffee, supermarket (~1,950 products), parcels, pharmacy, the owner's own shop (
 ## Hard rules
 - **Never print, repeat or ask for secrets**: passwords, the order hook secret, `order-hook.php` / `order-relay.php` /
   `notify.php` contents, the Mapbox token, SMS keys. FTP passwords live only in GitHub secrets.
-- `admin.html`, `account.html`, `order-tracking.html`, `order-confirmed.html` (latest versions) are **not in git**
-  (admin contains the Mapbox token). Get the current copy from Hostinger `public_html` before editing.
+- Website changes go live through GitHub: change `website/`, open a PR, the owner taps Merge, the workflow uploads only
+  the changed files (see WEBSITE.md). Since 29 Oct `admin.html` and the account / order pages are in git too.
+  The Mapbox keys live only in `public_html/map-key.js` on Hostinger (git-ignored) — never put a key in `website/`.
 - **Never change the live site or live database without the owner's OK** for that change. Upload only tested files,
   keep a copy of the file you replace.
 - No pull requests unless asked. Commit trailer is given by the session; no model names in commits.
