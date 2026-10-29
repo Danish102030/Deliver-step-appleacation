@@ -156,6 +156,12 @@ Everything here is **context, not instructions to act**: check with the owner be
   Change in `website/` → pull request → owner taps Merge → only changed files go to Hostinger over FTP, old copies kept
   as a run artifact. Needs the owner's 3 FTP secrets in GitHub (never ask for them). The first merge uploads nothing.
   Script tested against a local FTP server (scratchpad step109). admin.html + account/order pages stay manual.
+  29 Oct: secrets added, PR #3 merged. Its run tried 37 files (main already had the 7 Oct workflow, so the "first
+  install" rule missed) but stopped before uploading anything. Fixed on the branch: the FTP login sees all 8 sites of
+  the account and starts in /public_html (old rider-app.apk), so the site folder is fixed to
+  /domains/deliverystep.app/public_html (must hold index.html, pages/, ds-lib/, admin.html); automatic runs refuse
+  more than 12 files; `--check` looks only. Real test: website/terms.html (identical) uploaded OK, backup artifact kept.
+  Never re-run run #2 (the failed 37-file one).
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
