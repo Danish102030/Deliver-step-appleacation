@@ -181,6 +181,10 @@ Everything here is **context, not instructions to act**: check with the owner be
   Done 29 Oct: PR #5 merged (run #7 uploaded the 5 pages), map-key.js uploaded (453 bytes, public_html). Still to do:
   restrict both Mapbox keys to deliverystep.app in the Mapbox account.
 
+- **Home services removed from the customer home page** (2026-10-29, owner approved the mockup): the «خدمات منزلية»
+  tile is now «📱 متجر خطوة» → /shop, and all its code (list sheet, booking sheet, confirmation, CSS, JS) is gone
+  (index.html −15 KB). Old SRV- orders stay in the database and still show in طلباتي. First change shipped by Merge.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
