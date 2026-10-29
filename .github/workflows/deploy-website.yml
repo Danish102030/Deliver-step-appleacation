@@ -1,7 +1,8 @@
 # Puts the website on Hostinger by itself.
-# When files inside website/ change on the main branch, only those files are uploaded to public_html
-# (FTP, encrypted when the server allows it). Nothing on the server is ever deleted, and files that are
-# not in website/ (other pages, PHP files, .htaccess, photos) are never touched.
+# When files inside website/ change on the main branch (the owner taps "Merge" on a pull request), only those
+# files are uploaded to public_html (FTP, encrypted when the server allows it). Nothing on the server is ever
+# deleted, files that are not in website/ (admin.html, PHP files, photos) are never touched, and the server's
+# old copy of every replaced file is kept with the run for 90 days (Actions → the run → Artifacts).
 #
 # One-time setup (repository → Settings → Secrets and variables → Actions → New repository secret):
 #   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD   — from hPanel → Files → FTP Accounts
@@ -15,10 +16,10 @@ on:
     paths: ['website/**']
   workflow_dispatch:
     inputs:
-      all_files:
-        description: 'Upload every file in website/ (not only the ones changed by the last commit)'
-        type: boolean
-        default: false
+      files:
+        description: 'Files to upload, separated by spaces (e.g. website/terms.html). Empty = the files changed by the last commit.'
+        type: string
+        default: ''
 
 concurrency:
   group: deploy-website
@@ -47,15 +48,24 @@ jobs:
         if: env.READY == 'true'
         env:
           BEFORE: ${{ github.event.before }}
-          ALL: ${{ github.event_name == 'workflow_dispatch' && inputs.all_files }}
+          PICKED: ${{ inputs.files }}
         run: |
-          if [ "$GITHUB_EVENT_NAME" = "push" ] && [ -n "$BEFORE" ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null \
-             && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
-            git diff --name-only --diff-filter=AMR "$BEFORE" "$GITHUB_SHA" -- website/ > files.txt
-          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "$ALL" != "true" ]; then
+          : > files.txt
+          if [ "$GITHUB_EVENT_NAME" = "push" ] && [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] \
+             && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            # The merge that first brings this workflow to main carries months of history: some of those files were
+            # never put on the website on purpose. Upload nothing then; later merges upload only their own changes.
+            if [ -n "$(git diff --name-only --diff-filter=A "$BEFORE" "$GITHUB_SHA" -- .github/workflows/deploy-website.yml)" ]; then
+              echo "::notice::First run after the setup: nothing uploaded. Later changes are uploaded by themselves."
+            else
+              git diff --name-only --diff-filter=AMR "$BEFORE" "$GITHUB_SHA" -- website/ > files.txt
+            fi
+          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ -n "$PICKED" ]; then
+            printf '%s\n' $PICKED > files.txt
+          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
             git diff --name-only --diff-filter=AMR "$GITHUB_SHA~1" "$GITHUB_SHA" -- website/ > files.txt
           else
-            git ls-files website/ > files.txt
+            echo "::warning::Could not tell which files changed. Nothing uploaded — run the workflow by hand and name the files."
           fi
           echo "Files to upload:"; cat files.txt
 
@@ -67,3 +77,11 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_DIR: ${{ secrets.FTP_DIR }}
         run: python3 .github/scripts/deploy_website.py files.txt
+
+      - name: Keep the replaced files
+        if: always() && env.READY == 'true' && hashFiles('replaced-files/**') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: replaced-files-${{ github.run_number }}
+          path: replaced-files/
+          retention-days: 90

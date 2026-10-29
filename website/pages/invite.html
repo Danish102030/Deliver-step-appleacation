@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <meta name="theme-color" content="#be185d"/>
 <meta name="ds-invite-version" content="2026-10-06.1"/>
@@ -184,7 +185,7 @@ svg{display:block;flex-shrink:0}
       <div class="how-row"><span class="num">2</span>أكمل طلبك الأول</div>
       <div class="how-row"><span class="num g">3</span>التوصيل علينا — مجاناً</div>
     </div>
-    <a class="btn" id="f-start" href="/?v=14">ابدأ أول طلب</a>
+    <a class="btn" id="f-start" href="/">ابدأ أول طلب</a>
     <a class="btn dark" id="f-store" href="#" target="_blank" rel="noopener" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg><span id="f-store-t">حمّل التطبيق</span></a>
     <p class="fine">الهدية لأول طلب من رقم جوال جديد فقط</p>
   </div>
@@ -355,7 +356,7 @@ function route(){
 window.addEventListener('hashchange',route);
 $('back').onclick=function(){
   if(VIEW==='friends'||VIEW==='history'){ if(history.length>1)history.back(); else location.hash=''; return; }
-  location.href='/?v=14';
+  location.href='/';
 };
 
 /* ── a friend arriving through someone's link ── */
@@ -418,7 +419,7 @@ function paint(acc){
   var wp=$('wait-pill'); if(waiting.length){ wp.textContent=waiting.length+' بانتظار'; wp.hidden=false; } else wp.hidden=true;
   var hist=Array.isArray(acc.history)?acc.history:[];
   $('last-move').textContent=hist.length?('آخر حركة: '+(hist[0].type==='use'?'−':'+')+fmt(hist[0].amount)+' ريال'):'';
-  wireShare(acc.code||'', SITE+'/pages/invite.html?ref='+encodeURIComponent(acc.code||''));
+  wireShare(acc.code||'', SITE+'/invite?ref='+encodeURIComponent(acc.code||''));
   if(VIEW==='friends')renderFriends(); else if(VIEW==='history')renderHistory(); else route();
 }
 

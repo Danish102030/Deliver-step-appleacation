@@ -11,6 +11,7 @@ Safety rules:
     otherwise it stops without uploading anything.
   * Each file is uploaded under a temporary name first and then renamed, so customers never get a half-written page.
   * Encrypted FTP (TLS) is used when the server offers it.
+  * The server's old copy of every replaced file is downloaded first and kept with the GitHub run (90 days).
 
 Settings (GitHub repository secrets):
   FTP_SERVER     host name or IP from hPanel → Files → FTP Accounts (optionally host:port)
@@ -27,6 +28,7 @@ import ssl
 import sys
 
 LOCAL_ROOT = 'website'
+BACKUP_DIR = 'replaced-files'      # the workflow keeps this folder for 90 days (Actions → the run → Artifacts)
 SITE_CANDIDATES = ['.', 'public_html', 'domains/deliverystep.app/public_html']
 
 
@@ -101,6 +103,20 @@ def ensure_dir(ftp, path, made):
     made.add(path)
 
 
+def backup(ftp, remote_path, rel):
+    """Keep a copy of the file that is about to be replaced (saved with the GitHub run, not on the website)."""
+    buf = io.BytesIO()
+    try:
+        ftp.retrbinary('RETR ' + remote_path, buf.write)
+    except ftplib.error_perm:
+        return None                                      # new file: nothing to keep
+    dest = os.path.join(BACKUP_DIR, rel)
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    with open(dest, 'wb') as fh:
+        fh.write(buf.getvalue())
+    return len(buf.getvalue())
+
+
 def upload(ftp, local_path, remote_path):
     tmp = remote_path + '.ds-upload-tmp'
     with open(local_path, 'rb') as fh:
@@ -158,9 +174,10 @@ def main():
             rel = f[len(LOCAL_ROOT) + 1:]
             remote = posixpath.normpath(posixpath.join(site, rel))
             ensure_dir(ftp, posixpath.dirname(remote), made)
+            old = backup(ftp, remote, rel)
             size = upload(ftp, f, remote)
             total += size
-            log(f'  uploaded {rel} ({size:,} bytes)')
+            log(f'  uploaded {rel} ({size:,} bytes)' + (f' — old copy kept ({old:,} bytes)' if old is not None else ' — new file'))
         log(f'Done: {len(files)} file(s), {total:,} bytes. Customers get the new pages within 2 minutes.')
     finally:
         try:

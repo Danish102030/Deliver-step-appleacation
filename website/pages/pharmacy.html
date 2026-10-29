@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,viewport-fit=cover"/>
+<meta name="theme-color" content="#be185d"/>
+<title>الصيدليات · خطوة التوصيل</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
+<style>
+:root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f2937;--muted:#6b7280;--border:#eef0f3;--bg:#f5f6f8;--green:#16a34a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;direction:rtl;padding-top:env(safe-area-inset-top)}
+.top{background:var(--rose);color:#fff;padding:13px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.top .bk{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.2);border:none;color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;cursor:pointer}
+.top b{font-size:15px;font-weight:800;flex:1;text-align:center}
+.wrap{padding:14px}
+.lead{font-size:13px;color:var(--muted);margin-bottom:12px;font-weight:600}
+.ph{background:#fff;border:1px solid var(--border);border-radius:18px;padding:13px;margin-bottom:12px;box-shadow:0 3px 12px rgba(0,0,0,.05);cursor:pointer;transition:transform .12s}
+.ph:active{transform:scale(.98)}
+.ph.closed{opacity:.6;pointer-events:none}
+.ph-top{display:flex;align-items:center;gap:12px}
+.ph-mid{flex:1;min-width:0}
+.ph .logo{width:58px;height:58px;border-radius:15px;background:linear-gradient(135deg,#dcfce7,#bbf7d0);display:flex;align-items:center;justify-content:center;font-size:28px;flex:none;overflow:hidden;border:1px solid #eef0f3}
+.ph .logo img{width:100%;height:100%;object-fit:cover}
+.ph .nm{font-size:15.5px;font-weight:800}
+.ph .status{font-size:12px;font-weight:700;margin-top:4px}
+.ph .meta{font-size:11.5px;color:var(--muted);margin-top:3px}
+.open{color:var(--green);font-weight:700}.closedt{color:#dc2626;font-weight:700}
+.ph .go{color:var(--rose);font-size:24px;flex:none}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block}
+.chips{display:flex;gap:8px;margin-top:11px;padding-top:11px;border-top:1px dashed var(--border)}
+.chip{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:800;border-radius:11px;padding:8px 6px}
+.chip.fee{background:#eff6ff;color:#2563eb}
+.chip.free{background:#dcfce7;color:var(--green)}
+.chip.time{background:#f0fdf4;color:var(--green)}
+.pill{display:inline-block;background:#dcfce7;color:var(--green);font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px}
+.field-l{font-size:13px;font-weight:800;margin:14px 2px 7px;display:flex;align-items:center;gap:6px}
+.upload{display:block;border:2px dashed #f3b6d0;background:var(--rose-soft);border-radius:16px;padding:24px 16px;text-align:center;color:var(--rose);cursor:pointer}
+.upload:active{background:#ffe6f0}
+.upload .ic{font-size:36px;line-height:1}.upload .t{font-size:14px;font-weight:800;margin-top:6px}.upload .s{font-size:11px;color:var(--muted);margin-top:3px}
+.thumbs{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.thumb{width:66px;height:66px;position:relative;flex:none}
+.thumb img{width:100%;height:100%;object-fit:cover;border-radius:12px;border:1px solid var(--border);display:block}
+.thumb .x{position:absolute;top:-7px;left:-7px;width:23px;height:23px;border-radius:50%;background:#dc2626;color:#fff;font-size:14px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.35)}
+.ta{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px;font-family:'Tajawal';font-size:14px;resize:none;background:#fff;color:var(--text);outline:none}
+.ta:focus{border-color:var(--rose)}
+.nextnote{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:11px 13px;font-size:12px;color:#1d4ed8;font-weight:600;margin-top:14px;display:flex;gap:8px;align-items:center;line-height:1.7}
+.submit{width:100%;margin-top:12px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:#fff;font-family:'Tajawal';font-size:15px;font-weight:800;padding:15px;box-shadow:0 6px 18px rgba(190,24,93,.35);cursor:pointer}
+.submit:disabled{opacity:.55}
+.spin{width:30px;height:30px;border:3px solid #f0e0e8;border-top-color:var(--rose);border-radius:50%;animation:sp .8s linear infinite;margin:30px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;font-size:12.5px;font-weight:700;padding:10px 18px;border-radius:22px;z-index:99;opacity:0;transition:opacity .25s;pointer-events:none;text-align:center;max-width:90%}
+.toast.show{opacity:.96}
+.up-loading{display:none;text-align:center;color:var(--muted);font-size:12px;padding:8px}
+</style>
+</head>
+<body>
+<div class="top"><button class="bk" onclick="onBack()">›</button><b id="top-title">الصيدليات 💊</b><div style="width:32px"></div></div>
+
+<!-- LIST -->
+<div id="list-view" class="wrap">
+  <div class="lead">اختر الصيدلية — أرسل صورة الدواء أو الروشتة ويوصلك مندوبنا 🚀</div>
+  <div id="ph-list"><div class="spin"></div></div>
+  <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:14px">💵 الدفع عند الاستلام: سعر الدواء (فاتورة الصيدلية) + التوصيل</div>
+</div>
+
+<!-- ORDER (upload) -->
+<div id="order-view" class="wrap" style="display:none">
+  <span class="pill">💊 اطلب دواءك في دقيقة</span>
+  <div class="field-l">📷 صوّر الدواء أو الروشتة</div>
+  <label class="upload" for="rx-file">
+    <div class="ic">📷</div><div class="t">أضف صورة الدواء</div><div class="s">صورة العلبة أو الوصفة الطبية (حتى ٣ صور)</div>
+  </label>
+  <!-- no 'capture' attr → iPhone offers Photo Library + Camera (customers often already have the photo saved) -->
+  <input id="rx-file" type="file" accept="image/*" style="display:none" onchange="onFile(this)"/>
+  <div class="up-loading" id="up-loading">جارٍ رفع الصورة…</div>
+  <div class="thumbs" id="thumbs"></div>
+  <div class="field-l">📝 اسم الدواء / ملاحظة</div>
+  <textarea class="ta" id="rx-note" rows="3" placeholder="مثال: بنادول اكسترا ٢ علبة، وأي تفاصيل تساعد الصيدلية…"></textarea>
+  <div class="nextnote"><span>📍</span><div>العنوان (موقعك تلقائياً) والدفع في <b>صفحة إتمام الطلب</b> — نفس خطوات طلباتك المعتادة.</div></div>
+  <button class="submit" id="go-btn" onclick="proceed()">متابعة لإتمام الطلب ›</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdWh4cHR0c3NteW9tcXFvbWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjQxNjAsImV4cCI6MjA5NDUwMDE2MH0.JiGnmOEPPM3dka-KHIm5mEFs7GWb4Amsnp6R57r7Lro';
+var sb=null; try{ sb=supabase.createClient(SB_URL,SB_KEY); }catch(e){}
+var _fee=5.5, _defFee=5.5, _pharm=null, _images=[];
+
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
+function onBack(){ if(document.getElementById('order-view').style.display!=='none'){ showList(); } else { window.location.href='/'; } }
+function showList(){ document.getElementById('order-view').style.display='none'; document.getElementById('list-view').style.display='block'; document.getElementById('top-title').textContent='الصيدليات 💊'; }
+
+// delivery fee (same setting the checkout uses)
+(async function(){ try{ var r=await sb.from('settings').select('key,value').eq('key','supermarket_delivery_fee').limit(1); var v=r.data&&r.data[0]&&Number(r.data[0].value); if(v>0){_fee=v;_defFee=v;} }catch(e){} })();
+
+async function loadPharmacies(){
+  var list=[];
+  try{ var r=await sb.from('pharmacies').select('*').eq('is_active',true).order('sort_order',{ascending:true}); list=r.data||[]; }catch(e){}
+  var el=document.getElementById('ph-list');
+  if(!list.length){ el.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px">لا توجد صيدليات متاحة حالياً</div>'; return; }
+  el.innerHTML=list.map(function(p){
+    var open=!!p.is_open;
+    var logo=p.logo_url?('<img src="'+p.logo_url+'" alt="">'):(p.emoji||'💊');
+    var fee=Number(p.delivery_fee);
+    var feeCls=(fee>0)?'fee':'free';
+    var feeTxt=(fee>0)?('🚚 توصيل '+(fee%1?fee.toFixed(2):fee)+' ﷼'):'🚚 توصيل مجاني';
+    var timeTxt=p.delivery_time?('⏱ '+p.delivery_time+' دقيقة'):'';
+    return '<div class="ph'+(open?'':' closed')+'" onclick="selectPharmacy('+p.id+')">'
+      +'<div class="ph-top">'
+        +'<div class="logo">'+logo+'</div>'
+        +'<div class="ph-mid"><div class="nm">'+(p.name||'صيدلية')+'</div>'
+        +'<div class="status">'+(open?'<span class="open"><span class="dot"></span> مفتوحة الآن</span>':'<span class="closedt">مغلقة</span>')+(p.hours?(' <span style="color:var(--muted);font-weight:600">· '+p.hours+'</span>'):'')+'</div>'
+        +'</div>'
+        +'<div class="go">'+(open?'›':'')+'</div>'
+      +'</div>'
+      +'<div class="chips"><div class="chip '+feeCls+'">'+feeTxt+'</div>'+(timeTxt?('<div class="chip time">'+timeTxt+'</div>'):'')+'</div>'
+      +'</div>';
+  }).join('');
+  window._phMap={}; list.forEach(function(p){window._phMap[p.id]=p;});
+}
+
+function selectPharmacy(id){
+  _pharm=window._phMap[id]; if(!_pharm)return;
+  // use THIS pharmacy's own delivery fee (0 = free); fall back to the global default
+  _fee=(_pharm.delivery_fee!=null&&_pharm.delivery_fee!==''&&!isNaN(Number(_pharm.delivery_fee)))?Number(_pharm.delivery_fee):_defFee;
+  _images=[]; renderThumbs(); document.getElementById('rx-note').value='';
+  document.getElementById('list-view').style.display='none';
+  document.getElementById('order-view').style.display='block';
+  document.getElementById('top-title').textContent=_pharm.name||'صيدلية';
+  window.scrollTo(0,0);
+}
+
+async function onFile(input){
+  var f=input.files&&input.files[0]; input.value='';
+  if(!f) return;
+  if(_images.length>=3){ toast('يمكنك إضافة حتى ٣ صور'); return; }
+  if(!sb){ toast('تعذّر الرفع، حاول لاحقاً'); return; }
+  document.getElementById('up-loading').style.display='block';
+  try{
+    var ext=(f.name.split('.').pop()||'jpg').toLowerCase();
+    var name='rx-'+Date.now()+'-'+Math.floor(Math.random()*9999)+'.'+ext;
+    var up=await sb.storage.from('door-photos').upload(name,f,{cacheControl:'3600',upsert:false});
+    if(up.error){ throw up.error; }
+    var pu=sb.storage.from('door-photos').getPublicUrl(name);
+    var url=pu.data&&pu.data.publicUrl;
+    if(url){ _images.push(url); renderThumbs(); }
+    else toast('تعذّر الحصول على رابط الصورة');
+  }catch(e){ toast('فشل رفع الصورة، حاول مجدداً'); }
+  document.getElementById('up-loading').style.display='none';
+}
+function renderThumbs(){
+  var el=document.getElementById('thumbs');
+  el.innerHTML=_images.map(function(u,i){ return '<div class="thumb"><img src="'+u+'" alt=""><div class="x" onclick="rmImg('+i+')">×</div></div>'; }).join('');
+}
+function rmImg(i){ _images.splice(i,1); renderThumbs(); }
+
+function proceed(){
+  if(!_pharm){ toast('اختر الصيدلية أولاً'); return; }
+  var note=(document.getElementById('rx-note').value||'').trim();
+  if(!_images.length && !note){ toast('أضف صورة الدواء أو اكتب اسمه'); return; }
+  var itemName='💊 طلب دواء'+(note?(' — '+note):'');
+  // Note: WhatsApp is intentionally left EMPTY so the order routes to the OWNER
+  // (whose message carries the medicine photos) — the owner forwards it to the pharmacy.
+  var cartItem={ id:'PHM-'+Date.now(), name:itemName, price:0, qty:1,
+    vendor:_pharm.name, vendor_wa:'', vendor_fee:_fee,
+    image:_images[0]||'', restaurant:_pharm.name, restaurant_wa:'' };
+  try{
+    localStorage.setItem('qibah_cart', JSON.stringify([cartItem]));
+    localStorage.setItem('qibah_restaurant', JSON.stringify({id:'pharmacy-'+_pharm.id,name:_pharm.name,whatsapp:'',delivery_fee:_fee}));
+    localStorage.setItem('qibah_delivery_fee', String(_fee));
+    localStorage.removeItem('qibah_delivery_disc');
+    // pharmacy extras for the confirmation / owner message (all image links + the note)
+    localStorage.setItem('qibah_pharmacy_imgs', JSON.stringify(_images));
+    localStorage.setItem('qibah_pharmacy_note', note);
+    localStorage.setItem('qibah_is_pharmacy', '1');
+  }catch(e){}
+  window.location.href='/checkout';
+}
+
+window.addEventListener('load',loadPharmacies);
+</script>
+</body>
+</html>

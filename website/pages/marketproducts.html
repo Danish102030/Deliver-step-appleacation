@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
   <meta name="theme-color" content="#be185d"/>
   <title>منتجات - خطوة التوصيل</title>
@@ -32,6 +33,14 @@
     /* INFO BAR */
     .info-bar{background:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border)}
     .info-count{font-size:12px;color:var(--muted);font-weight:500}
+    .chips-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:1;margin-right:10px;justify-content:flex-start}
+    .chips-row::-webkit-scrollbar{display:none}
+    .fchip{flex-shrink:0;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:5px 11px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;color:#374151;white-space:nowrap}
+    .fchip.on{background:#1f1f1f;color:#fff;border-color:#1f1f1f}
+    .und-row{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px}
+    .und-row:not(:empty){padding:8px 12px 0}
+    .und-c{background:#eef2ff;border:1px solid #c7d2fe;color:#3730a3;border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif}
+    .search-box input::-webkit-search-cancel-button{-webkit-appearance:none}
     .sort-btn{background:var(--bg);border:0.5px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;gap:4px;color:var(--muted)}
 
     /* PRODUCTS GRID — 3 columns compact */
@@ -120,9 +129,9 @@
 <body>
 
 <div class="topbar">
-  <button class="btn-back" onclick="history.back()" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+  <button class="btn-back" onclick="dsBack()" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
   <div class="topbar-title" id="page-title">جاري التحميل...</div>
-  <button class="cart-btn" onclick="window.location.href='/pages/cart.html?v=14'" aria-label="السلة">
+  <button class="cart-btn" onclick="window.location.href='/cart'" aria-label="السلة">
     <i class="ti ti-shopping-cart" style="font-size:18px"></i>
     <div class="cart-dot" id="cart-count">٠</div>
   </button>
@@ -131,17 +140,15 @@
 <div class="search-wrap">
   <div class="search-box">
     <i class="ti ti-search" style="font-size:16px;color:var(--rose)" aria-hidden="true"></i>
-    <input type="text" id="search-input" placeholder="ابحث في المنتجات..." oninput="searchProducts(this.value)"/>
+    <input type="search" id="search-input" placeholder="ابحث في القسم… أو اكتب: أقل من 5، الأرخص" autocomplete="off" oninput="searchProducts(this.value)"/>
   </div>
 </div>
 
 <div class="info-bar">
   <div class="info-count" id="products-count">جاري التحميل...</div>
-  <button class="sort-btn" onclick="toggleSort()">
-    <i class="ti ti-arrows-sort" style="font-size:13px" aria-hidden="true"></i>
-    <span id="sort-label">الأقل سعراً</span>
-  </button>
+  <div class="chips-row" id="chips-row"></div>
 </div>
+<div class="und-row" id="und-row"></div>
 
 <div class="products-grid" id="products-grid">
   <div class="skel" style="height:160px"></div>
@@ -160,7 +167,7 @@
 </div>
 
 <!-- CART BAR + FREE-DELIVERY PROGRESS -->
-<div class="cart-bar" id="cart-bar" onclick="window.location.href='/pages/cart.html?v=14'">
+<div class="cart-bar" id="cart-bar" onclick="window.location.href='/cart'">
   <div class="fd-row" id="fd-row">
     <div class="fd-text" id="fd-text"></div>
     <div class="fd-track"><div class="fd-fill" id="fd-fill"></div></div>
@@ -177,28 +184,29 @@
 <!-- GLASS NAV -->
 <div class="glass-nav-wrap">
   <nav class="glass-nav">
-    <div class="gnav-item" onclick="window.location.href='/?v=14'">
+    <div class="gnav-item" onclick="window.location.href='/'">
       <i class="ti ti-home gnav-icon" aria-hidden="true"></i>
       <span class="gnav-label">الرئيسية</span>
       <div class="gnav-dot"></div>
     </div>
-    <div class="gnav-item" onclick="window.location.href='/pages/restaurants.html'">
+    <div class="gnav-item" onclick="window.location.href='/restaurants'">
       <i class="ti ti-tools-kitchen-2 gnav-icon" aria-hidden="true"></i>
       <span class="gnav-label">المطاعم</span>
       <div class="gnav-dot"></div>
     </div>
-    <div class="gnav-item" onclick="window.location.href='/pages/supermarket.html?v=14'">
+    <div class="gnav-item" onclick="window.location.href='/supermarket'">
       <i class="ti ti-building-store gnav-icon act" aria-hidden="true"></i>
       <span class="gnav-label act">سوبرماركت</span>
       <div class="gnav-dot act"></div>
     </div>
-    <div class="gnav-item" onclick="window.location.href='/pages/account.html'">
+    <div class="gnav-item" onclick="window.location.href='/account'">
       <i class="ti ti-user-circle gnav-icon" aria-hidden="true"></i>
       <span class="gnav-label">حسابي</span>
       <div class="gnav-dot"></div>
     </div>
   </nav>
 </div>
+<script src="/ds-lib/ds-nav-3.js"></script><!-- same bottom menu on every page (الرئيسية · سوبرماركت · طلباتي · حسابي) -->
 
 <div class="toast" id="toast"></div>
 
@@ -214,6 +222,11 @@ let sb=null;
 
 const PAGE_SIZE = 30;
 let cart={}, sortAsc=true, categoryName='';
+let ALL=[], SORT='cheap', PRICE='', SHOWN=PAGE_SIZE, POP={};
+// the time-of-day banner on the supermarket page opens /category/<key> = the products for that time
+// (these addresses are reserved in the database, no category can take them)
+const COLLS={breakfast:['الفطور','🍳'],lunch:['طبخ الغداء','🍲'],dinner:['عشاء خفيف','🌙'],sweets:['حلا وشوكولاتة','🍫'],kashta:['كشتة وشواء','🔥'],cold:['آيسكريم وبارد','🍦']};
+let COLLN='', COLLE='';
 let loaded=[];
 let offset=0;
 let totalCount=0;
@@ -243,57 +256,132 @@ window.addEventListener('load', async () => {
   const params = new URLSearchParams(window.location.search);
   const raw = params.get('cat') || '';
   const stored = sessionStorage.getItem('qibah_cat') || '';
-  try { categoryName = stored || decodeURIComponent(raw).trim(); }
-  catch(e) { categoryName = stored || raw.trim(); }
+  const slugM = /^\/category\/([a-z0-9-]+)\/?$/i.exec(location.pathname);
+  if (slugM && COLLS[slugM[1].toLowerCase()]) {
+    [COLLN, COLLE] = COLLS[slugM[1].toLowerCase()];
+  } else if (slugM) {
+    // clean address /category/fruits-vegetables → the category's name (instant when we came from the supermarket page)
+    const slug = slugM[1].toLowerCase();
+    if (stored && (sessionStorage.getItem('qibah_cat_slug') || '') === slug) categoryName = stored;
+    else {
+      try { const r = await sb.from('supermarket_categories').select('name').eq('slug', slug).limit(1); categoryName = (r.data && r.data[0] && r.data[0].name) || ''; } catch(e) { categoryName = ''; }
+      if (!categoryName) { location.replace('/supermarket'); return; }
+    }
+  } else {
+    // the address decides (a shared link must open ITS category); the saved name only when the address has none
+    try { categoryName = raw ? decodeURIComponent(raw).trim() : stored; }
+    catch(e) { categoryName = raw ? raw.trim() : stored; }
+    // old address (…?cat=name) → show the clean one in the address bar (no reload)
+    sb.from('supermarket_categories').select('slug').eq('name', categoryName).not('slug', 'is', null).limit(1)
+      .then(r => { const s = r && r.data && r.data[0] && r.data[0].slug; if (s && history.replaceState) history.replaceState(history.state, '', '/category/' + s); }).catch(() => {});
+  }
+  // a retired shelf (e.g. «الصافي», «جالكسي») opens the section its products moved into
+  if (categoryName) {
+    try {
+      const r = await sb.from('supermarket_categories').select('is_active,parent_name').eq('name', categoryName).order('is_active', { ascending: false }).limit(1);
+      const c = r.data && r.data[0];
+      if (c && c.is_active === false && c.parent_name) categoryName = c.parent_name;
+    } catch(e) {}
+  }
+  try { sessionStorage.setItem('qibah_cat', categoryName); } catch(e) {}
 
-  document.getElementById('page-title').textContent = categoryName || 'المنتجات';
-  document.title = categoryName + ' - قبة';
+  document.getElementById('page-title').textContent = COLLN ? COLLE + ' ' + COLLN : (categoryName || 'المنتجات');
+  document.title = (COLLN || categoryName) + ' - خطوة التوصيل';
+  if (COLLN) SORT = 'pop';   // the time pages: most ordered first
   loadCartFromStorage();
   await fetchPage(true);
 });
 
-/* ---- Fetch one page from Supabase ---- */
+/* ---- Load the whole category once (pages of 1000), then everything is instant on the phone ---- */
 async function fetchPage(reset) {
+  if (!reset) { SHOWN += PAGE_SIZE; applyView(); return; }
   if (isLoading) return;
   isLoading = true;
-  if (reset) { offset = 0; loaded = []; reachedEnd = false; }
-
-  // Only count the whole category on the FIRST load (reset). On "load more" we skip
-  // the count — it never changes mid-session, so this makes each tap much faster.
-  let q = sb.from('supermarket_products')
-    .select('*', reset ? { count: 'exact' } : {})
-    .or('is_active.is.null,is_active.eq.true');
-
-  if (categoryName) q = q.eq('category_name', categoryName);
-  if (searchQuery)  q = q.ilike('name', '%' + searchQuery + '%');
-
-  q = q.order('price', { ascending: sortAsc })
-       .range(offset, offset + PAGE_SIZE - 1);
-
-  let { data, count, error } = await q;
-
-  if (reset && !searchQuery && categoryName && (!data || !data.length)) {
-    const r = await sb.from('supermarket_products')
-      .select('*', { count: 'exact' })
-      .or('is_active.is.null,is_active.eq.true')
-      .ilike('category_name', '%' + categoryName.substring(0,4) + '%')
-      .order('price', { ascending: sortAsc })
-      .range(0, PAGE_SIZE - 1);
-    data = r.data; count = r.count; error = r.error;
+  async function loadAll(filterCat) {
+    let all = [], from = 0;
+    for (let i = 0; i < 20; i++) {
+      let q = sb.from('supermarket_products').select('*').or('is_active.is.null,is_active.eq.true');
+      q = filterCat(q).order('id', { ascending: true }).range(from, from + 999);
+      const { data, error } = await q;
+      if (error) return all.length ? all : null;
+      all = all.concat(data || []);
+      if (!data || data.length < 1000) break;
+      from += 1000;
+    }
+    return all;
   }
-
+  // a whole section (e.g. «ألبان وبيض») = the products of all its sub-sections
+  let subs = [];
+  if (categoryName) { try { const k = await sb.from('supermarket_categories').select('name').eq('parent_name', categoryName).eq('is_active', true); subs = (k.data || []).map(x => x.name); } catch(e) {} }
+  let data = await loadAll(q => COLLN ? q.contains('collections', [COLLN]) : categoryName ? (subs.length ? q.in('category_name', subs) : q.eq('category_name', categoryName)) : q);
+  if (categoryName && (!data || !data.length)) data = await loadAll(q => q.ilike('category_name', '%' + categoryName.substring(0,4) + '%'));
   isLoading = false;
-  if (error) { renderProducts(); return; }
+  ALL = (data || []).map(p => { p._n = dsNorm(p.name + ' ' + (p.name_en || '') + ' ' + (p.brand || '')); return p; });
+  loadPopular();
+  applyView();
+}
 
-  if (reset) totalCount = count || 0;   // keep the first-load total on subsequent "load more"
-  const batch = data || [];
-  loaded = reset ? batch : loaded.concat(batch);
-  offset += batch.length;
-  if (batch.length < PAGE_SIZE || loaded.length >= totalCount) reachedEnd = true;
-
+// Arabic search that forgives spelling: أ/إ/آ=ا · ة=ه · ى/ی=ي · tashkeel ignored · Arabic digits = 0-9
+// Back: to the page the customer came from on this site; opened from a shared link → the supermarket (not out of the app)
+function dsBack(){ var ok=false; try{ ok=!!document.referrer&&new URL(document.referrer).origin===location.origin; }catch(_){} if(ok&&history.length>1) history.back(); else location.href='/supermarket'; }
+function dsNorm(t){ return String(t||'').replace(/[\u064B-\u0652\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/[ىی]/g,'ي').replace(/ک/g,'ك')
+  .replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/ء/g,'').replace(/[٠-٩]/g,d=>String(d.charCodeAt(0)-1632)).replace(/[۰-۹]/g,d=>String(d.charCodeAt(0)-1776))
+  .replace(/[^\u0600-\u06FF0-9a-zA-Z.\s]/g,' ').replace(/\s+/g,' ').trim().toLowerCase(); }
+// understands "أقل من 5", "أكثر من 10", "بين 5 و 10", "الأرخص", "الأغلى", "الأكثر طلباً"
+function dsParse(q){
+  let t=' '+dsNorm(q)+' '; const R={min:null,max:null,sort:'',parts:[]}; const N='(\\d+(?:\\.\\d+)?)', C='(?:\\s*(?:ريال|رس|sar|rs))?';
+  const take=(re,fn)=>{ t=t.replace(re,(...a)=>{ R.parts.push({label:fn(...a),src:a[0].trim()}); return ' '; }); };
+  take(new RegExp(' (?:بين|من|between|from) '+N+C+' ?(?:و|الي|to|and|-) ?'+N+C+'(?= )','g'),(m,a,b)=>{ R.min=Math.min(+a,+b); R.max=Math.max(+a,+b); return '💰 '+R.min+' – '+R.max+' ريال'; });
+  take(new RegExp(' (?:اقل من|ارخص من|تحت|دون|under|below|less than) ?'+N+C+'(?= )','g'),(m,a)=>{ R.max=+a; return '💰 أقل من '+(+a)+' ريال'; });
+  take(new RegExp(' (?:اكثر من|فوق|اغلي من|over|above|more than) ?'+N+C+'(?= )','g'),(m,a)=>{ R.min=+a; return '💰 أكثر من '+(+a)+' ريال'; });
+  take(/ (?:الارخص|ارخص|اقل سعر|cheapest)(?= )/g,()=>{ R.sort='cheap'; return '↕ الأرخص'; });
+  take(/ (?:الاغلي|اغلي|اعلي سعر|most expensive)(?= )/g,()=>{ R.sort='exp'; return '↕ الأغلى'; });
+  take(/ (?:الاكثر طلبا|الاكثر مبيعا|الاشهر|popular)(?= )/g,()=>{ R.sort='pop'; return '🔥 الأكثر طلباً'; });
+  R.words=t.split(' ').filter(w=>w&&!['ريال','في','من','و','ابي','ابغي'].includes(w));
+  return R;
+}
+const PRICES={lt5:[null,5],'5-10':[5,10],'10-25':[10,25],gt25:[25,null]};
+function applyView(){
+  const R=dsParse(searchQuery);
+  let mn=R.min, mx=R.max;
+  if(PRICES[PRICE]){ const p=PRICES[PRICE]; if(p[0]!=null) mn=Math.max(mn||0,p[0]); if(p[1]!=null) mx=mx==null?p[1]:Math.min(mx,p[1]); }
+  let list=ALL.filter(p=>{ const v=Number(p.price)||0; return R.words.every(w=>p._n.indexOf(w)>=0)&&(mn==null||v>=mn)&&(mx==null||v<=mx); });
+  const sort=R.sort||SORT, num=p=>Number(p.price)||0, pop=p=>Number(POP[String(p.id)]||0);
+  if(sort==='exp') list.sort((a,b)=>num(b)-num(a));
+  else if(sort==='pop') list.sort((a,b)=>pop(b)-pop(a)||num(a)-num(b));
+  else list.sort((a,b)=>num(a)-num(b));
+  totalCount=list.length; loaded=list.slice(0,SHOWN); reachedEnd=SHOWN>=list.length;
+  renderChips(R);
   renderProducts();
   Object.keys(cart).forEach(id => updateCtrl(id));
+  if(searchQuery.trim()) logCatSearch(searchQuery,list.length);
 }
+function renderChips(R){
+  const sort=R.sort||SORT;
+  document.getElementById('chips-row').innerHTML=
+    [['cheap','الأرخص'],['exp','الأغلى'],['pop','🔥 الأكثر طلباً']].map(s=>'<button class="fchip'+(sort===s[0]?' on':'')+'" onclick="setSort(\''+s[0]+'\')">'+s[1]+'</button>').join('')+
+    [['lt5','أقل من 5'],['5-10','5 – 10'],['10-25','10 – 25'],['gt25','أكثر من 25']].map(s=>'<button class="fchip'+(PRICE===s[0]?' on':'')+'" onclick="setPrice(\''+s[0]+'\')">'+s[1]+'</button>').join('');
+  document.getElementById('und-row').innerHTML=R.parts.map((p,i)=>'<button class="und-c" onclick="dropPart('+i+')">'+p.label+' ✕</button>').join('');
+}
+function setSort(s){ SORT=s; const inp=document.getElementById('search-input'); const R=dsParse(inp.value); if(R.sort){ R.parts.filter(p=>/↕|🔥/.test(p.label)).forEach(p=>{ inp.value=inp.value.replace(new RegExp(dsLoose(p.src),'i'),' ').replace(/\s+/g,' ').trim(); }); searchQuery=inp.value.trim(); } SHOWN=PAGE_SIZE; applyView(); }
+function setPrice(p){ PRICE=PRICE===p?'':p; SHOWN=PAGE_SIZE; applyView(); }
+function dsLoose(src){ return src.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/ا/g,'[اأإآٱ]').replace(/ه/g,'[هة]').replace(/ي/g,'[يىی]').replace(/و/g,'[وؤ]').replace(/ /g,'\\s+'); }
+function dropPart(i){ const inp=document.getElementById('search-input'), p=dsParse(inp.value).parts[i]; if(!p)return; inp.value=inp.value.replace(new RegExp(dsLoose(p.src),'i'),' ').replace(/\s+/g,' ').trim(); searchQuery=inp.value.trim(); SHOWN=PAGE_SIZE; applyView(); }
+function loadPopular(){
+  try{ const c=JSON.parse(localStorage.getItem('qibah_sm_pop')||'null'); if(c&&c.d){ POP=c.d; if(Date.now()-c.t<20*3600*1000) return; } }catch(e){}
+  try{ sb.rpc('sm_popular').then(r=>{ if(r&&!r.error&&r.data){ POP=r.data; try{ localStorage.setItem('qibah_sm_pop',JSON.stringify({t:Date.now(),d:POP})); }catch(e){} if(SORT==='pop') applyView(); } }); }catch(e){}
+}
+// tell the admin what was searched inside this category (once, after typing stops)
+let _logT=null, _logKey='', _logId=null, _logMarked=false;
+function logCatSearch(q,n){
+  const key=dsNorm(q); if(key.length<2||key===_logKey) return;
+  clearTimeout(_logT); _logT=setTimeout(()=>{ _logKey=key; _logId=null; _logMarked=false;
+    let phone=''; try{ phone=(JSON.parse(localStorage.getItem('ds_customer')||'{}')||{}).phone||''; }catch(e){}
+    const dev=window.DS_APP_VERSION?'app':'web';
+    sb.rpc('log_search',{p_q:q.trim(),p_results:n,p_source:'category',p_phone:phone,p_device:dev,p_cat:categoryName||null}).then(r=>{ if(r&&!r.error) _logId=r.data; },()=>{});
+  },1500);
+}
+function logCatCart(){ if(_logMarked||!_logId||!searchQuery.trim()) return; _logMarked=true; try{ sb.rpc('search_mark_cart',{p_id:_logId}).then(()=>{},()=>{}); }catch(e){} }
 
 /* ---- Render products ---- */
 // Tap a product image → show it large; tap anywhere to close.
@@ -319,7 +407,7 @@ function renderProducts() {
     grid.innerHTML = `
       <div class="empty" style="grid-column:span 3">
         <i class="ti ti-package" aria-hidden="true"></i>
-        لا توجد منتجات في هذه الفئة حالياً
+        ${(searchQuery||PRICE) ? 'ما لقينا منتجات بهذا البحث في هذا القسم — جرّب كلمة أقصر أو <a style="color:var(--rose);font-weight:800;cursor:pointer" onclick="dsOpenAll()">ابحث في كل السوبرماركت</a>' : 'لا توجد منتجات في هذه الفئة حالياً'}
       </div>`;
     moreWrap.style.display = 'none';
     return;
@@ -369,12 +457,7 @@ function renderProducts() {
 }
 
 /* ---- Load more ---- */
-async function loadMore() {
-  const btn = document.querySelector('.load-more-btn');
-  if (btn) { btn.disabled = true; document.getElementById('load-more-label').textContent = 'جاري التحميل...'; }
-  await fetchPage(false);
-  if (btn) btn.disabled = false;
-}
+async function loadMore() { SHOWN += PAGE_SIZE; applyView(); }
 
 /* ---- Fly-to-cart animation ---- */
 function flyToCart(triggerEl) {
@@ -409,7 +492,7 @@ function flyToCart(triggerEl) {
 function changeQty(id, delta, e) {
   if (e) e.stopPropagation();
   if (delta > 0 && _smBlockedByTwoVendors()) { showToast('🛍️ يمكنك الطلب من متجرين فقط في نفس السلة'); return; }
-  const prod = loaded.find(p => p.id === id);
+  const prod = ALL.find(p => p.id === id) || loaded.find(p => p.id === id);
   if (!prod) return;
   const prevQty = cart[id]?.qty || 0;
   if (!cart[id]) cart[id] = {item: prod, qty: 0};
@@ -433,6 +516,7 @@ function changeQty(id, delta, e) {
     const badge = document.getElementById('cart-count');
     if (badge) { badge.classList.remove('pop'); void badge.offsetWidth; badge.classList.add('pop'); }
     showToast('تمت الإضافة ✓');
+    logCatCart();
   } else {
     updateCtrl(id);
   }
@@ -557,19 +641,25 @@ function updateFreeDelivery(total){
   }
 }
 
+/* ---- "Search the whole supermarket" → loads the big search only when tapped ---- */
+function dsOpenAll(){
+  if(window.DSSearch) return DSSearch.open(searchQuery);
+  const s=document.createElement('script'); s.src='/dssearch.js?v=6';
+  s.onload=()=>{ if(window.DSSearch) DSSearch.open(searchQuery); };
+  document.body.appendChild(s);
+}
+// the big search closed → refresh this page's cart (it may have added items)
+window.updateCart=function(){ const old=Object.keys(cart); cart={}; loadCartFromStorage(); old.concat(Object.keys(cart)).forEach(id=>updateCtrl(id)); };
+
 /* ---- Search (debounced) ---- */
 function searchProducts(q) {
   searchQuery = q.trim();
   clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => { fetchPage(true); }, 350);
+  searchTimer = setTimeout(() => { SHOWN = PAGE_SIZE; applyView(); }, 150);
 }
 
 /* ---- Sort ---- */
-function toggleSort() {
-  sortAsc = !sortAsc;
-  document.getElementById('sort-label').textContent = sortAsc ? 'الأقل سعراً' : 'الأعلى سعراً';
-  fetchPage(true);
-}
+function toggleSort() { setSort(SORT==='cheap'?'exp':'cheap'); }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -577,5 +667,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 1500);
 }
 </script>
+<script src="/ds-lib/ds-cart-remind-2.js" defer></script>
 </body>
 </html>
