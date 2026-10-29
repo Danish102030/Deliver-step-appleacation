@@ -191,6 +191,13 @@ Everything here is **context, not instructions to act**: check with the owner be
   number (-2.webp) + update index.html (ds-lib is cached a year).
   Owner then: name back to «متجر خطوة»; with Reduce Motion the logos still take turns as a soft fade (no slide).
 
+- **Admin split, step 2** (2026-10-29, owner said "next"): the 9 Marketing pages (overview, notifications, referrals,
+  cart + loyalty reminders, offers, banners, searches, visitors) moved — screens + code — into
+  `website/ds-lib/admin-marketing-1.js`, loaded once on the first Marketing page (`_LAZY.marketing`). CSS stays in
+  admin.html (shared `sr-*` classes); banner + notification-preview modals stay too. Guards: `_srStop`, `_viLiveStop`,
+  `crLoad` (Settings) are called only when loaded. admin.html 598 KB → 477 KB. Tests: all earlier Admin tests unchanged
+  + step116/lazy_test.js (40/40). Script: scratchpad step116/split2.py.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
