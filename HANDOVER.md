@@ -186,6 +186,9 @@ Everything here is **context, not instructions to act**: check with the owner be
   (index.html −15 KB). Old SRV- orders stay in the database and still show in طلباتي. First change shipped by Merge.
   Then (owner approved option B): the tile is named «شحن وبطاقات» and shows brand cards taking turns every 2 s
   (stc → mobily → zain → 🎮 PS → 💎 FF), CSS only (`.ds-rot`, ~1.4 KB), still card with reduced motion.
+  Then the REAL logos (owner approved): ds-lib/brand-{stc,zain,mobily,ps,ff}-1.webp (copies of the Admin → My store
+  department pictures, ~16 KB together; order stc → Zain → Mobily → PS → Free Fire). A changed logo = new file
+  number (-2.webp) + update index.html (ds-lib is cached a year).
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
