@@ -152,6 +152,11 @@ Everything here is **context, not instructions to act**: check with the owner be
   (= «Delivery fee 5.50»); coupon card line «Before discount» (was «Subtotal» = items + delivery). Zip
   deliverystep-vendor-vat-fix.zip (admin.html 597868 + pages/checkout.html + pages/cart.html), scratchpad step108.
 
+- **Auto-update from GitHub** (2026-10-29, owner said "yes setup"; built 7 Oct and undone then): see WEBSITE.md.
+  Change in `website/` → pull request → owner taps Merge → only changed files go to Hostinger over FTP, old copies kept
+  as a run artifact. Needs the owner's 3 FTP secrets in GitHub (never ask for them). The first merge uploads nothing.
+  Script tested against a local FTP server (scratchpad step109). admin.html + account/order pages stay manual.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
