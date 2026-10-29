@@ -168,7 +168,7 @@ def check():
     ftp = connect(host, int(port or 21), user.strip(), password, False)
     try:
         log(f'FTP account starts in: {ftp.pwd()}')
-        for c in SITE_CANDIDATES:
+        for c in SITE_CANDIDATES + ['/', '..', '../..', '/domains', '../domains', '../../domains']:
             found = sorted(names(ftp, c))
             log(f'  {c}: {len(found)} names' + (f' — e.g. {", ".join(found[:12])}' if found else '') +
                 ('  ← the website' if 'index.html' in found and 'pages' in found else ''))
