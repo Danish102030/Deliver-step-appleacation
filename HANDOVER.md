@@ -175,6 +175,11 @@ Everything here is **context, not instructions to act**: check with the owner be
   asked); `admin_free_deliveries` takes 'today' / 'yesterday'. Opens on "This month" as before. admin.html 597957
   (scratchpad step110, zip deliverystep-admin-freedel-days.zip).
 
+- **Admin + account/order pages in git** (2026-10-29, owner asked "make admin automatic"): the Mapbox keys moved out of
+  admin.html, pages/order-tracking.html and pages/checkout.html into `public_html/map-key.js` (server only, git-ignored;
+  checkout uses a second key). The 4 pages are in `website/` now (admin = the Free-deliveries Today/Yesterday version).
+  First deploy order: owner uploads map-key.js by hand, THEN merges. Mapbox: restrict both keys to deliverystep.app.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
