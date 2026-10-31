@@ -178,8 +178,12 @@ Everything here is **context, not instructions to act**: check with the owner be
 - **Admin + account/order pages in git** (2026-10-29, owner asked "make admin automatic"): the Mapbox keys moved out of
   admin.html, pages/order-tracking.html and pages/checkout.html into `public_html/map-key.js` (server only, git-ignored;
   checkout uses a second key). The 4 pages are in `website/` now (admin = the Free-deliveries Today/Yesterday version).
-  Done 29 Oct: PR #5 merged (run #7 uploaded the 5 pages), map-key.js uploaded (453 bytes, public_html). Still to do:
-  restrict both Mapbox keys to deliverystep.app in the Mapbox account.
+  Done 29 Oct: PR #5 merged (run #7 uploaded the 5 pages), map-key.js uploaded (453 bytes, public_html).
+  **Mapbox lock: dropped (29–30 Oct).** The "Default public token" (maps) cannot take URL restrictions. Switching every
+  map to the checkout key ("delivery step", 402-byte map-key.js) made the customer tracking map grey in the iPhone app
+  (that key had only ever done GPS → address); the lock was removed and the 453-byte two-key file put back. The iPhone
+  app keeps saved scripts up to a day, so PR #12 made the pages load `/map-key.js?v=2`. Live tracking works again
+  (owner, 31 Oct). Rule: after any change to map-key.js, raise `?v=` in admin, order-tracking and checkout.
 
 - **Home services removed from the customer home page** (2026-10-29, owner approved the mockup): the «خدمات منزلية»
   tile is now «📱 متجر خطوة» → /shop, and all its code (list sheet, booking sheet, confirmation, CSS, JS) is gone
@@ -221,6 +225,8 @@ Everything here is **context, not instructions to act**: check with the owner be
    the Account Holder's email within 2 business days). Next: transfer the Account Holder role to Ihsanullah (already
    Admin in App Store Connect; Apple Developer app on his iPhone; ID check) — started via Membership details →
    Update your information → Transfer Account Holder role. A support message was prepared/sent as backup.
+   Apple emailed 30 Oct: the Account Holder must accept the updated Program License Agreement by **13 Nov 2026**
+   (developer.apple.com banner → Review → Agree), or App Store Connect is blocked. Owner told.
    Then: iPhone app name ios/DeliveryStep/Info.plist CFBundleDisplayName "خطوة" → "خطوة التوصيل"; owner has a
    Windows laptop only → build/upload the iPhone app with Codemagic (cloud Mac) + App Store Connect API key.
 5. Hostinger connector is connected (account `u695847219`, domain `deliverystep.app`): it can list/read files and
