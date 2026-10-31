@@ -25,15 +25,8 @@ body{font-family:'Cairo','Inter',sans-serif;background:#f1f5f9;min-height:100vh;
 }
 
 /* ── Logo & Header ── */
+.inv-logo{display:block;width:210px;max-width:60%;height:auto;margin:0 auto 14px}
 .inv-top{text-align:center;margin-bottom:20px}
-.inv-logo-box{
-  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
-  background:#be185d;color:#fff;border-radius:14px;
-  padding:8px 22px;margin-bottom:12px;
-  font-family:'Cairo',sans-serif;
-}
-.inv-logo-ar{font-size:22px;font-weight:800;letter-spacing:1px;line-height:1}
-.inv-logo-en{font-size:9px;font-weight:600;letter-spacing:3px;opacity:.9;margin-top:2px}
 
 .inv-main-title{font-size:20px;font-weight:800;color:#0f172a;margin-bottom:4px}
 .inv-main-sub{font-size:13px;font-weight:400;color:#475569;margin-bottom:10px}
@@ -122,8 +115,7 @@ body{font-family:'Cairo','Inter',sans-serif;background:#f1f5f9;min-height:100vh;
   /* compact on paper: one invoice per A4 sheet */
   .page{padding:16px 22px!important}
   .inv-top{margin-bottom:8px}
-  .inv-logo-box{padding:5px 16px;margin-bottom:6px}
-  .inv-logo-ar{font-size:18px}
+  .inv-logo{width:170px;margin-bottom:6px}
   .inv-main-title{font-size:17px;margin-bottom:0}
   .inv-main-sub{font-size:11px;margin-bottom:4px}
   .inv-company{font-size:13px;margin-bottom:0}
@@ -232,7 +224,7 @@ async function getItems(ids){
 
 function header(titleAr, titleEn){
   return '<div class="inv-top">'
-    + '<div class="inv-logo-box"><div class="inv-logo-ar">خطوة</div><div class="inv-logo-en">DELIVER STEP</div></div>'
+    + '<img class="inv-logo" src="/ds-lib/ds-logo-1.webp" alt="خطوة التوصيل · Delivery Step">'
     + '<div class="inv-main-title">' + titleAr + '</div><div class="inv-main-sub">' + titleEn + '</div>'
     + '<div class="inv-company">' + SELLER_AR + '</div><div class="inv-company-en">Deliver Step Est.</div>'
     + '<div class="inv-address">الأسياح، 4744 - حي الجزيرة، 52836، المملكة العربية السعودية<br>Al-Ayah, 4744 - Al-Jazeera District, 52836, Saudi Arabia</div>'
