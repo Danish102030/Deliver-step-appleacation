@@ -43,3 +43,10 @@ The website uses rose `#be185d` today (very close; can be moved to `#C9307E` in 
 - `van.jpg` — the designer's van with the full name on the big rear side panel, «اطلب الآن من التطبيق», what we
   deliver and the website on the door; stripes unchanged. Suggested extras: QR code + big logo on the back doors,
   reflective stickers, one phone / WhatsApp number if wanted.
+- `delivery-box.jpg` — thermal box: stacked white logo on the front, «اطلب الآن من التطبيق» + website on the side,
+  white arrow on the top. Printed vinyl wrap.
+- `scooter.jpg` — box with the logo on the back, the van's pink→purple stripes on the body, arrow on the front
+  shield, website on the side. Any motorcycle: box wrap + 2 stripe stickers, no repaint.
+- `rider-shirt.jpg` — pink shirt: small logo on the chest; big stacked logo + website + reflective band on the
+  back. Printed, not embroidered. Optional pink cap with the white arrow.
+- `box-scooter-shirt-board.jpg` — all three with notes. Box, scooter and shirt approved by the owner 31 Oct.

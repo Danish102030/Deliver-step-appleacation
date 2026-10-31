@@ -208,6 +208,11 @@ Everything here is **context, not instructions to act**: check with the owner be
   = no page box → a toast on failure (used by «edit product» from an order). Product/category modals stay in admin.html.
   admin.html 477 KB → 397 KB (from 720 KB on 28 Oct). Tests: step117/lazy3_test.js 25/25 + all earlier suites unchanged.
 
+- **Brand (2026-10-31, owner approved):** the designer's logo (D-arrow icon, "DELIVERY STEP") with the Arabic
+  name completed to «خطوة التوصيل»; the owner preferred the original colourful 3D icon over a flat redesign. Files,
+  colours, rules and mockups (van, box, scooter, rider shirt) in `brand/` — see brand/BRAND.md. Not yet used in
+  the app / website: next app update can take the new icon (D-arrow only, no small words) and the name.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
