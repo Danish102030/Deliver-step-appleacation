@@ -37,7 +37,7 @@ The website uses rose `#be185d` today (very close; can be moved to `#C9307E` in 
 - Smallest size: the full logo 3 cm wide in print / 120 px on screens; smaller than that, use the icon alone.
 - Never stretch, rotate, recolour, add shadows, or place it on a busy photo.
 - One-colour jobs (embroidery, rubber stamp, single-colour stickers): use `-white` on pink or ask for a flat
-  one-colour version of the icon (a flat version was drafted on 31 Oct, scratchpad brand1/board2).
+  one-colour version of the icon (a flat 2-colour version was drafted on 31 Oct; the owner kept the 3D one).
 
 ## Mockups (`brand/mockups/`)
 - `van.jpg` — the designer's van with the full name on the big rear side panel, «اطلب الآن من التطبيق», what we
