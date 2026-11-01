@@ -213,6 +213,16 @@ Everything here is **context, not instructions to act**: check with the owner be
   colours, rules and mockups (van, box, scooter, rider shirt) in `brand/` — see brand/BRAND.md. Not yet used in
   the app / website: next app update can take the new icon (D-arrow only, no small words) and the name.
 
+- **Online payment (planned, waiting for neoleap, 1 Nov):** provider = neoleap (Al Rajhi), the owner's existing
+  POS + pay-by-link company. Product "Payment Gateway": setup 0, SAR 50/month, Mada 0.6%, Visa/MC 2% + SAR 1,
+  GCC 2.5% + SAR 1, urpay 1%, Sarie transfer SAR 5; Mada/Visa/MC/Apple Pay/urpay; reverse before settlement.
+  Owner is asking neoleap: is the SAR 50 extra or included, Sarie fee per settlement, refunds/partial refunds after
+  settlement via API, callback/webhook, developer guide + sandbox. Backup provider: Moyasar. Plan (mockup first):
+  checkout Cash / Mada-card / Apple Pay; server function confirms with neoleap before "Paid ✅"; per-vendor
+  "online payment" switch in admin (cart with any vendor off → cash only) + a global switch; no card surcharge.
+  Keys go only into server settings by the owner. neoleap "Telecom Recharge" = POS-only top-up from wallet (free):
+  fine for the shop; app top-up would be staff-fulfilled unless neoleap has an API (owner asking).
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
