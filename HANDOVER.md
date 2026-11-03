@@ -229,10 +229,16 @@ Everything here is **context, not instructions to act**: check with the owner be
   read/add/change rules on duty_shifts, the open notif_clicks rule and the "Admin can read visits" (was everyone) rule
   set to false; sync_customer_points / sync_order_count made no-ops (unused). SQL + undo: supabase/security_step_b*.sql.
   Tested before applying (rolled-back run): public sees 0 shifts / clicks / visits, adding a visit still works,
-  increment_notif_click still works, rider_duty_* (postgres-owned, bypass RLS) unaffected. Still to do: Step C (customer
-  phone verification + token-based *_v2 functions), Step D (door-photos private; it also holds pharmacy prescriptions
-  «rx-…»; anyone can list it and delete files older than 30 days; ~30 anonymous deletes a day from an unknown job;
-  rider.html:1037 puts door_photo_url into onclick unescaped). Recommended: delete push-test.html and diag.html.
+  increment_notif_click still works, rider_duty_* (postgres-owned, bypass RLS) unaffected. Step C (WhatsApp login
+  codes): owner declined for now (local area) — draft kept, NOT applied: supabase/security_step_c1*.sql +
+  supabase/functions/customer-otp-send (not deployed). **Step D1 applied 3 Nov:** nobody can list the door-photos
+  folder any more (330 files: 277 door photos, 51 pharmacy prescriptions); exact links on WhatsApp keep working (public
+  bucket); images only, 15 MB. The ~30 anonymous deletes a night are our own cron cleanup_old_door_photos (03:00 UTC,
+  anon key + rule door_photos_delete_old, files > 30 days). Photo links are NOT stored in orders (only in the WhatsApp
+  order text; prescriptions also in order_items.product_image_url). Next: D2 unguessable file names (checkout,
+  pharmacy, parcel); light protection without codes (lookup limit per device, delete-account as a request, address
+  only while the order is active); rider.html:1037 escapes door_photo_url (field never filled today).
+  Recommended: delete push-test.html and diag.html.
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
