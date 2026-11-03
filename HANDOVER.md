@@ -223,6 +223,17 @@ Everything here is **context, not instructions to act**: check with the owner be
   Keys go only into server settings by the owner. neoleap "Telecom Recharge" = POS-only top-up from wallet (free):
   fine for the shop; app top-up would be staff-fulfilled unless neoleap has an API (owner asking).
 
+- **Security hardening (owner's audit, 3 Nov).** Scope: customer app + rider app (this database) only. DS Software
+  (ds.deliverystep.app) uses a different Supabase project; CRM / WhatsApp (crm_*, wa_*, whatsapp-* / wa-* functions)
+  are owned by another project and are not touched. Step A (usage report) done. **Step B applied 3 Nov:** public
+  read/add/change rules on duty_shifts, the open notif_clicks rule and the "Admin can read visits" (was everyone) rule
+  set to false; sync_customer_points / sync_order_count made no-ops (unused). SQL + undo: supabase/security_step_b*.sql.
+  Tested before applying (rolled-back run): public sees 0 shifts / clicks / visits, adding a visit still works,
+  increment_notif_click still works, rider_duty_* (postgres-owned, bypass RLS) unaffected. Still to do: Step C (customer
+  phone verification + token-based *_v2 functions), Step D (door-photos private; it also holds pharmacy prescriptions
+  «rx-…»; anyone can list it and delete files older than 30 days; ~30 anonymous deletes a day from an unknown job;
+  rider.html:1037 puts door_photo_url into onclick unescaped). Recommended: delete push-test.html and diag.html.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
