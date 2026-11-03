@@ -213,6 +213,33 @@ Everything here is **context, not instructions to act**: check with the owner be
   colours, rules and mockups (van, box, scooter, rider shirt) in `brand/` — see brand/BRAND.md. Not yet used in
   the app / website: next app update can take the new icon (D-arrow only, no small words) and the name.
 
+- **Online payment (planned, waiting for neoleap, 1 Nov):** provider = neoleap (Al Rajhi), the owner's existing
+  POS + pay-by-link company. Product "Payment Gateway": setup 0, SAR 50/month, Mada 0.6%, Visa/MC 2% + SAR 1,
+  GCC 2.5% + SAR 1, urpay 1%, Sarie transfer SAR 5; Mada/Visa/MC/Apple Pay/urpay; reverse before settlement.
+  Owner is asking neoleap: is the SAR 50 extra or included, Sarie fee per settlement, refunds/partial refunds after
+  settlement via API, callback/webhook, developer guide + sandbox. Backup provider: Moyasar. Plan (mockup first):
+  checkout Cash / Mada-card / Apple Pay; server function confirms with neoleap before "Paid ✅"; per-vendor
+  "online payment" switch in admin (cart with any vendor off → cash only) + a global switch; no card surcharge.
+  Keys go only into server settings by the owner. neoleap "Telecom Recharge" = POS-only top-up from wallet (free):
+  fine for the shop; app top-up would be staff-fulfilled unless neoleap has an API (owner asking).
+
+- **Security hardening (owner's audit, 3 Nov).** Scope: customer app + rider app (this database) only. DS Software
+  (ds.deliverystep.app) uses a different Supabase project; CRM / WhatsApp (crm_*, wa_*, whatsapp-* / wa-* functions)
+  are owned by another project and are not touched. Step A (usage report) done. **Step B applied 3 Nov:** public
+  read/add/change rules on duty_shifts, the open notif_clicks rule and the "Admin can read visits" (was everyone) rule
+  set to false; sync_customer_points / sync_order_count made no-ops (unused). SQL + undo: supabase/security_step_b*.sql.
+  Tested before applying (rolled-back run): public sees 0 shifts / clicks / visits, adding a visit still works,
+  increment_notif_click still works, rider_duty_* (postgres-owned, bypass RLS) unaffected. Step C (WhatsApp login
+  codes): owner declined for now (local area) — draft kept, NOT applied: supabase/security_step_c1*.sql +
+  supabase/functions/customer-otp-send (not deployed). **Step D1 applied 3 Nov:** nobody can list the door-photos
+  folder any more (330 files: 277 door photos, 51 pharmacy prescriptions); exact links on WhatsApp keep working (public
+  bucket); images only, 15 MB. The ~30 anonymous deletes a night are our own cron cleanup_old_door_photos (03:00 UTC,
+  anon key + rule door_photos_delete_old, files > 30 days). Photo links are NOT stored in orders (only in the WhatsApp
+  order text; prescriptions also in order_items.product_image_url). Next: D2 unguessable file names (checkout,
+  pharmacy, parcel); light protection without codes (lookup limit per device, delete-account as a request, address
+  only while the order is active); rider.html:1037 escapes door_photo_url (field never filled today).
+  Recommended: delete push-test.html and diag.html.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
