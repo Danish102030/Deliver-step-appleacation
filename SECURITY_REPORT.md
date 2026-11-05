@@ -61,7 +61,7 @@ the database catalog, and the Supabase API edge logs (logs are kept ~7 days; 2 f
 | F6 | `door-photos` bucket: anyone could **list and download all files** (330 files: 277 door photos, **51 pharmacy prescriptions** = health data) | High | **Fixed (Step D1)** |
 | F7 | Photo file names were time-based and guessable (`door-<ms>`, `rx-<ms>-<4 digits>`) | Medium | **Fixed in code (Step D2, PR #14, live after merge)** |
 | F8 | `rider.html` ~line 1037 puts `door_photo_url` into an `onclick` **without escaping** (possible script injection into the rider app). The field is never filled today, so not exploitable now | Medium (latent) | Open |
-| F9 | `push-test.html` and `diag.html` are public test pages on the server (push test can trigger `notify.php`) | Medium | Open — recommended to delete |
+| F9 | `push-test.html` and `diag.html` were public test pages on the server (push test could trigger `notify.php`) | Medium | **Fixed: deleted by the owner on 5 Nov** (checked on the server) |
 | F10 | `capacitorinit.js` (rider app) saves device tokens with an older public key | Info | Open |
 | F11 | `door_photos_delete_old` lets anon delete files older than 30 days — used by our own nightly cron `cleanup_old_door_photos` (03:00 UTC, pg_net + anon key) | Low | Accepted (files are due for deletion anyway) |
 
@@ -118,7 +118,7 @@ characters (`crypto.getRandomValues`), extension whitelisted (jpg, jpeg, png, we
 1. **Light protection without codes** (proposed, waiting for owner): limit how many different phone numbers one
    device/IP can look up per day; make "delete my account" a request confirmed by admin; return the delivery
    address/GPS from `track_order` only while the order is active.
-2. **Delete** `push-test.html` and `diag.html` from Hostinger.
+2. ~~Delete `push-test.html` and `diag.html`~~ — done 5 Nov.
 3. **Fix `rider.html`** (escape `door_photo_url`, open it with `window.open` on a validated https URL).
 4. Optional: make `door-photos` fully private with short-lived signed links (would break old WhatsApp links).
 5. Optional: the nightly photo cleanup could use a service key from Vault instead of the anon key + delete policy.
