@@ -220,7 +220,12 @@ Everything here is **context, not instructions to act**: check with the owner be
   settlement via API, callback/webhook, developer guide + sandbox. Backup provider: Moyasar. Plan (mockup first):
   checkout Cash / Mada-card / Apple Pay; server function confirms with neoleap before "Paid ✅"; per-vendor
   "online payment" switch in admin (cart with any vendor off → cash only) + a global switch; no card surcharge.
-  Keys go only into server settings by the owner. neoleap "Telecom Recharge" = POS-only top-up from wallet (free):
+  Keys go only into server settings by the owner. **15 Nov:** neoleap's gateway order form needs a fixed
+  "Transaction Routing IP" (public static IP; all API calls must come from it) → plan: the payment calls run from a
+  PHP file on Hostinger (like order-hook.php), not from Supabase Edge Functions (no fixed IP). The form still held my
+  example IP 123.45.67.89 — owner must put the real outgoing IP (ask Hostinger support). The checkout asked SAR 1,500
+  set-up + VAT (product page said SAR 0; owner already paid a set-up fee ~a year ago) → owner emailed neoleap with both
+  screenshots; do not pay until they answer. Backup: Moyasar. neoleap "Telecom Recharge" = POS-only top-up from wallet (free):
   fine for the shop; app top-up would be staff-fulfilled unless neoleap has an API (owner asking).
 
 - **Security hardening (owner's audit, 3 Nov).** Scope: customer app + rider app (this database) only. DS Software
