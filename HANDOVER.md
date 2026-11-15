@@ -240,6 +240,15 @@ Everything here is **context, not instructions to act**: check with the owner be
   only while the order is active); rider.html:1037 escapes door_photo_url (field never filled today).
   push-test.html and diag.html deleted from public_html by the owner (5 Nov, checked).
 
+- **iPhone app 1.0.6 (15 Nov):** new icon + name «خطوة التوصيل», build 14 (Codemagic workflow "iOS App Store
+  Release" on main), submitted to App Review 15 Nov ("Waiting for Review"). Live before: 1.0.4 (1.0.5 was only a
+  TestFlight build). New App Store screenshots (owner approved): brand/appstore/ (1320 x 2868) and
+  brand/appstore/medium-6.3/ (1206 x 2622, the slot App Store Connect asked for). Age rating questions answered.
+  Apple agreement accepted by the Account Holder (14 Nov).
+- **Photo uploads broken 7–11 Nov (fixed 11 Nov):** the CRM rule "order slips: team uploads own folder" read wa_team
+  directly → every storage upload failed. Now uses SECURITY DEFINER public.ds_is_active_wa_member().
+  File: supabase/fix_storage_uploads_2026-11-11.sql. CRM AI informed by the owner.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
