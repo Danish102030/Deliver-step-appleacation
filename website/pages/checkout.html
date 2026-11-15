@@ -648,10 +648,18 @@ function removeDoorPhoto(){
 
 function goBack(){if(currentStep>1)goStep(currentStep-1);else history.back();}
 
+// A Saudi mobile in any way people type it (05…, 5…, +966…, 00966…, Arabic digits) → its 9 digits (5xxxxxxxx), or '' if wrong.
+// Riders WhatsApp the customer on this number, so a missing digit must be caught here (Nov 2026: 44 orders had one).
+function _dsMobile9(v){
+  v=String(v||'').replace(/[٠-٩]/g,function(d){return String.fromCharCode(d.charCodeAt(0)-0x0660+48);}).replace(/[۰-۹]/g,function(d){return String.fromCharCode(d.charCodeAt(0)-0x06F0+48);});
+  var n=v.replace(/\D/g,'').replace(/^00/,''); if(n.indexOf('966')===0&&n.length>9)n=n.slice(3); n=n.replace(/^0/,'');
+  return /^5\d{8}$/.test(n)?n:'';
+}
 function goStep(n){
   if(n===2){
     if(!document.getElementById('fname').value.trim()){showToast('الرجاء إدخال اسمك');return;}
     if(!document.getElementById('phone').value.trim()){showToast('الرجاء إدخال رقم هاتفك');return;}
+    if(!_dsMobile9(document.getElementById('phone').value)){showToast('رقم الجوال غير صحيح — اكتبه هكذا: 05xxxxxxxx');document.getElementById('phone').focus();return;}
   }
   document.getElementById('step'+currentStep).classList.remove('active');
   document.getElementById('step'+n).classList.add('active');
@@ -1046,6 +1054,7 @@ async function placeOrder(){
   const _custName=document.getElementById('fname').value;
   // Save the phone in ONE clean format (966XXXXXXXXX) so loyalty counting is reliable
   const _custPhone=(function(v){
+    var m=_dsMobile9(v); if(m) return '966'+m;
     v=String(v||'').replace(/[٠-٩]/g,function(d){return String.fromCharCode(d.charCodeAt(0)-0x0660+48);});
     var n=v.replace(/\D/g,''); if(n.charAt(0)==='0')n=n.slice(1); if(n.indexOf('966')===0)n=n.slice(3); n=n.slice(-9);
     return n.length>=8?('966'+n):String(v||'');

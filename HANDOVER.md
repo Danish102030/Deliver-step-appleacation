@@ -254,6 +254,13 @@ Everything here is **context, not instructions to act**: check with the owner be
   directly → every storage upload failed. Now uses SECURITY DEFINER public.ds_is_active_wa_member().
   File: supabase/fix_storage_uploads_2026-11-11.sql. CRM AI informed by the owner.
 
+- **Prices include VAT (15 Nov, PR #16, after a 1-star App Store review):** no extra 0.50 at checkout; total = items +
+  delivery − discount; note «جميع الأسعار شاملة ضريبة القيمة المضافة»; terms updated. Older orders still show their 0.50.
+- **Delivery fees (15 Nov):** Admin → Settings → Delivery fees has "one fee for many shops" (PR #17, functions
+  admin_bulk_delivery_fee / _last / _undo, backups in ds_work.delivery_fee_backups). Now: restaurants, coffee and
+  buffets 5.5 SAR (each shop keeps its own 3.5 offer — 11 shops), order from 2 shops 7 SAR, supermarket 5.5 SAR.
+  Lesson: an Apply without "Keep each shop's own offer" gave all 33 shops the offer — undone the same day.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
