@@ -238,7 +238,7 @@ Everything here is **context, not instructions to act**: check with the owner be
   order text; prescriptions also in order_items.product_image_url). Next: D2 unguessable file names (checkout,
   pharmacy, parcel); light protection without codes (lookup limit per device, delete-account as a request, address
   only while the order is active); rider.html:1037 escapes door_photo_url (field never filled today).
-  Recommended: delete push-test.html and diag.html.
+  push-test.html and diag.html deleted from public_html by the owner (5 Nov, checked).
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
