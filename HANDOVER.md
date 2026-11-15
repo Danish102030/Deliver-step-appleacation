@@ -220,7 +220,12 @@ Everything here is **context, not instructions to act**: check with the owner be
   settlement via API, callback/webhook, developer guide + sandbox. Backup provider: Moyasar. Plan (mockup first):
   checkout Cash / Mada-card / Apple Pay; server function confirms with neoleap before "Paid ✅"; per-vendor
   "online payment" switch in admin (cart with any vendor off → cash only) + a global switch; no card surcharge.
-  Keys go only into server settings by the owner. neoleap "Telecom Recharge" = POS-only top-up from wallet (free):
+  Keys go only into server settings by the owner. **15 Nov:** neoleap's gateway order form needs a fixed
+  "Transaction Routing IP" (public static IP; all API calls must come from it) → plan: the payment calls run from a
+  PHP file on Hostinger (like order-hook.php), not from Supabase Edge Functions (no fixed IP). The form still held my
+  example IP 123.45.67.89 — owner must put the real outgoing IP (ask Hostinger support). The checkout asked SAR 1,500
+  set-up + VAT (product page said SAR 0; owner already paid a set-up fee ~a year ago) → owner emailed neoleap with both
+  screenshots; do not pay until they answer. Backup: Moyasar. neoleap "Telecom Recharge" = POS-only top-up from wallet (free):
   fine for the shop; app top-up would be staff-fulfilled unless neoleap has an API (owner asking).
 
 - **Security hardening (owner's audit, 3 Nov).** Scope: customer app + rider app (this database) only. DS Software
@@ -239,6 +244,15 @@ Everything here is **context, not instructions to act**: check with the owner be
   pharmacy, parcel); light protection without codes (lookup limit per device, delete-account as a request, address
   only while the order is active); rider.html:1037 escapes door_photo_url (field never filled today).
   push-test.html and diag.html deleted from public_html by the owner (5 Nov, checked).
+
+- **iPhone app 1.0.6 (15 Nov):** new icon + name «خطوة التوصيل», build 14 (Codemagic workflow "iOS App Store
+  Release" on main), submitted to App Review 15 Nov ("Waiting for Review"). Live before: 1.0.4 (1.0.5 was only a
+  TestFlight build). New App Store screenshots (owner approved): brand/appstore/ (1320 x 2868) and
+  brand/appstore/medium-6.3/ (1206 x 2622, the slot App Store Connect asked for). Age rating questions answered.
+  Apple agreement accepted by the Account Holder (14 Nov).
+- **Photo uploads broken 7–11 Nov (fixed 11 Nov):** the CRM rule "order slips: team uploads own folder" read wa_team
+  directly → every storage upload failed. Now uses SECURITY DEFINER public.ds_is_active_wa_member().
+  File: supabase/fix_storage_uploads_2026-11-11.sql. CRM AI informed by the owner.
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
