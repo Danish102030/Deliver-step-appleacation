@@ -26,3 +26,14 @@ Ideas the owner approved in principle but asked to keep for a future session.
 ## 5. Nightly clean-up of visit records (small, not urgent)
 - page_views / visit_live / visit_days grow by a few thousand rows a day. A nightly job should delete page_views older than 180 days, visit_live older than 1 day, visit_days older than ~400 days.
 - Not added yet: statements with DELETE need the owner's confirmation in the database tool (it timed out). Add `public.clean_visit_logs()` + a pg_cron job when the owner can approve.
+
+## Parked 15 Nov 2026 — "team-style" project hygiene (owner: "parked this now")
+Recommended order (docs / file moves only, live app unchanged, through a PR):
+1. **KEYS.md** — map of every key/secret: purpose, where stored, who sees it, how to rotate (never the values).
+   Known to fix: an old Mapbox key still in old git files (`www/`, root `checkout.html` — old rider app) → remove from
+   code and rotate in Mapbox; `capacitorinit.js` (server) uses an older public key → check.
+2. **API.md** — every database function the apps call (place_order, my_orders, track_order, rider_*, …): what it does,
+   inputs, who may call it. Makes a future native app (Flutter/Swift) easy: same backend.
+3. Folder tidy-up — old rider-app files (root *.html, `www/`) → `legacy/`; keep website/, supabase/, ios/, brand/, docs/.
+4. Owner: 2-step login on GitHub, Hostinger, Supabase, Apple, Meta; protect `main`; GitHub secret scanning on.
+5. Later: a test (staging) database for risky changes.
