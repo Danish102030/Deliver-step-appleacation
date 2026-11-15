@@ -333,6 +333,12 @@ mark.osr{background:#fde68a;color:inherit;border-radius:3px;padding:0 1px}
 [data-theme="dark"] .cr-nt{background:#e2e8f0}
 .set-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;align-items:start;max-width:1100px}
 .set-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px}
+.bf-chips{display:flex;flex-wrap:wrap;gap:8px}
+.bf-chip{border:1.5px solid var(--border);background:#fff;border-radius:20px;padding:7px 13px;font-size:12.5px;font-weight:600;color:var(--text);cursor:pointer;font-family:inherit}
+.bf-chip.on{border-color:var(--rose);background:var(--rose-light);color:var(--rose)}
+.bf-chip.on::before{content:"✓ "}
+.bf-prev{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 12px;margin:0 0 10px;font-size:12.5px;line-height:1.6}
+.bf-prev.empty{background:var(--bg);border-color:var(--border);color:var(--muted)}
 .set-h{font-size:13.5px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px}
 .set-h i{color:var(--rose);font-size:17px}
 .set-row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}
@@ -1434,6 +1440,25 @@ tr:hover td{background:var(--bg)}
             <button class="btn-primary set-btn" onclick="saveSupermarketSettings()"><i class="ti ti-device-floppy" style="font-size:14px"></i> Save</button>
             <div class="set-msg" id="set-sm-out"></div>
           </div>
+          <div class="set-card set-wide" id="set-bulkfee-card">
+            <div class="set-h"><i class="ti ti-tools-kitchen-2"></i> Restaurants &amp; cafés — one fee for many shops</div>
+            <div class="set-hint" style="margin-top:-6px">Change the delivery fee of a whole group at once. Customers see it on their next page open. One shop with a special price? Edit it in Restaurants afterwards.</div>
+            <div style="font-size:12px;font-weight:600;margin:10px 0 6px">Apply to</div>
+            <div class="bf-chips">
+              <button type="button" class="bf-chip" id="bf-c-restaurants" onclick="_bfToggle('restaurants')">Restaurants (<span id="bf-n-restaurants">–</span>)</button>
+              <button type="button" class="bf-chip" id="bf-c-coffee" onclick="_bfToggle('coffee')">Coffee &amp; sweets (<span id="bf-n-coffee">–</span>)</button>
+              <button type="button" class="bf-chip" id="bf-c-buffet" onclick="_bfToggle('buffet')">Buffets (<span id="bf-n-buffet">–</span>)</button>
+            </div>
+            <div class="set-row2" style="margin-top:12px">
+              <div class="field"><label>Delivery fee (SAR)</label><input type="number" id="bf-fee" value="5" step="0.5" min="0" oninput="_bfPreview()"/></div>
+              <div class="field"><label>Cheaper delivery from (SAR) — 0 = off</label><input type="number" id="bf-dmin" value="25" step="1" min="0" oninput="_bfPreview()"/></div>
+              <div class="field"><label>Cheaper delivery fee (SAR)</label><input type="number" id="bf-dfee" value="3.5" step="0.5" min="0" oninput="_bfPreview()"/></div>
+            </div>
+            <label style="display:flex;align-items:center;gap:7px;font-size:12px;margin:0 0 10px;cursor:pointer"><input type="checkbox" id="bf-keep" onchange="_bfPreview()"/> Keep each shop's own cheaper-delivery offer (change only the delivery fee)</label>
+            <div class="bf-prev" id="bf-prev"></div>
+            <button class="btn-primary set-btn" id="bf-btn" onclick="_bfApply()"><i class="ti ti-check" style="font-size:14px"></i> Apply</button>
+            <div class="set-msg" id="bf-last"></div>
+          </div>
           <div class="set-card set-wide" id="set-strip-card">
             <div class="set-h"><i class="ti ti-speakerphone"></i> Offer strip on the supermarket page — شريط العروض</div>
             <div class="set-hint" style="margin-top:-6px">Preview (tap it) — exactly what customers see:</div>
@@ -2320,7 +2345,7 @@ function goSection(name){
   if(name==='notifications')_lazy('marketing','section-notifications', function(){ loadNotifications(); });
   if(name==='reviews')loadReviews();
   if(name==='vat')initVatSection();
-  if(name==='settings'){ loadDeliverySettings(); setTab(_setTab||'setg-orders'); }
+  if(name==='settings'){ loadDeliverySettings(); setTab(_setTab||'setg-orders'); _bfLoad(); }
   if(name==='cartrem')_lazy('marketing','section-cartrem', function(){ loadDeliverySettings(); });
   if(name==='loyrem')_lazy('marketing','section-loyrem', function(){ loadLoyRem(); });
   if(name==='marketing')_lazy('marketing','section-marketing', function(){ loadMarketingOverview(); });
@@ -4795,6 +4820,55 @@ const _SET_KEYS=['geo_block','supermarket_delivery_fee','supermarket_free_delive
 var _setVals={};
 function _setV(k){ return _setVals[k]==null?'':String(_setVals[k]); }
 function _setJson(k){ try{ var o=JSON.parse(_setV(k)||'null'); return (o&&typeof o==='object')?o:{}; }catch(e){ return {}; } }
+// ── One delivery fee for many shops (restaurants / coffee / buffets) → admin_bulk_delivery_fee().
+//    The database keeps a copy of the old prices first (ds_work.delivery_fee_backups) → "Undo last change".
+var _BF={rows:[],groups:{restaurants:true,coffee:true,buffet:false}};
+function _bfGroup(c){ c=String(c||''); return c==='coffee'?'coffee':(c.indexOf('buffet')===0?'buffet':(c==='ds_store'?'ds_store':'restaurants')); }
+async function _bfLoad(){
+  try{ const r=await sb.from('restaurants').select('id,category,delivery_fee,delivery_discount_min,delivery_discount_fee,is_active');
+    _BF.rows=((r&&r.data)||[]).filter(function(x){ return x.is_active!==false; }); }catch(e){ _BF.rows=[]; }
+  var c={restaurants:0,coffee:0,buffet:0}; _BF.rows.forEach(function(x){ var g=_bfGroup(x.category); if(c[g]!=null)c[g]++; });
+  Object.keys(c).forEach(function(g){ var el=document.getElementById('bf-n-'+g); if(el)el.textContent=c[g]; });
+  _bfChips(); _bfPreview(); _bfLast();
+}
+function _bfToggle(g){ _BF.groups[g]=!_BF.groups[g]; _bfChips(); _bfPreview(); }
+function _bfChips(){ ['restaurants','coffee','buffet'].forEach(function(g){ var el=document.getElementById('bf-c-'+g); if(el)el.classList.toggle('on',!!_BF.groups[g]); }); }
+function _bfSel(){ return ['restaurants','coffee','buffet'].filter(function(g){ return _BF.groups[g]; }); }
+function _bfVals(){ var n=function(id){ var v=document.getElementById(id).value; return v===''?null:Number(v); };
+  return {fee:n('bf-fee'),min:n('bf-dmin'),dfee:n('bf-dfee'),keep:document.getElementById('bf-keep').checked}; }
+function _bfPreview(){
+  var el=document.getElementById('bf-prev'), btn=document.getElementById('bf-btn'); if(!el||!btn)return;
+  var g=_bfSel(), v=_bfVals(), rows=_BF.rows.filter(function(x){ return g.indexOf(_bfGroup(x.category))>=0; });
+  ['bf-dmin','bf-dfee'].forEach(function(id){ document.getElementById(id).disabled=v.keep; });
+  var bad=!g.length||v.fee==null||v.fee<0||v.fee>50||(!v.keep&&(v.min==null||v.min<0||(v.min>0&&(v.dfee==null||v.dfee<0))));
+  if(!rows.length||bad){ el.className='bf-prev empty'; el.textContent=!g.length?'Choose at least one group.':(bad?'Check the numbers.':'No shops in this group.'); btn.disabled=true; btn.innerHTML='<i class="ti ti-check" style="font-size:14px"></i> Apply'; return; }
+  var by={}, same=0; rows.forEach(function(x){ var f=Number(x.delivery_fee||0); if(f===v.fee)same++; else { var k=f+'→'+v.fee; by[k]=(by[k]||0)+1; } });
+  var parts=Object.keys(by).map(function(k){ var a=k.split('→'); return by[k]+' shop'+(by[k]>1?'s':'')+' '+a[0]+' → <b>'+a[1]+'</b>'; });
+  if(same)parts.push(same+' already '+v.fee);
+  var offer=v.keep?'Cheaper delivery: <b>each shop keeps its own offer</b>':(v.min>0?'Cheaper delivery: <b>'+v.dfee+' SAR from '+v.min+' SAR</b> for all '+rows.length:'Cheaper delivery: <b>off</b> for all '+rows.length);
+  el.className='bf-prev'; el.innerHTML='<b>'+rows.length+' shops will change:</b><br>• '+parts.join(' · ')+'<br>• '+offer;
+  btn.disabled=false; btn.innerHTML='<i class="ti ti-check" style="font-size:14px"></i> Apply to '+rows.length+' shops';
+}
+async function _bfApply(){
+  var g=_bfSel(), v=_bfVals(); if(!g.length)return;
+  if(!confirm('Change the delivery fee of these shops to '+v.fee+' SAR?\nYou can undo it afterwards.'))return;
+  var btn=document.getElementById('bf-btn'); btn.disabled=true;
+  try{ const r=await sb.rpc('admin_bulk_delivery_fee',{p_groups:g,p_fee:v.fee,p_disc_min:v.keep?null:v.min,p_disc_fee:v.keep?null:(v.min>0?v.dfee:0)});
+    if(r.error)throw r.error; showToast('✅ '+((r.data&&r.data.changed)||0)+' shops updated'); }
+  catch(e){ showToast('⚠️ '+((e&&e.message)||'Could not save')); }
+  _bfLoad();
+}
+async function _bfLast(){
+  var el=document.getElementById('bf-last'); if(!el)return;
+  try{ const r=await sb.rpc('admin_bulk_delivery_fee_last'); var d=r&&r.data;
+    el.innerHTML=d?('Last change: '+new Date(d.at).toLocaleString('en-GB',{timeZone:'Asia/Riyadh',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+' · '+d.shops+' shops · <a href="#" onclick="_bfUndo();return false" style="color:var(--rose);font-weight:600">Undo last change</a>'):''; }catch(e){ el.textContent=''; }
+}
+async function _bfUndo(){
+  if(!confirm('Put back the delivery prices from before the last change?'))return;
+  try{ const r=await sb.rpc('admin_bulk_delivery_fee_undo'); if(r.error)throw r.error;
+    showToast(r.data&&r.data.ok?('↩️ '+r.data.restored+' shops restored'):'Nothing to undo'); }catch(e){ showToast('⚠️ '+((e&&e.message)||'Could not undo')); }
+  _bfLoad();
+}
 async function loadDeliverySettings(){   // (name kept — opening Settings calls it)
   try{
     const r=await sb.from('settings').select('key,value').in('key',_SET_KEYS);
