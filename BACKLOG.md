@@ -3,6 +3,7 @@
 Ideas the owner approved in principle but asked to keep for a future session.
 
 ## 1. Instant pages — no more grey loading boxes
+- **Done 16 Nov for home, restaurants, coffee, buffet (+ menu header)** — see HANDOVER "No more flashing". Left: supermarket categories, menu dishes.
 - **Pages:** restaurants, coffee, supermarket (categories), menu (a restaurant's dishes).
 - **Today:** every visit shows grey placeholder boxes for 0.5–2 s while the page asks the database, then the cards pop in.
 - **Plan:** like the new home page (`ds_home_v2`):

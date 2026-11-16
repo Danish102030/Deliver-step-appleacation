@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8"/>
-  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-3.css"/><script>/* smooth page changes: forward = slide; BACK (button or swipe) = no animation, the page is simply there */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}function tr(a){return !!(a&&a.navigationType==='traverse')}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(e){try{if(window.navigation&&navigation.activation)b(tr(navigation.activation))}catch(x){}if(e.viewTransition&&d.classList.contains('vt-back'))try{e.viewTransition.skipTransition()}catch(x){}});addEventListener('pageswap',function(e){try{if(e.viewTransition&&tr(e.activation))e.viewTransition.skipTransition()}catch(x){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
   <script>try{if(!localStorage.getItem('ds_seen_intro'))location.replace('/welcome');}catch(e){}</script>
   <script>try{var _ss=sessionStorage;var _seen=_ss.getItem('ds_splash_shown')==='1';var _fromWel=(document.referrer||'').indexOf('welcome')>-1;if(_seen||_fromWel){document.documentElement.className+=' dsos-skip';}_ss.setItem('ds_splash_shown','1');}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
@@ -635,7 +635,6 @@ img{-webkit-user-drag:none}
 
 <div class="toast" id="toast"></div>
 
-<script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
 <script src="/ds-order-sync.js?v=3" defer></script>
 <script src="/dssearch.js?v=6" defer></script>
 <script>
@@ -648,10 +647,12 @@ let slides=[], current=0, autoTimer=null;
 
 async function loadBanners(){
   // Paint the hero INSTANTLY from a saved copy (or defaults) — do NOT wait for the database.
-  let cached=null;
-  try{ cached=JSON.parse(localStorage.getItem('qibah_banners')||'null'); }catch(e){}
-  slides=(cached&&cached.length)?cached:getDefaultSlides();
-  buildSlider();
+  if(!window._dsHeroEarly){   // (normally already drawn the moment the page opened — see "Home appears at once" below)
+    let cached=null;
+    try{ cached=JSON.parse(localStorage.getItem('qibah_banners')||'null'); }catch(e){}
+    slides=(cached&&cached.length)?cached:getDefaultSlides();
+    buildSlider();
+  }
   // Then refresh from the database in the background; rebuild only if it actually changed.
   try{
     const{data}=await sb.from('banners').select('*').eq('is_active',true).order('sort_order');
@@ -757,7 +758,7 @@ function _go(v){ return `window.location.href='/menu?id=${encodeURIComponent(v.i
 
 async function loadRestaurants(){
   // 1) instant paint from the saved copy
-  try{ const c=JSON.parse(localStorage.getItem('ds_home_v2')||'null'); if(c&&c.rests&&c.rests.length){ HOME.rests=c.rests; HOME.top=c.top||[]; HOME.set=c.set||{}; HOME.store=c.store||null; renderHome(); } }catch(e){}
+  if(!window._dsHomeEarly) try{ const c=JSON.parse(localStorage.getItem('ds_home_v2')||'null'); if(c&&c.rests&&c.rests.length){ HOME.rests=c.rests; HOME.top=c.top||[]; HOME.set=c.set||{}; HOME.store=c.store||null; renderHome(); } }catch(e){}
   // 2) fresh data (3 small requests, side by side)
   const cols='id,name,category,banner_url,logo_url,delivery_fee,delivery_discount_min,delivery_discount_fee,delivery_time,rating,is_open,is_24h,open_time,close_time,sort_order,is_active';
   const [r,t,s]=await Promise.all([
@@ -969,7 +970,12 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2000);
 }
 
-window.addEventListener('load',()=>{
+/* Home appears at once: the saved banners and shops are drawn right now — before, the page waited until every
+   picture had finished downloading, so the banner space stayed empty pink for a moment (the "flash"). */
+try{ const c=JSON.parse(localStorage.getItem('qibah_banners')||'null'); slides=(c&&c.length)?c:getDefaultSlides(); buildSlider(); window._dsHeroEarly=1; }catch(e){}
+try{ const c=JSON.parse(localStorage.getItem('ds_home_v2')||'null'); if(c&&c.rests&&c.rests.length){ HOME.rests=c.rests; HOME.top=c.top||[]; HOME.set=c.set||{}; HOME.store=c.store||null; renderHome(); window._dsHomeEarly=1; } }catch(e){}
+
+document.addEventListener('DOMContentLoaded',()=>{   // fresh data: start when the page is read, not after every picture
   if(typeof supabase==='undefined'){
     const el=document.getElementById('rest-list');
     if(el)el.innerHTML='<div style="text-align:center;padding:32px;color:#6b7280">تعذر الاتصال، أعد تحميل الصفحة</div>';
@@ -1002,6 +1008,8 @@ function _dsFlushPendingOrders(){
   return Promise.resolve();
 }
 </script>
+<!-- the database library loads AFTER the saved copy is drawn, so the page never shows empty boxes first -->
+<script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
 
 <!-- ════════ APP DOWNLOAD BANNER (iOS Safari only) ════════ -->
 <style>

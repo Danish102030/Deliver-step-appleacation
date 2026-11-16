@@ -1,0 +1,27 @@
+/* خطوة التوصيل — smooth, app-like page changes (no blank flash between pages).
+   Works on iPhone (iOS 18.2+) and Android; older phones simply open pages as before.
+   v3 (Nov 2026): going BACK (button or iPhone swipe) has no animation at all — the page is simply there.
+   The swipe already moves the page; a second animation on top of it was the "flash". */
+@view-transition { navigation: auto; }
+/* Forward: the new page slides in from the left (Arabic, right-to-left), the old page moves away and dims — like iPhone apps */
+::view-transition-group(root) { animation-duration: .34s; animation-timing-function: cubic-bezier(.2,.85,.25,1); }
+::view-transition-new(root) { animation: ds-vt-in .34s cubic-bezier(.2,.85,.25,1) both; box-shadow: 0 0 40px rgba(0,0,0,.18); }
+::view-transition-old(root) { animation: ds-vt-out .34s cubic-bezier(.2,.85,.25,1) both; }
+@keyframes ds-vt-in  { from { transform: translateX(-100%); } to { transform: none; } }
+@keyframes ds-vt-out { from { transform: none; filter: brightness(1); } to { transform: translateX(28%); filter: brightness(.82); } }
+/* Back: no animation (the head script also skips the transition; this is the safety net) */
+html.vt-back::view-transition-group(*) { animation: none; }
+html.vt-back::view-transition-old(*) { display: none; }
+html.vt-back::view-transition-new(*) { animation: none; box-shadow: none; }
+@keyframes ds-vt-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ds-vt-fade-out { from { opacity: 1; } to { opacity: 0; } }
+/* The bottom menu stays still (like a real tab bar) — only the page content moves */
+.glass-nav-wrap { view-transition-name: ds-nav; }
+::view-transition-group(ds-nav) { animation: none; z-index: 10; }
+::view-transition-old(ds-nav) { display: none; }
+::view-transition-new(ds-nav) { animation: none; }
+/* Phones with "Reduce Motion" on: a calm cross-fade instead of sliding (same as iPhone apps do) */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-new(root) { animation: ds-vt-fade-in .2s ease-out both; box-shadow: none; }
+  ::view-transition-old(root) { animation: ds-vt-fade-out .2s ease-out both; }
+}

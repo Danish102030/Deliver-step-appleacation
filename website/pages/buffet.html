@@ -2,15 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8"/>
-  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-3.css"/><script>/* smooth page changes: forward = slide; BACK (button or swipe) = no animation, the page is simply there */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}function tr(a){return !!(a&&a.navigationType==='traverse')}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(e){try{if(window.navigation&&navigation.activation)b(tr(navigation.activation))}catch(x){}if(e.viewTransition&&d.classList.contains('vt-back'))try{e.viewTransition.skipTransition()}catch(x){}});addEventListener('pageswap',function(e){try{if(e.viewTransition&&tr(e.activation))e.viewTransition.skipTransition()}catch(x){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <meta name="theme-color" content="#0d9488"/>
   <title>بوفيهات إفطار - خطوة التوصيل</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="/ds-lib/ds-icons-2.47.0-1.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"/>
-  <script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
-  <style>
+    <style>
     :root{--accent:#0d9488;--accent-dark:#0f766e;--accent-light:#ccfbf1;--rose:#be185d;--text:#1f1f1f;--muted:#6b7280;--border:#99f6e4;--bg:#f0fdfa;--white:#fff;--green:#16a34a}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:90px;direction:rtl}
@@ -94,7 +93,7 @@
 </head>
 <body>
 <div class="topbar">
-  <button class="btn-back" onclick="window.location.href='/'" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
+  <button class="btn-back" onclick="window.dsHome?dsHome():location.href='/'" aria-label="رجوع"><i class="ti ti-arrow-right"></i></button>
   <div class="topbar-title">بوفيهات إفطار · قبة</div>
   <div style="position:relative">
     <button class="cart-btn" onclick="window.location.href='/cart'" aria-label="السلة">
@@ -134,7 +133,6 @@
     <div class="gnav-item" onclick="window.location.href='/account'"><i class="ti ti-user-circle gnav-icon"></i><span class="gnav-label">حسابي</span><div class="gnav-dot"></div></div>
   </nav>
 </div>
-<script src="/ds-lib/ds-nav-3.js"></script><!-- same bottom menu on every page (الرئيسية · سوبرماركت · طلباتي · حسابي) -->
 <div class="toast" id="toast"></div>
 <script>
 const SB_URL='https://vjuhxpttssmyomqqomdx.supabase.co';
@@ -206,10 +204,7 @@ function toggleFav(ev,id){
   return false;
 }
 async function loadBuffets(){
-  const CK='qibah_cache_buffet';
-  let _paintedSig='';
-  // Instant paint from cache → no flash when coming back from a menu
-  try{const c=sessionStorage.getItem(CK);if(c){allBuffets=JSON.parse(c)||[];if(allBuffets.length){renderFeatured();renderBuffets();_paintedSig=c;}}}catch(e){}
+  let _paintedSig=_earlySig;   // the saved list was already drawn when the page opened (_paintSaved below)
   try{
     const race=await Promise.race([
       sb.from('restaurants').select('*').order('sort_order'),
@@ -221,11 +216,17 @@ async function loadBuffets(){
     let list=all.filter(r=>BUFFET_CATS.includes(r.category)||_alsoIn(r,'buffet'));
     if(!list.length&&all.length) list=all;
     allBuffets=list;
-    if(list.length){try{sessionStorage.setItem(CK,JSON.stringify(list));}catch(e){}}
+    if(list.length)_saveList(list);
   }catch(e){console.error('loadBuffets:',e.message);/* keep cached list on error */}
   // Only repaint if the list actually changed → no flash on the second visit
   if(JSON.stringify(allBuffets)!==_paintedSig){renderFeatured();renderBuffets();}
 }
+/* Instant page: the list is saved on the phone (up to 7 days) and drawn the moment the page opens → no grey boxes.
+   Fresh prices and open / closed load right after and replace it only if something changed. */
+const LIST_KEY='ds_list_buffet_v1', CK='qibah_cache_buffet';
+function _readList(){try{const c=JSON.parse(localStorage.getItem(LIST_KEY)||'null');if(c&&Array.isArray(c.l)&&c.l.length&&Date.now()-c.t<7*864e5)return c.l;}catch(e){}try{const s=JSON.parse(sessionStorage.getItem(CK)||'null');if(Array.isArray(s)&&s.length)return s;}catch(e){}return null;}
+function _saveList(l){try{localStorage.setItem(LIST_KEY,JSON.stringify({t:Date.now(),l:l}));}catch(e){}try{sessionStorage.setItem(CK,JSON.stringify(l));}catch(e){}}
+let _earlySig='';
 function updateCartCount(){const cart=JSON.parse(localStorage.getItem('qibah_cart')||'[]');document.getElementById('cart-count').textContent=cart.reduce((s,i)=>s+i.qty,0)||'٠';}
 function renderFeatured(){
   const list=allBuffets.filter(b=>b.is_open).slice(0,4);
@@ -250,7 +251,8 @@ function renderBuffets(){
   document.getElementById('buffet-list').innerHTML=list.map(b=>vendorCard(b)).join('');
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
-window.addEventListener('load',()=>{
+(function _paintSaved(){const l=_readList();if(!l)return;try{allBuffets=l;renderFeatured();renderBuffets();_earlySig=JSON.stringify(l);}catch(e){}})();
+document.addEventListener('DOMContentLoaded',()=>{   // start as soon as the page is read (not after every picture)
   if(typeof supabase==='undefined'){
     document.getElementById('buffet-list').innerHTML='<div class="empty"><i class="ti ti-wifi-off"></i>تعذر الاتصال، أعد تحميل الصفحة</div>';
     return;
@@ -260,5 +262,8 @@ window.addEventListener('load',()=>{
   loadBuffets();
 });
 </script>
+<script src="/ds-lib/ds-nav-4.js"></script><!-- same bottom menu on every page (الرئيسية · سوبرماركت · طلباتي · حسابي) -->
+<!-- the database library loads AFTER the saved copy is drawn, so the page never shows empty boxes first -->
+<script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
 </body>
 </html>
