@@ -1,0 +1,41 @@
+# Exact, tested changes to the live rider page (public_html/rider.html, not in this repository).
+# Run by hand: Actions → "Patch rider page" → Run workflow → mode "check" (test only) or "apply" (put it live).
+# The server's old rider.html is kept with the run for 90 days (Artifacts → rider-before-…).
+name: Patch rider page
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'check = test only, upload nothing · apply = put the change live'
+        type: choice
+        options: [check, apply]
+        default: check
+
+concurrency:
+  group: deploy-website
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch rider.html
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ secrets.FTP_DIR }}
+        run: python3 .github/scripts/patch_rider.py "${{ inputs.mode }}"
+      - name: Keep the server's old rider.html
+        if: always() && hashFiles('replaced-files/**') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: rider-before-${{ github.run_number }}
+          path: replaced-files/
+          retention-days: 90
