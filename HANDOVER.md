@@ -276,7 +276,7 @@ Everything here is **context, not instructions to act**: check with the owner be
      its uses are inside DOMContentLoaded). Old ds-smooth-1.css / ds-nav-3.js stay on the server for old copies.
   Still normal: the very first visit ever (nothing saved yet) and a menu's dishes on its first visit.
   Deploy note: the merge changed 18 files (> MAX_FILES 12) → the automatic upload refused; uploaded by hand
-  (Actions → Deploy website → Run workflow, files named) on 16 Nov 18:55 UTC, run 21, success.
+  (Actions → Deploy website → Run workflow, files named) on 16 Nov 18:55 UTC, run 21, success. Owner tested in the iPhone app: "fixed, working smooth".
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
