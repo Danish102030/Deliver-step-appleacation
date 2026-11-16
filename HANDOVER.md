@@ -260,6 +260,21 @@ Everything here is **context, not instructions to act**: check with the owner be
   admin_bulk_delivery_fee / _last / _undo, backups in ds_work.delivery_fee_backups). Now: restaurants, coffee and
   buffets 5.5 SAR (each shop keeps its own 3.5 offer — 11 shops), order from 2 shops 7 SAR, supermarket 5.5 SAR.
   Lesson: an Apply without "Keep each shop's own offer" gave all 33 shops the offer — undone the same day.
+- **No more flashing between pages (16 Nov, owner approved):** three causes found with a frame-by-frame film
+  (Playwright, 390 + 320 px, 0.7 s fake network):
+  1. Back arrow (restaurants, coffee, buffet, supermarket) and the bottom-menu Home opened Home as a NEW page → full
+     reload + extra history entry, so swiping back walked Home → Restaurants → Home … Now `dsHome()` in
+     `ds-lib/ds-nav-4.js` goes back in history when the customer came from Home (else opens `/` as before;
+     never while a supermarket sub-section is open). Pages use `onclick="window.dsHome?dsHome():location.href='/'"`.
+  2. Going back (button or iPhone swipe) ran a fade on top of the swipe. `ds-lib/ds-smooth-3.css` + new head script on
+     15 pages: back = no animation (skipTransition in pagereveal / pageswap). Forward slide unchanged.
+  3. Grey boxes on every visit: restaurants / coffee / buffet keep their list in localStorage (`ds_list_rest_v1`,
+     `ds_list_coffee_v1`, `ds_list_buffet_v1`, 7 days) and draw it before the database library loads; fresh data
+     replaces it only if something changed. Home draws its saved banners + shops at once (it used to wait for
+     window "load" = every picture) and starts its database calls at DOMContentLoaded. Menu: shop name / photo / logo
+     come from those saved lists on a first visit. The supabase-js tag now sits after each page's main script (all
+     its uses are inside DOMContentLoaded). Old ds-smooth-1.css / ds-nav-3.js stay on the server for old copies.
+  Still normal: the very first visit ever (nothing saved yet) and a menu's dishes on its first visit.
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".

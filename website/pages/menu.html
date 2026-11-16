@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8"/>
-  <link rel="stylesheet" href="/ds-lib/ds-smooth-1.css"/><script>/* smooth page changes: "back" = soft fade */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(){try{if(window.navigation&&navigation.activation)b(navigation.activation.navigationType==='traverse')}catch(e){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
+  <link rel="stylesheet" href="/ds-lib/ds-smooth-3.css"/><script>/* smooth page changes: forward = slide; BACK (button or swipe) = no animation, the page is simply there */(function(){var d=document.documentElement;function b(on){d.classList.toggle('vt-back',!!on)}function tr(a){return !!(a&&a.navigationType==='traverse')}try{var n=performance.getEntriesByType('navigation')[0];b(n&&n.type==='back_forward')}catch(e){}addEventListener('pageshow',function(e){if(e.persisted)b(1)});addEventListener('pagereveal',function(e){try{if(window.navigation&&navigation.activation)b(tr(navigation.activation))}catch(x){}if(e.viewTransition&&d.classList.contains('vt-back'))try{e.viewTransition.skipTransition()}catch(x){}});addEventListener('pageswap',function(e){try{if(e.viewTransition&&tr(e.activation))e.viewTransition.skipTransition()}catch(x){}})})();</script><script src="/ds-lib/ds-smooth-2.js" defer></script><script src="/ds-lib/ds-geo-1.js" defer></script><script src="/ds-lib/ds-track-2.js" defer></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <meta name="theme-color" content="#be185d"/>
   <title>القائمة - خطوة التوصيل</title>
@@ -192,8 +192,12 @@ function dsImgRetry(img){var s=img.getAttribute('src')||'';if(/^https:\/\/cdn\.s
       <div class="rest-header-sub" id="rest-sub-el">قبة · الرياض</div>
     </div>
   </div>
-<script>/* Re-visit: paint the shop photo, logo and name from the saved copy BEFORE the first paint → no grey/pink/"loading" flash */
-(function(){try{var id=new URLSearchParams(location.search).get('id'),c=id&&JSON.parse(sessionStorage.getItem('qibah_menu_'+id)||'null'),r=c&&c.r;if(!r)return;
+<script>/* Re-visit: paint the shop photo, logo and name from the saved copy BEFORE the first paint → no grey/pink/"loading" flash.
+   First visit: the shop is usually already in the saved list of the page the customer came from (home / restaurants / coffee / buffet). */
+(function(){try{var id=new URLSearchParams(location.search).get('id'),c=id&&JSON.parse(sessionStorage.getItem('qibah_menu_'+id)||'null'),r=c&&c.r;
+if(!r&&id){var L=[];try{['ds_list_rest_v1','ds_list_coffee_v1','ds_list_buffet_v1'].forEach(function(k){var x=JSON.parse(localStorage.getItem(k)||'null');if(x&&x.l)L=L.concat(x.l);});var h=JSON.parse(localStorage.getItem('ds_home_v2')||'null');if(h&&h.rests)L=L.concat(h.rests);}catch(e){}
+for(var i=0;i<L.length;i++){if(L[i]&&String(L[i].id)===id){r=L[i];break;}}}
+if(!r)return;
 var hb=document.getElementById('header-bg'),bi=document.getElementById('rest-banner-img'),lg=document.getElementById('rest-logo-el');
 if(r.banner_url){bi.onerror=function(){bi.style.display='none';hb.classList.add('ds-ph-pink');};bi.src=r.banner_url;bi.style.display='block';}else hb.classList.add('ds-ph-pink');
 if(!r.logo_url)lg.classList.add('ds-ph');else{var li=document.createElement('img');li.alt='';li.style.cssText='width:100%;height:100%;object-fit:cover';li.onerror=function(){lg.classList.add('ds-ph');li.remove();};li.src=r.logo_url;lg.textContent='';lg.appendChild(li);}
