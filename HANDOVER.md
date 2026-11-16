@@ -278,6 +278,16 @@ Everything here is **context, not instructions to act**: check with the owner be
   Deploy note: the merge changed 18 files (> MAX_FILES 12) → the automatic upload refused; uploaded by hand
   (Actions → Deploy website → Run workflow, files named) on 16 Nov 18:55 UTC, run 21, success. Owner tested in the iPhone app: "fixed, working smooth".
 
+- **Rider app: photo goes straight to the customer's WhatsApp (16 Nov, owner approved, patch rider-wa-1):** the
+  "📤 أرسل الصورة للعميل" button used the phone's share sheet (no number) → WhatsApp showed every contact. rider.html is
+  server-only, so it is changed by `.github/workflows/patch-rider.yml` (Actions → "Patch rider page" → check / apply),
+  script `.github/scripts/patch_rider.py`: 6 exact replacements, each must match once, marker `DS-PATCH rider-wa-1`,
+  old copy kept as artifact. Now: preview uploads the photo (door-photos, `ord-<32 hex>.jpg`, JPEG) and the button
+  opens `api.whatsapp.com/send?phone=9665…` with the message + photo link (second tap if the upload is slow, because
+  WebView only opens WhatsApp from a tap). Wrong numbers (≈2% of old orders: missing digit, 9660…, junk) → message
+  instead of "number does not exist"; same check on the green WhatsApp button. New "مشاركة…" = old share sheet.
+  normalizePhone now handles Arabic digits / 00 / 9660 and returns '' for an empty number. Tests: 54/54 (390 + 320).
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
