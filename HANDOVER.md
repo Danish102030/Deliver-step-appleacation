@@ -246,7 +246,7 @@ Everything here is **context, not instructions to act**: check with the owner be
   push-test.html and diag.html deleted from public_html by the owner (5 Nov, checked).
 
 - **iPhone app 1.0.6 (15 Nov):** new icon + name «خطوة التوصيل», build 14 (Codemagic workflow "iOS App Store
-  Release" on main), submitted to App Review 15 Nov ("Waiting for Review"). Live before: 1.0.4 (1.0.5 was only a
+  Release" on main), submitted to App Review 15 Nov; **released 16 Nov** (new screenshots may take up to 24 h to show on the App Store). Live before: 1.0.4 (1.0.5 was only a
   TestFlight build). New App Store screenshots (owner approved): brand/appstore/ (1320 x 2868) and
   brand/appstore/medium-6.3/ (1206 x 2622, the slot App Store Connect asked for). Age rating questions answered.
   Apple agreement accepted by the Account Holder (14 Nov).
