@@ -194,7 +194,7 @@ function dsImgRetry(img){var s=img.getAttribute('src')||'';if(/^https:\/\/cdn\.s
   </div>
 <script>/* Re-visit: paint the shop photo, logo and name from the saved copy BEFORE the first paint → no grey/pink/"loading" flash.
    First visit: the shop is usually already in the saved list of the page the customer came from (home / restaurants / coffee / buffet). */
-(function(){try{var id=new URLSearchParams(location.search).get('id'),c=id&&JSON.parse(sessionStorage.getItem('qibah_menu_'+id)||'null'),r=c&&c.r;
+(function(){try{var id=new URLSearchParams(location.search).get('id'),c=id&&JSON.parse(sessionStorage.getItem('qibah_menu_'+id)||(function(){try{var m=JSON.parse(localStorage.getItem('ds_menus_v1')||'{}');return m[id]&&m[id].j;}catch(e){return null}})()||'null'),r=c&&c.r;
 if(!r&&id){var L=[];try{['ds_list_rest_v1','ds_list_coffee_v1','ds_list_buffet_v1'].forEach(function(k){var x=JSON.parse(localStorage.getItem(k)||'null');if(x&&x.l)L=L.concat(x.l);});var h=JSON.parse(localStorage.getItem('ds_home_v2')||'null');if(h&&h.rests)L=L.concat(h.rests);}catch(e){}
 for(var i=0;i<L.length;i++){if(L[i]&&String(L[i].id)===id){r=L[i];break;}}}
 if(!r)return;
@@ -306,13 +306,17 @@ function _menuSig(){
   const ik=menuItems.map(i=>[i.id,i.name,i.price,i.discount_price,i.image_url,i.in_stock,i.category,i.sort_order,i._hasMods,i._fromPrice].join(',')).join(';');
   return rk+'#'+ik;
 }
+/* Instant page: the last 10 menus stay on the phone (3 days) → a menu opened yesterday appears at once. */
+function _dsMenuGet(id){ try{ const m=JSON.parse(localStorage.getItem('ds_menus_v1')||'{}'), c=m[id]; if(c&&Date.now()-c.t<3*864e5) return c.j; }catch(e){} return null; }
+function _dsMenuPut(id,j){ try{ const m=JSON.parse(localStorage.getItem('ds_menus_v1')||'{}'); m[id]={t:Date.now(),j:j};
+  Object.keys(m).sort((a,b)=>m[b].t-m[a].t).slice(10).forEach(k=>delete m[k]); localStorage.setItem('ds_menus_v1',JSON.stringify(m)); }catch(e){ try{ localStorage.removeItem('ds_menus_v1'); }catch(_){} } }
 document.addEventListener('DOMContentLoaded',async()=>{   // start as soon as the page is read (not after every picture) → saved menu paints at once
   const params=new URLSearchParams(window.location.search);
   const id=params.get('id');
   if(!id){window.location.href='/restaurants';return;}
   // Instant paint from the saved copy → no blank, and no flash when re-opening this menu
   try{
-    const c=JSON.parse(sessionStorage.getItem('qibah_menu_'+id)||'null');
+    const c=JSON.parse(sessionStorage.getItem('qibah_menu_'+id)||_dsMenuGet(id)||'null');
     if(c&&c.r&&c.r.category==='ds_store'){location.replace('/shop');return;}
     if(c&&c.items&&c.items.length){currentRestaurant=c.r;menuItems=c.items;loadRestaurant();_fromCache=true;_cachedSig=_menuSig();}
   }catch(e){}
@@ -329,12 +333,16 @@ document.addEventListener('DOMContentLoaded',async()=>{   // start as soon as th
     if(_fromCache){
       // Already painted from cache → enrich quietly, then repaint ONLY if something actually changed (no flash)
       await enhanceModifiers(true);
-      if(_menuSig()!==_cachedSig)loadRestaurant();
+      if(_menuSig()!==_cachedSig){
+        // a price changed since the saved copy → dishes already in the cart get today's price (dishes without options)
+        Object.keys(cart).forEach(k=>{ const c=cart[k], m=menuItems.find(x=>String(x.id)===String(k)); if(c&&m&&!(c.modifiers&&c.modifiers.length)){ const np=m.discount_price||m.price; if(Number(c.item.price)!==Number(np)) c.item.price=np; } });
+        loadRestaurant(); try{updateCartBar();}catch(e){}
+      }
     }else{
       loadRestaurant();          // first visit: menu appears NOW — no waiting on options
       await enhanceModifiers();  // then enrich: instant +, "من ﷼ X" prices & chips
     }
-    try{sessionStorage.setItem('qibah_menu_'+id,JSON.stringify({r:currentRestaurant,items:menuItems}));}catch(e){}
+    try{const _j=JSON.stringify({r:currentRestaurant,items:menuItems});sessionStorage.setItem('qibah_menu_'+id,_j);_dsMenuPut(id,_j);}catch(e){}
   }catch(e){if(!_fromCache)window.location.href='/restaurants';}
 });
 

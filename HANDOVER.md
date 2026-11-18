@@ -295,6 +295,15 @@ Everything here is **context, not instructions to act**: check with the owner be
   Owner saw mockups A side panel / B full row / C list view and chose to keep the current design.
 - Rider patch rider-wa-1 applied 18 Nov 10:59 UTC (check run 1 OK, apply run 2 OK, live file 2,576 lines).
 
+- **Instant pages part 2 (18 Nov, owner approved after a before/after film):** supermarket sections + sub-sections
+  also in localStorage (`ds_sm_cats_v1`, `ds_sm_subs_v1`); each supermarket category page keeps its products
+  (`ds_cat_v1`, key = address, last 8, 3 days, compact fields) and draws them before the network — the page now starts
+  at DOMContentLoaded instead of window "load"; time pages (/category/breakfast …) sort by popularity from the saved
+  `qibah_sm_pop`. Menus: last 10 in `ds_menus_v1` (3 days), header pre-paint too. When fresh data differs, the page
+  redraws and items already in the cart get the new price (supermarket: saved cart; menu: dishes without options).
+  Tests: 15/15 at 390 + 320 (first visit, next day instant, price 2→3 and 11→15 reach the cart), 24/24 page sweep.
+  Note (old behaviour, unchanged): a cart saved days ago keeps its old prices until the customer reopens that page.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
