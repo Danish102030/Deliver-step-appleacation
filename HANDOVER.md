@@ -302,6 +302,7 @@ Everything here is **context, not instructions to act**: check with the owner be
   `qibah_sm_pop`. Menus: last 10 in `ds_menus_v1` (3 days), header pre-paint too. When fresh data differs, the page
   redraws and items already in the cart get the new price (supermarket: saved cart; menu: dishes without options).
   Tests: 15/15 at 390 + 320 (first visit, next day instant, price 2→3 and 11→15 reach the cart), 24/24 page sweep.
+  Live 18 Nov 17:06 UTC (deploy run 23); owner tested: "work good".
   Note (old behaviour, unchanged): a cart saved days ago keeps its old prices until the customer reopens that page.
 
 ## 5. Owner decisions to respect
