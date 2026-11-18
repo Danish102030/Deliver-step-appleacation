@@ -152,7 +152,7 @@ async function loadCatsFromDB() {
       const map = {};
       all.filter(c => c.parent_name).forEach(c => { (map[c.parent_name] = map[c.parent_name] || []).push(c); });
       SUBMAP = map; SUBMAP_OK = true;
-      try { sessionStorage.setItem('qibah_sm_subs', JSON.stringify(map)); } catch(_){}
+      try { sessionStorage.setItem('qibah_sm_subs', JSON.stringify(map)); localStorage.setItem('ds_sm_subs_v1', JSON.stringify(map)); } catch(_){}
     }
     // If fruits & vegetables is missing from results, fetch it directly by ID
     if (!cats.find(c => c.id === FRUIT_VEG_ID)) {
@@ -163,7 +163,7 @@ async function loadCatsFromDB() {
       } catch(e2) {}
     }
     allCats = cats;
-    try { sessionStorage.setItem('qibah_sm_cats', JSON.stringify(cats)); } catch(_){}
+    try { sessionStorage.setItem('qibah_sm_cats', JSON.stringify(cats)); localStorage.setItem('ds_sm_cats_v1', JSON.stringify(cats)); } catch(_){}
   } catch(e) { allCats = getDefaultCats(); }
   if (SUB && SUBMAP[SUB] && SUBMAP[SUB].length) showSubCategories(SUB, SUBMAP[SUB], true);   // refresh the open section quietly
   renderCats(allCats);
@@ -172,7 +172,7 @@ async function loadCatsFromDB() {
 // Instant render from this session's cache (used on back-navigation → no flicker)
 function renderCachedCats(){
   try{
-    const c = sessionStorage.getItem('qibah_sm_cats');
+    const c = sessionStorage.getItem('qibah_sm_cats') || localStorage.getItem('ds_sm_cats_v1');
     if(c){ const cats = JSON.parse(c); if(cats && cats.length){ allCats = cats; renderCats(cats); return true; } }
   }catch(_){}
   return false;
@@ -396,7 +396,7 @@ updateCart();
 renderHero();
 try{ const c=localStorage.getItem('ds_sm_strip_v1'); if(c){ const o=JSON.parse(c); if(o&&Array.isArray(o.s)){ _dsKey=c; _dsSpeed=o.sp||4000; deliverySlider(o.s); } } }catch(e){}
 try{ const c=JSON.parse(localStorage.getItem('ds_sm_count')||'null'); if(c&&c.n) showCount(c.n); }catch(e){}
-try{ const m=JSON.parse(sessionStorage.getItem('qibah_sm_subs')||'null'); if(m&&typeof m==='object'){ SUBMAP=m; SUBMAP_OK=true; } }catch(e){}
+try{ const m=JSON.parse(sessionStorage.getItem('qibah_sm_subs')||localStorage.getItem('ds_sm_subs_v1')||'null'); if(m&&typeof m==='object'){ SUBMAP=m; SUBMAP_OK=true; } }catch(e){}
 renderCachedCats();
 if (history.state && history.state.dsSub) {                 // came back to a section → show it straight away
   SUB = history.state.dsSub;
