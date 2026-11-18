@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="/ds-lib/ds-icons-2.47.0-1.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" media="print" onload="this.media='all'"/>
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"/></noscript>
-  <script src="/map-key.js?v=2"></script><script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
+  <script src="/map-key.js?v=2"></script><script src="/ds-lib/supabase-js-2.117.1.js"></script><script src="/ds-lib/ds-price-1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
   <script src="/ds-order-sync.js" defer></script>
   <style>
     :root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f1f1f;--muted:#6b7280;--border:#f0e4e9;--bg:#fafafa;--green:#16a34a}
@@ -472,6 +472,7 @@ window.addEventListener('load',async()=>{
   _dsApplyPay(); _dsRenderBlock();
   autofillCustomer();
   loadCartItems();calcTotals();tryGPS();
+  _dsPriceRun();   // today's prices: the cart is checked again here (it may be days old)
   checkReferral();
   initLoyalty();
 });
@@ -1018,6 +1019,22 @@ function queuePendingOrder(ov, op, cartArr, vendorOf, ref){
 function flushPendingOrders(){ try{ if(window.dsFlushPendingOrders) window.dsFlushPendingOrders(); }catch(e){} }
 try{ setTimeout(flushPendingOrders, 2500); }catch(e){}
 
+/* Today's prices (ds-lib/ds-price-1.js): on opening the page and again just before the order is sent.
+   A change → yellow note above the items, totals redrawn, and the order waits for the customer to look again. */
+function _dsShowPriceNote(r){
+  const html=window.dsPriceNote?dsPriceNote(r):''; if(!html) return;
+  ['cart-items-list','final-items-list'].forEach(id=>{ const el=document.getElementById(id); if(!el||!el.parentNode) return;
+    let box=document.getElementById(id+'-pnote'); if(!box){ box=document.createElement('div'); box.id=id+'-pnote'; el.parentNode.insertBefore(box,el); }
+    box.innerHTML=html; });
+}
+function _dsPriceApply(r){
+  if(!r||(!r.changed.length&&!r.gone.length)) return false;
+  let left=[]; try{ left=JSON.parse(localStorage.getItem('qibah_cart')||'[]'); }catch(e){}
+  if(!left.length){ showToast('المنتجات في سلتك لم تعد متوفرة'); setTimeout(()=>{ location.href='/cart'; },1500); return true; }
+  _dsShowPriceNote(r); loadCartItems(); calcTotals(); if(currentStep===3) syncFinal();
+  return true;
+}
+async function _dsPriceRun(){ try{ if(window.dsPriceCheck) _dsPriceApply(await dsPriceCheck(sb)); }catch(e){} }
 async function placeOrder(){
   // Admin → Settings rules (pause / supermarket minimum-maximum / payment methods), with the latest settings
   const _pb=document.getElementById('place-btn');
@@ -1027,6 +1044,9 @@ async function placeOrder(){
   if(_blocked)return;
   // Friend gift (free delivery) is for the FIRST order only — re-check with the phone typed in the form
   if(await _refRecheck()){ if(_pb)_pb.disabled=false; return; }
+  // today's prices, last look before sending (max 4 s — a slow network never blocks the order)
+  try{ if(window.dsPriceCheck){ const _pr=await Promise.race([dsPriceCheck(sb),new Promise(x=>setTimeout(()=>x(null),4000))]);
+    if(_dsPriceApply(_pr)){ showToast('تغيّر سعر بعض المنتجات — راجع المجموع ثم أكّد الطلب'); if(_pb)_pb.disabled=false; return; } } }catch(e){}
   const btn=document.getElementById('place-btn');
   btn.innerHTML='<i class="ti ti-loader" style="font-size:18px"></i> جاري تأكيد الطلب...';btn.disabled=true;
 

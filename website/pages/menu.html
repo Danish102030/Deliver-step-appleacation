@@ -409,7 +409,7 @@ function _restoreSavedCart(){
       if((i.vendor||i.restaurant)!==currentRestaurant.name) return;
       const m=menuItems.find(x=>x.id===i.id), mods=Array.isArray(i.modifiers)?i.modifiers:[], q=Math.max(1,Number(i.qty)||1);
       if(m&&!mods.length&&!cart[i.id]) cart[i.id]={item:{...m,price:Number(i.price)},qty:q};
-      else cart[String(i.id)+'_saved'+(k++)]={item:{...(m||{}),id:i.id,name:i.name,price:Number(i.price),image_url:i.image||(m&&m.image_url)||''},qty:q,modifiers:mods};
+      else cart[String(i.id)+'_saved'+(k++)]={item:{...(m||{}),id:i.id,name:i.name,price:Number(i.price),_base:i.base,image_url:i.image||(m&&m.image_url)||''},qty:q,modifiers:mods};
     });
   }catch(e){}
 }
@@ -687,7 +687,7 @@ function proceedToCheckout(){
     showToast('🛍️ يمكنك الطلب من متجرين فقط في نفس السلة');
     return;
   }
-  const cartData=items.map(i=>({id:i.item.id,name:i.item.name,price:i.item.price,qty:i.qty,image:i.item.image_url||'',modifiers:i.modifiers||[],restaurant:r.name,restaurant_wa:r.whatsapp,vendor:r.name,vendor_wa:r.whatsapp||'',vendor_fee:Number(r.delivery_fee)||0}));
+  const cartData=items.map(i=>({id:i.item.id,name:i.item.name,price:i.item.price,base:(i.modifiers&&i.modifiers.length&&i.item._base!=null)?i.item._base:undefined,qty:i.qty,image:i.item.image_url||'',modifiers:i.modifiers||[],restaurant:r.name,restaurant_wa:r.whatsapp,vendor:r.name,vendor_wa:r.whatsapp||'',vendor_fee:Number(r.delivery_fee)||0}));
   const merged=[...others,...cartData];
   localStorage.setItem('qibah_cart',JSON.stringify(merged));
   const distinct=[...new Set(merged.map(vendorOf))];
@@ -861,7 +861,7 @@ function addToCartFromSheet(){
     });
   });
   const cartKey=modItem.id+'_'+Date.now();
-  cart[cartKey]={item:{...modItem,price:finalPrice},qty:modQty,modifiers:modLabels};
+  cart[cartKey]={item:{...modItem,price:finalPrice,_base:base},qty:modQty,modifiers:modLabels};
   updateCartBar();
   closeModSheet();
   showToast('تمت الإضافة! ✓');
