@@ -288,6 +288,13 @@ Everything here is **context, not instructions to act**: check with the owner be
   instead of "number does not exist"; same check on the green WhatsApp button. New "مشاركة…" = old share sheet.
   normalizePhone now handles Arabic digits / 00 / 9660 and returns '' for an empty number. Tests: 54/54 (390 + 320).
 
+- **Admin Orders: item list closes by itself (18 Nov, owner's choice — keep the current cards):** an opened 🧺 list
+  hides 5 s later (thin countdown bar; paused while the mouse is on it, 5 s again after the mouse leaves; touch: each
+  tap gives 5 s more). Survives the 30-s refresh. On close the page is held still (anchor = first card starting on
+  screen). Only above 768 px (the phone layout has its own sheet). admin.html `_itemsAutoHide` / `_itemsHide`.
+  Owner saw mockups A side panel / B full row / C list view and chose to keep the current design.
+- Rider patch rider-wa-1 applied 18 Nov 10:59 UTC (check run 1 OK, apply run 2 OK, live file 2,576 lines).
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
