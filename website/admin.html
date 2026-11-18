@@ -613,6 +613,7 @@ tr:hover td{background:var(--bg)}
 
 /* ─── DASHBOARD GRID ─── */
 .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.ih-bar{height:3px;background:var(--rose-light,#fbcfe8);border-radius:2px;overflow:hidden;margin:-4px 0 8px}.ih-bar>i{display:block;height:100%;width:100%;background:var(--rose,#be185d)}
 .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:11px}
 .bar-label{min-width:80px;color:var(--muted);text-align:right}
 .bar-track{flex:1;height:7px;background:var(--bg);border-radius:4px;overflow:hidden}
@@ -2779,7 +2780,8 @@ function renderOrders(){
   // Restore open items panels
   Object.keys(_openItemsCache).forEach(function(id){
     var el2=document.getElementById('items-'+id);
-    if(el2){el2.innerHTML=_openItemsCache[id];el2.style.display='block';}
+    if(el2){el2.innerHTML=_openItemsCache[id];el2.style.display='block';
+      if(_itemsTimers[id]) _itemsAutoHide(id); else if(_itemsTimers[id]===0) _itemsBar(id,false); }   // after a refresh: countdown starts again (or stays paused under the mouse)
   });
 
   // Auto-load item counts for all visible orders
@@ -2995,9 +2997,46 @@ async function assignRider(name, phone, riderId) {
   showToast('✅ تم تعيين ' + name);
 }
 
+/* Item list auto-hide (owner request 18 Nov 2026): an opened list closes by itself 5 seconds later, so the order
+   cards don't stay stretched. While the mouse is on the list (reading / ✏️) it waits; it starts again when the mouse
+   leaves. A thin bar shows the time left. Big screens only (the phone layout opens orders in its own sheet).
+   When it closes, the page is held in place (no jump up). */
+var _itemsTimers={}, _ITEMS_MS=5000;
+function _itemsAutoOn(){ return window.innerWidth>768; }
+function _itemsBar(id,run){
+  var el=document.getElementById('items-'+id); if(!el) return;
+  var b=el.querySelector('.ih-bar');
+  if(!b){ b=document.createElement('div'); b.className='ih-bar'; b.innerHTML='<i></i>'; el.insertBefore(b,el.firstChild); }
+  var i=b.firstChild; i.style.transition='none'; i.style.width='100%'; void i.offsetWidth;
+  if(run){ i.style.transition='width '+_ITEMS_MS+'ms linear'; i.style.width='0%'; }
+}
+function _itemsAutoHide(id){
+  clearTimeout(_itemsTimers[id]); if(!_itemsAutoOn()) return;
+  _itemsBar(id,true);
+  _itemsTimers[id]=setTimeout(function(){ _itemsHide(id,true); },_ITEMS_MS);
+}
+function _itemsHide(id,keepView){
+  clearTimeout(_itemsTimers[id]); delete _itemsTimers[id]; delete _openItemsCache[id];
+  var el=document.getElementById('items-'+id); if(!el||el.style.display!=='block') return;
+  var anchor=null, top0=0;
+  if(keepView){   // hold the page still: remember a card that is on screen now
+    var cards=document.querySelectorAll('#orders-list>*');
+    for(var k=0;k<cards.length;k++){ if(cards[k].contains(el)) continue; var r=cards[k].getBoundingClientRect(); if(r.top>=0){ anchor=cards[k]; top0=r.top; break; } }
+  }
+  el.style.display='none'; el.innerHTML='';
+  if(anchor){ var d=anchor.getBoundingClientRect().top-top0; if(Math.abs(d)>1) window.scrollBy(0,d); }
+}
+(function(){
+  function pid(e){ var p=e.target&&e.target.closest&&e.target.closest('[id^="items-"]'); return p&&p.style.display==='block'?p.id.slice(6):null; }
+  document.addEventListener('mouseover',function(e){ var id=pid(e); if(id&&_itemsTimers[id]){ clearTimeout(_itemsTimers[id]); _itemsTimers[id]=0; _itemsBar(id,false); } });
+  document.addEventListener('mouseout',function(e){ var id=pid(e); if(!id) return; var to=e.relatedTarget;
+    if(to&&to.closest&&to.closest('#items-'+id)) return;               // still inside the list
+    if(_itemsTimers[id]===0) _itemsAutoHide(id); });
+  document.addEventListener('pointerdown',function(e){ if(e.pointerType==='mouse') return; var id=pid(e); if(id&&_itemsTimers[id]!==undefined) _itemsAutoHide(id); },{passive:true});  // touch: each tap gives 5 s more
+})();
 async function toggleItems(orderId){
   const el=document.getElementById('items-'+orderId);
-  if(el.style.display==='block'){el.style.display='none';delete _openItemsCache[orderId];return;}
+  if(el.style.display==='block'){_itemsHide(orderId,false);return;}
   el.innerHTML='<div style="color:var(--muted);padding:6px 0;font-size:12px">Loading...</div>';
   el.style.display='block';
   try{
@@ -3062,6 +3101,7 @@ async function toggleItems(orderId){
         '<div class="sf-sum-total"><span>Total</span><span>SAR '+total.toFixed(2)+'</span></div>'+
       '</div>';
     _openItemsCache[orderId]=el.innerHTML; // save so re-renders restore this panel
+    _itemsAutoHide(orderId);             // owner 18 Nov: the list closes by itself after 5 s (not while the mouse is on it)
   }catch(e){el.innerHTML='<div style="color:var(--red-text);font-size:12px">Error loading items</div>';}
 }
 
