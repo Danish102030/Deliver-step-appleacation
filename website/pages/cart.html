@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="/ds-lib/ds-icons-2.47.0-1.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" media="print" onload="this.media='all'"/>
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"/></noscript>
-  <script src="/ds-lib/supabase-js-2.117.1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
+  <script src="/ds-lib/supabase-js-2.117.1.js"></script><script src="/ds-lib/ds-price-1.js"></script><script>window.supabase&&window.supabase.createClient||document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"><\/script>')</script>
   <style>
     :root{--rose:#be185d;--rose-dark:#9d174d;--rose-light:#fce7f3;--rose-soft:#fff1f6;--text:#1f1f1f;--muted:#6b7280;--border:#f0e4e9;--bg:#f9f9f9;--white:#fff;--green:#16a34a}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -190,6 +190,7 @@ function _cartBlockedTap(){
   const c=document.getElementById('ds-rule'); if(c)c.scrollIntoView({behavior:'smooth',block:'center'});
 }
 
+let _dsPriceRes=null;   // today's-price check result (ds-lib/ds-price-1.js) → yellow note + ~~old~~ new price
 async function loadCart() {
   if(!_settingsLoaded) await loadDeliverySettings();
   const cart = JSON.parse(localStorage.getItem('qibah_cart') || '[]');
@@ -279,7 +280,7 @@ async function loadCart() {
             </div>
             <div class="item-body">
               <div class="item-name">${item.name}</div>
-              <div class="item-price">SAR ${item.price.toFixed(2)}</div>
+              <div class="item-price">${(()=>{ const c=_dsPriceRes&&_dsPriceRes.changed.find(x=>x.id===String(item.id)); return c?`<span style="text-decoration:line-through;color:#9ca3af;font-size:11px;margin-left:5px">SAR ${Number(c.old).toFixed(2)}</span>SAR ${Number(item.price).toFixed(2)} <span style="font-size:10.5px;background:#fef3c7;color:#92400e;border-radius:6px;padding:1px 6px;font-weight:700">سعر اليوم</span>`:`SAR ${Number(item.price).toFixed(2)}`; })()}</div>
             </div>
             <div class="qty-ctrl">
               <button class="qty-btn qty-m" onclick="changeQty('${item.id}',-1)"><i class="ti ti-minus" style="font-size:11px"></i></button>
@@ -293,6 +294,7 @@ async function loadCart() {
 
   content.innerHTML = `
     <div class="body">
+      ${window.dsPriceNote?dsPriceNote(_dsPriceRes):''}
       ${_dsRuleCard(_blk)}
       ${restBanner}
       <div class="card">
@@ -423,8 +425,11 @@ function showToast(msg) {
 }
 
 window.addEventListener('load', async () => {
+  const _pc = window.dsPriceCheck ? dsPriceCheck(sb).catch(()=>null) : Promise.resolve(null);   // today's prices (runs side by side)
   await loadDeliverySettings();
   await loadCart();
+  const r = await _pc;
+  if (r && (r.changed.length || r.gone.length)) { _dsPriceRes = r; await loadCart(); }
 });
 </script>
 <script src="/ds-lib/ds-cart-remind-2.js" defer></script>

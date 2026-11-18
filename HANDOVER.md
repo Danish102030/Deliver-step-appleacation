@@ -302,7 +302,18 @@ Everything here is **context, not instructions to act**: check with the owner be
   `qibah_sm_pop`. Menus: last 10 in `ds_menus_v1` (3 days), header pre-paint too. When fresh data differs, the page
   redraws and items already in the cart get the new price (supermarket: saved cart; menu: dishes without options).
   Tests: 15/15 at 390 + 320 (first visit, next day instant, price 2→3 and 11→15 reach the cart), 24/24 page sweep.
+  Live 18 Nov 17:06 UTC (deploy run 23); owner tested: "work good".
   Note (old behaviour, unchanged): a cart saved days ago keeps its old prices until the customer reopens that page.
+
+- **Cart always uses today's prices (18 Nov, owner approved after a before/after mockup):** `ds-lib/ds-price-1.js`
+  (`dsPriceCheck(sb)`, `dsPriceNote(r)`), used by cart.html (on open, side by side with the settings) and
+  checkout.html (on open + last look in placeOrder, max 4 s, a slow network never blocks the order). Each cart line
+  with a uuid id is looked up (supermarket → supermarket_products.price; others → menu_items discount_price||price):
+  changed price → line updated (dishes with options only when the line has `base` — menu.html now saves it); product
+  is_active=false or in_stock=false → taken out; not found / parcel / pharmacy / متجر خطوة cards / old ids → untouched.
+  Yellow note «🔄 حدّثنا سلتك بأسعار اليوم» + ~~old~~ new + «سعر اليوم». Price changed during checkout → order waits,
+  toast «تغيّر سعر بعض المنتجات — راجع المجموع ثم أكّد الطلب». Everything sold out → back to /cart.
+  Tests 22/22 at 390 + 320 (incl. unchanged → order sent; 6-s slow check → sent after ~4 s), 24/24 sweep, 15/15 instant.
 
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
