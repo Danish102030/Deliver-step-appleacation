@@ -1035,22 +1035,35 @@ function _dsPriceApply(r){
   return true;
 }
 async function _dsPriceRun(){ try{ if(window.dsPriceCheck) _dsPriceApply(await dsPriceCheck(sb)); }catch(e){} }
+/* One order per tap (19 Nov 2026): a second tap while the first was still checking (rules, friend gift, today's
+   prices) started a SECOND order 1 second later — the first had already emptied the cart, so the second had no
+   items, only the delivery fee (DS-538448). Now: one run at a time, the button stays off the whole time, and an
+   empty cart is never sent. */
+let _dsPlacing=false;
 async function placeOrder(){
+  if(_dsPlacing) return;
+  _dsPlacing=true;
+  try{ return await _dsPlaceOrderRun(); } finally { _dsPlacing=false; }
+}
+async function _dsPlaceOrderRun(){
   // Admin → Settings rules (pause / supermarket minimum-maximum / payment methods), with the latest settings
   const _pb=document.getElementById('place-btn');
   if(_pb){ if(_pb.disabled)return; _pb.disabled=true; }
   const _blocked=await _dsRulesBlocked();
-  if(_pb)_pb.disabled=false;
-  if(_blocked)return;
+  if(_blocked){ if(_pb)_pb.disabled=false; return; }
   // Friend gift (free delivery) is for the FIRST order only — re-check with the phone typed in the form
   if(await _refRecheck()){ if(_pb)_pb.disabled=false; return; }
   // today's prices, last look before sending (max 4 s — a slow network never blocks the order)
   try{ if(window.dsPriceCheck){ const _pr=await Promise.race([dsPriceCheck(sb),new Promise(x=>setTimeout(()=>x(null),4000))]);
     if(_dsPriceApply(_pr)){ showToast('تغيّر سعر بعض المنتجات — راجع المجموع ثم أكّد الطلب'); if(_pb)_pb.disabled=false; return; } } }catch(e){}
   const btn=document.getElementById('place-btn');
+  const _dsPlaceLabel=btn.innerHTML;
   btn.innerHTML='<i class="ti ti-loader" style="font-size:18px"></i> جاري تأكيد الطلب...';btn.disabled=true;
 
   const cart=JSON.parse(localStorage.getItem('qibah_cart')||'[]');
+  if(!Array.isArray(cart)||!cart.length){   // never send an order with no items (e.g. a tap right after the order was sent)
+    btn.disabled=false; btn.innerHTML=_dsPlaceLabel||btn.innerHTML; return;
+  }
   const sub=cart.reduce((s,i)=>s+i.price*i.qty,0); _vatNow();
   const _lines=_dsSplitFees(cart);   // card and «رسوم الخدمة» as separate order lines
   const del=getDeliveryFee(sub),cDisc=appliedCoupon?appliedCoupon.discount_amount:0,rDisc=Math.min(Number(refCredit||0),Math.max(0,sub+del+VAT-cDisc)),disc=cDisc+rDisc,tot=sub+del+VAT-disc;

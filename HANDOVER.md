@@ -326,6 +326,13 @@ Everything here is **context, not instructions to act**: check with the owner be
   card «Account deletion requests» (list: `admin_deletion_requests()`); customer sees «تم استلام طلب حذف حسابك … 24 ساعة».
   Rolled-back test 15/15 before applying (it found + fixed a crash when request.headers is empty).
 
+- **Ghost orders from a double tap (fixed 19 Nov):** DS-538448 (0 items, 5.50 = delivery only) came 1 s after the
+  real order DS-613154 of the same customer, with its own client_ref. placeOrder re-enabled «تأكيد الطلب» after the
+  rules check and then waited (friend gift + today's prices from PR #23) → a second tap started a second order after the
+  first had emptied the cart. Same kind of ghosts on 9–11 Nov. Fix in checkout.html: one run at a time (`_dsPlacing`),
+  the button stays off the whole time, an empty cart is never sent. Test: 2 and 3 fast taps → 1 order (old code: 2 / 3).
+  Idea for later (needs owner OK): place_order could refuse an order with no items.
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
