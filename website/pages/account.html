@@ -872,15 +872,28 @@ function confirmLogout(){if(!confirm('هل تريد تسجيل الخروج؟'))
 async function confirmDeleteAccount(){
   if(!confirm('هل أنت متأكد من حذف حسابك؟\nسيتم حذف بياناتك الشخصية نهائياً ولا يمكن التراجع.'))return;
   if(!confirm('تأكيد نهائي: سيتم حذف حسابك وبياناتك بشكل دائم.\nهل تريد المتابعة؟'))return;
-  // The database removes the name and phone from all this number's orders and deletes the profile
+  // Security F1 (Nov 2026): this sends a deletion REQUEST — the owner approves it in Admin (within 24 h), so a stranger
+  // who types someone else's number can't wipe their account. The database then removes name + phone from the orders.
   let ok=false;
-  try{ const r=await sb.rpc('delete_my_account',{p_phone:currentPhone}); ok=!!(r&&!r.error&&r.data&&r.data.ok); }catch(e){}
-  if(!ok){ showToast('تعذّر حذف الحساب الآن — تحقق من الإنترنت وحاول مجدداً'); return; }
+  let _delPending=false,_delWhy='';
+  try{ const r=await sb.rpc('delete_my_account',{p_phone:currentPhone}); ok=!!(r&&!r.error&&r.data&&r.data.ok); _delPending=!!(r&&r.data&&r.data.pending); _delWhy=(r&&r.data&&r.data.why)||''; }catch(e){}
+  if(!ok){ showToast(_delWhy==='too_many'?'محاولات كثيرة — حاول بعد ساعة':'تعذّر حذف الحساب الآن — تحقق من الإنترنت وحاول مجدداً'); return; }
   ['ds_customer','ds_favorites','ds_free_delivery','ds_ref_mycode','ds_track_phone'].forEach(function(k){ try{localStorage.removeItem(k);}catch(e){} });
   currentPhone='';allOrders=[];loyState=null;
   document.getElementById('phone-input').value='';
-  showToast('تم حذف الحساب بنجاح');
   showScreen('screen-login');
+  if(_delPending) _delRequestDone(); else showToast('تم حذف الحساب بنجاح');
+}
+function _delRequestDone(){
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(15,8,12,.55);z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px;font-family:Tajawal,sans-serif';
+  ov.innerHTML='<div style="background:#fff;border-radius:22px;max-width:360px;width:100%;padding:24px 20px;text-align:center;direction:rtl">'+
+    '<div style="font-size:44px;margin-bottom:6px">🗑️</div>'+
+    '<div style="font-size:18px;font-weight:900;color:#1a1022;margin-bottom:8px">تم استلام طلب حذف حسابك</div>'+
+    '<div style="font-size:14px;color:#6b7280;line-height:1.8;margin-bottom:16px">سيتم حذف بياناتك الشخصية خلال <b>24 ساعة</b>.<br>إذا لم تطلب ذلك بنفسك، تواصل معنا على واتساب.</div>'+
+    '<button style="width:100%;background:#be185d;color:#fff;border:none;border-radius:14px;padding:13px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer">حسناً</button></div>';
+  ov.querySelector('button').onclick=()=>ov.remove();
+  document.body.appendChild(ov);
 }
 function saveToStorage(p){localStorage.setItem('ds_customer',JSON.stringify(p));}
 function getProfile(){try{return JSON.parse(localStorage.getItem('ds_customer')||'null');}catch(e){return null;}}

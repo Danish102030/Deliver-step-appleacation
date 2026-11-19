@@ -1034,6 +1034,7 @@ tr:hover td{background:var(--bg)}
 
       <!-- ── DASHBOARD ── -->
       <div class="section active" id="section-dashboard">
+        <div id="del-req-card" style="display:none"></div><!-- account deletion requests (security F1) -->
 
         <!-- Greeting + Period Tabs -->
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px">
@@ -3364,7 +3365,45 @@ function renderFreeDeliveries(d){
 }
 function fdOpenOrder(num){ goSection('orders'); setTimeout(function(){ ordSearchPhone(num); },350); }
 
+/* Account deletion requests (security F1, Nov 2026): a customer's "delete my account" is a request; the owner
+   approves it here (call the customer if unsure). Approve = the old deletion: name + phone removed from all orders,
+   profile and referral account deleted (a copy is kept 30 days). Hidden when there is nothing waiting. */
+var _delReqs=[], _delReqsT=0;
+async function loadDelReqs(force){
+  if(!force&&Date.now()-_delReqsT<60000){ renderDelReqs(); return; }
+  _delReqsT=Date.now();
+  try{ const r=await sb.rpc('admin_deletion_requests'); _delReqs=(r&&!r.error&&Array.isArray(r.data))?r.data:[]; }catch(e){ _delReqs=[]; }
+  renderDelReqs();
+}
+function _ago(t){ const m=Math.max(0,Math.round((Date.now()-new Date(t).getTime())/60000)); return m<60?m+' min ago':m<1440?Math.round(m/60)+' h ago':Math.round(m/1440)+' days ago'; }
+function renderDelReqs(){
+  const el=document.getElementById('del-req-card'); if(!el) return;
+  const p=_delReqs.filter(x=>x.pending);
+  if(!p.length){ el.style.display='none'; el.innerHTML=''; return; }
+  el.style.display='';
+  el.innerHTML='<div style="background:#fff;border:1.5px solid #fecaca;border-radius:14px;padding:14px 16px;margin-bottom:16px;box-shadow:0 4px 14px rgba(185,28,28,.06)">'+
+    '<div style="display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;color:#b91c1c"><i class="ti ti-user-x" style="font-size:18px"></i>Account deletion requests ('+p.length+')</div>'+
+    '<div style="font-size:12px;color:var(--muted);margin:3px 0 10px">The customer was told: deleted within 24 hours. Not sure it was really them? Call first.</div>'+
+    p.map(x=>'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--border)">'+
+      '<div style="flex:1;min-width:180px"><div style="font-weight:700">'+escHtml(x.name||'—')+' · <span dir="ltr">'+escHtml(x.phone)+'</span></div>'+
+      '<div style="font-size:12px;color:var(--muted)">'+(x.orders||0)+' orders'+(x.last_order?' · last '+_ago(x.last_order):'')+' · asked '+_ago(x.requested_at)+'</div></div>'+
+      '<a href="tel:'+escHtml(x.phone)+'" style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--text);text-decoration:none">📞 Call</a>'+
+      '<button onclick="decideDelReq('+Number(x.id)+',false)" style="border:1px solid var(--border);background:#fff;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Reject</button>'+
+      '<button onclick="decideDelReq('+Number(x.id)+',true)" style="border:none;background:#b91c1c;color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Delete account</button>'+
+    '</div>').join('')+'</div>';
+}
+async function decideDelReq(id,approve){
+  const x=_delReqs.find(r=>Number(r.id)===Number(id)); if(!x) return;
+  if(approve&&!confirm('Delete the account of '+(x.name||x.phone)+'?\n\nName and phone are removed from all '+(x.orders||0)+' orders (the orders stay for your records). Profile and referral account are deleted. This cannot be undone from the app.')) return;
+  if(!approve&&!confirm('Reject this request? (e.g. the customer says they did not ask for it)')) return;
+  try{ const r=await sb.rpc('admin_deletion_decide',{p_id:Number(id),p_approve:!!approve});
+    if(r.error||!r.data||!r.data.ok){ showToast('⚠️ '+((r.error&&r.error.message)||'Could not save')); return; }
+    showToast(approve?'✅ Account deleted ('+((r.data.result&&r.data.result.orders)||0)+' orders anonymised)':'Request rejected');
+  }catch(e){ showToast('⚠️ Could not save — check the internet'); return; }
+  loadDelReqs(true);
+}
 function renderDashboard(){
+  try{ loadDelReqs(false); }catch(e){}
   try{ loadFreeDeliveries(false); }catch(e){}
   // (chart data comes from _dashOrders(), which is cached 45s so auto-refreshes don't re-fetch.
   //  A manual Dashboard-tab tap forces a fresh pull — see goSection.)
@@ -5455,6 +5494,8 @@ async function deletePharmacy(id,name){
     if(pend)rows.push(['#d97706',pend+' order'+(pend>1?'s':'')+' waiting for a rider',"mAttnGo('pending')"]);
     if(hold)rows.push(['#ea580c',hold+' order'+(hold>1?'s':'')+' to check first',"mAttnGo('all')"]);
     if(ref)rows.push(['#db2777',ref+' referral'+(ref==='1'?'':'s')+' to approve',"goSection('referrals')"]);
+    var dreq=(window._delReqs||[]).filter(function(x){ return x.pending; }).length;
+    if(dreq)rows.push(['#b91c1c',dreq+' account deletion request'+(dreq>1?'s':''),"goSection('dashboard');setTimeout(function(){var c=document.getElementById('del-req-card');if(c)c.scrollIntoView({behavior:'smooth'});},300)"]);
     box.innerHTML=rows.length?rows.map(function(r){ return '<div class="m-attn-r" onclick="'+r[2]+'"><span class="dot" style="background:'+r[0]+'"></span>'+r[1]+'<i class="ti ti-chevron-right"></i></div>'; }).join('')
       :'<div class="m-attn-ok">✅ All clear — nothing waiting right now</div>';
   }

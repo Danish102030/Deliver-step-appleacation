@@ -315,6 +315,17 @@ Everything here is **context, not instructions to act**: check with the owner be
   toast «تغيّر سعر بعض المنتجات — راجع المجموع ثم أكّد الطلب». Everything sold out → back to /cart.
   Tests 22/22 at 390 + 320 (incl. unchanged → order sent; 6-s slow check → sent after ~4 s), 24/24 sweep, 15/15 instant.
 
+- **Security F1 — account protection without codes (applied 19 Nov, owner "go"; migration
+  `security_step_f1_account_protection`, files supabase/security_step_f1.sql + _rollback.sql):**
+  `_ds_lookup_ok(key)` = max 30 different phones (or phone#order pairs) per internet address (x-forwarded-for) per
+  hour in my_orders / track_order / customer_cancel_info / customer_cancel_order / save_my_profile / delete request
+  (table ds_work.phone_lookups; no address → never blocked). These functions are VOLATILE now (they write) — always call
+  them with POST (supabase-js rpc does). track_order: address + lat/lng only while active (< 24 h, not delivered /
+  cancelled). delete_my_account = request (ds_work.account_deletion_requests); the old deletion is
+  `_ds_delete_account_now` (no public execute), run by `admin_deletion_decide(id, approve)` from the Admin Dashboard
+  card «Account deletion requests» (list: `admin_deletion_requests()`); customer sees «تم استلام طلب حذف حسابك … 24 ساعة».
+  Rolled-back test 15/15 before applying (it found + fixed a crash when request.headers is empty).
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".

@@ -53,7 +53,7 @@ the database catalog, and the Supabase API edge logs (logs are kept ~7 days; 2 f
 
 | # | Finding | Severity | Status |
 |---|---|---|---|
-| F1 | Customer RPCs trust **only a phone number** (`delete_my_account`, `my_orders`, `save_my_profile`, `track_order` (returns address + GPS), `customer_cancel_*`, loyalty/referral) | High–Medium | **Open by owner decision** (see §6) |
+| F1 | Customer RPCs trust **only a phone number** (`delete_my_account`, `my_orders`, `save_my_profile`, `track_order` (returns address + GPS), `customer_cancel_*`, loyalty/referral) | High–Medium | **Reduced (Step F1, 19 Nov):** 30 numbers/hour per address, address only for active orders, delete = admin-approved request. No login codes (owner decision, §6) |
 | F2 | `duty_shifts`: public read/insert/update policies (193 shifts readable by anyone) | Medium | **Fixed (Step B)** |
 | F3 | `notif_clicks`: public read/write policy (228 rows) | Low | **Fixed (Step B)** |
 | F4 | `page_visits`: policy named "Admin can read visits" allowed **everyone** (29,221 rows) | Low | **Fixed (Step B)** |
@@ -115,9 +115,9 @@ characters (`crypto.getRandomValues`), extension whitelisted (jpg, jpeg, png, we
 
 ## 7. Open items / recommended next steps
 
-1. **Light protection without codes** (proposed, waiting for owner): limit how many different phone numbers one
-   device/IP can look up per day; make "delete my account" a request confirmed by admin; return the delivery
-   address/GPS from `track_order` only while the order is active.
+1. ~~Light protection without codes~~ — done 19 Nov as **Step F1** (`supabase/security_step_f1.sql`): max 30 different
+   numbers per internet address per hour, `track_order` address/GPS only while active, delete = request approved in
+   Admin (`_ds_delete_account_now` not callable by the app). Other projects: call these RPCs with POST (they are VOLATILE).
 2. ~~Delete `push-test.html` and `diag.html`~~ — done 5 Nov.
 3. **Fix `rider.html`** (escape `door_photo_url`, open it with `window.open` on a validated https URL).
 4. Optional: make `door-photos` fully private with short-lived signed links (would break old WhatsApp links).
