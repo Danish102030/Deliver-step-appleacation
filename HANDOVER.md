@@ -333,6 +333,14 @@ Everything here is **context, not instructions to act**: check with the owner be
   the button stays off the whole time, an empty cart is never sent. Test: 2 and 3 fast taps → 1 order (old code: 2 / 3).
   Idea for later (needs owner OK): place_order could refuse an order with no items.
 
+- **Notification page: clear numbers + orders after each notification (19 Nov, owner "fix"):** new
+  `ds-lib/admin-marketing-3.js` (admin.html _LAZY points to it; -2 stays for old copies). KPIs: Total devices · 🟢 Active
+  this week (device_tokens.last_seen < 7 d) · Sent / Clicks for the last 30 days only (before, deliveries + clicks were
+  all-time) · 🛒 Extra orders (30 days) = Σ(orders in 3 h after − average of the same 3 h on the 14 days before), only
+  notifications with ≥ 50 recipients. Each sent notification gets a chip «🛒 X orders in 3 h · normal Y · ±Z» (green ≥ +1.5,
+  red ≤ −1.5, «measuring…» for the first 3 h). Orders (75 days, not deleted/cancelled) are loaded once, cached 5 min.
+  Real data check (19 Nov): offers with a named shop at ~8 PM ≈ +3…+5 orders; greetings ≈ 0. Tests 20/20 (1366 + 390).
+
 ## 5. Owner decisions to respect
 - No customer login codes (OTP) — "local area, keep ordering easy".
 - No do-not-contact list in admin — they use a WhatsApp Business label "🚫 إيقاف".
